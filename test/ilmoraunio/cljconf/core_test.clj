@@ -24,7 +24,10 @@
 (deftest rules-test
   (testing "allow rules"
     (testing "triggered"
-      (is (= {"test-resources/test.yaml" [{:message :cljconf/rule-validation-failed
+      (is (= {"test-resources/test.yaml" [{:message "port should be 80"
+                                           :name "allow-malli-rule"
+                                           :rule-type :allow}
+                                          {:message :cljconf/rule-validation-failed
                                            :name "allow-my-absolute-bare-rule"
                                            :rule-type :allow}
                                           {:message "port should be 80"
@@ -45,17 +48,22 @@
                #'ilmoraunio.cljconf.example-rules/allow-my-rule
                #'ilmoraunio.cljconf.example-rules/differently-named-allow-rule
                #'ilmoraunio.cljconf.example-rules/allow-my-bare-rule
-               #'ilmoraunio.cljconf.example-rules/allow-my-absolute-bare-rule))))
+               #'ilmoraunio.cljconf.example-rules/allow-my-absolute-bare-rule
+               #'ilmoraunio.cljconf.example-rules/allow-malli-rule))))
     (testing "not triggered"
       (is (= {} (conftest/test
                   test-input-yaml
                   #'ilmoraunio.cljconf.example-rules/allow-my-rule
                   #'ilmoraunio.cljconf.example-rules/differently-named-allow-rule
                   #'ilmoraunio.cljconf.example-rules/allow-my-bare-rule
-                  #'ilmoraunio.cljconf.example-rules/allow-my-absolute-bare-rule)))))
+                  #'ilmoraunio.cljconf.example-rules/allow-my-absolute-bare-rule
+                  #'ilmoraunio.cljconf.example-rules/allow-malli-rule)))))
   (testing "deny rules"
     (testing "triggered"
-      (is (= {"test-resources/test.yaml" [{:message :cljconf/rule-validation-failed
+      (is (= {"test-resources/test.yaml" [{:message "port should not be 80"
+                                           :name "deny-malli-rule"
+                                           :rule-type :deny}
+                                          {:message :cljconf/rule-validation-failed
                                            :name "deny-my-absolute-bare-rule"
                                            :rule-type :deny}
                                           {:message "port should not be 80"
@@ -72,7 +80,8 @@
                #'ilmoraunio.cljconf.example-rules/deny-my-rule
                #'ilmoraunio.cljconf.example-rules/differently-named-deny-rule
                #'ilmoraunio.cljconf.example-rules/deny-my-bare-rule
-               #'ilmoraunio.cljconf.example-rules/deny-my-absolute-bare-rule))))
+               #'ilmoraunio.cljconf.example-rules/deny-my-absolute-bare-rule
+               #'ilmoraunio.cljconf.example-rules/deny-malli-rule))))
     (testing "not triggered"
       (is (= {}
              (conftest/test
@@ -84,9 +93,13 @@
                #'ilmoraunio.cljconf.example-rules/deny-my-rule
                #'ilmoraunio.cljconf.example-rules/differently-named-deny-rule
                #'ilmoraunio.cljconf.example-rules/deny-my-bare-rule
-               #'ilmoraunio.cljconf.example-rules/deny-my-absolute-bare-rule)))))
+               #'ilmoraunio.cljconf.example-rules/deny-my-absolute-bare-rule
+               #'ilmoraunio.cljconf.example-rules/deny-malli-rule)))))
   (testing "resolve functions via namespace"
-    (is (= {"test-resources/test.yaml" [{:message :cljconf/rule-validation-failed
+    (is (= {"test-resources/test.yaml" [{:message "port should not be 80"
+                                         :name "deny-malli-rule"
+                                         :rule-type :deny}
+                                        {:message :cljconf/rule-validation-failed
                                          :name "deny-my-absolute-bare-rule"
                                          :rule-type :deny}
                                         {:message "port should not be 80"
@@ -104,7 +117,10 @@
            (conftest/test
              test-input-yaml
              (the-ns 'ilmoraunio.cljconf.example-rules))))
-    (is (= {"test-resources/test.yaml" [{:message :cljconf/rule-validation-failed
+    (is (= {"test-resources/test.yaml" [{:message "port should be 80"
+                                         :name "allow-malli-rule"
+                                         :rule-type :allow}
+                                        {:message :cljconf/rule-validation-failed
                                          :name "allow-my-absolute-bare-rule"
                                          :rule-type :allow}
                                         {:message "port should be 80"
@@ -135,4 +151,14 @@
     )
   (testing "exceptions"
     ; TODO
-    ))
+    )
+  (testing "vector inputs"
+    ; TODO
+    )
+  (testing "malli schemas"
+    ; TODO
+    )
+  (testing "map-based rules"
+    ; TODO
+    )
+  )

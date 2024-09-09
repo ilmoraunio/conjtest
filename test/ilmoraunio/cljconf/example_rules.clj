@@ -31,6 +31,15 @@
        (= "Service" (get input "kind"))
        (= 80.0 (get-in input ["spec" "ports" 0 "port"]))))
 
+(def allow-malli-rule
+  {:type :allow
+   :name "allow-malli-rule"
+   :message "port should be 80"
+   :rule [:map
+          ["apiVersion" [:= "v1"]]
+          ["kind" [:= "Service"]]
+          ["spec" [:map ["ports" [:+ [:map ["port" [:= 80.0]]]]]]]]})
+
 (defn ^{:rule/type :deny
         :rule/message "port should not be 80"}
       deny-my-rule
@@ -60,6 +69,15 @@
   (and (= "v1" (get input "apiVersion"))
        (= "Service" (get input "kind"))
        (= 80.0 (get-in input ["spec" "ports" 0 "port"]))))
+
+(def deny-malli-rule
+  {:type :deny
+   :name "deny-malli-rule"
+   :message "port should not be 80"
+   :rule [:map
+          ["apiVersion" [:= "v1"]]
+          ["kind" [:= "Service"]]
+          ["spec" [:map ["ports" [:+ [:map ["port" [:= 80.0]]]]]]]]})
 
 (defn kikka-my-bare-rule
   [input]
