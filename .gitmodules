@@ -1,0 +1,6 @@
+[submodule "pod-conftest-clj"]
+	path = pod-conftest-clj
+	url = git@github.com:ilmoraunio/pod-conftest-clj.git
+[submodule "pod-conftest-parser"]
+	path = pod-conftest-parser
+	url = git@github.com:ilmoraunio/pod-conftest-parser.git
