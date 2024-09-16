@@ -1,20 +1,11 @@
 (ns ilmoraunio.cljconf.core-test
-  (:require [clojure.test :refer [deftest testing is]]
+  (:require [clojure.string :as str]
+            [clojure.test :refer [deftest testing is]]
             [ilmoraunio.cljconf.core :as conftest]
             [ilmoraunio.cljconf.example-rules]))
 
 (def test-input-yaml
   {"test-resources/test.yaml" {"apiVersion" "v1"
-                               "kind" "Service"
-                               "metadata" {"name" "hello-kubernetes"}
-                               "spec" {"type" "LoadBalancer"
-                                       "ports" [{"port" 80.0 "targetPort" 8080.0}]
-                                       "selector" {"app" "hello-kubernetes"}}}})
-
-(def test-input-full
-  {"test-resources/test.json" {:hello [1 2 4]}
-   "test-resources/test.edn" {:foo :bar}
-   "test-resources/test.yaml" {"apiVersion" "v1"
                                "kind" "Service"
                                "metadata" {"name" "hello-kubernetes"}
                                "spec" {"type" "LoadBalancer"
@@ -146,19 +137,24 @@
                                         0
                                         "port"] 9999.0)
              (the-ns 'ilmoraunio.cljconf.example-rules)))))
-  (testing "multiple inputs"
-    ; TODO
-    )
-  (testing "exceptions"
-    ; TODO
-    )
+  (testing "multiple map entries"
+    (is (= {"test-resources/test.2.yaml" [{:message "port should be 80", :name "allow-my-rule", :rule-type :allow}],
+            "test-resources/test.yaml" [{:message "port should not be 80", :name "deny-my-rule", :rule-type :deny}]}
+           (conftest/test (merge test-input-yaml
+                                 (assoc-in {"test-resources/test.2.yaml" (first (vals test-input-yaml))}
+                                           ["test-resources/test.2.yaml"
+                                            "spec"
+                                            "ports"
+                                            0
+                                            "port"] 9999.0))
+                          #'ilmoraunio.cljconf.example-rules/deny-my-rule
+                          #'ilmoraunio.cljconf.example-rules/allow-my-rule))))
   (testing "vector inputs"
-    ; TODO
-    )
-  (testing "malli schemas"
-    ; TODO
-    )
-  (testing "map-based rules"
-    ; TODO
-    )
-  )
+    (is (= [{:message "port should not be 80", :name "deny-my-rule", :rule-type :deny}]
+           (conftest/test [(first (vals test-input-yaml))
+                           (assoc-in (first (vals test-input-yaml))
+                                     ["spec"
+                                      "ports"
+                                      0
+                                      "port"] 9999.0)]
+                          #'ilmoraunio.cljconf.example-rules/deny-my-rule)))))
