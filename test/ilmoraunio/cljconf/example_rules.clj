@@ -1,5 +1,4 @@
-(ns ilmoraunio.cljconf.example-rules
-  (:require [clojure.test :refer :all]))
+(ns ilmoraunio.cljconf.example-rules)
 
 (defn ^{:rule/type :allow
         :rule/message "port should be 80"}

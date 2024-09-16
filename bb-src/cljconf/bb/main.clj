@@ -1,5 +1,6 @@
 (ns cljconf.bb.main
   (:require [babashka.cli :as cli]
+            [babashka.tasks :as tasks]
             [clojure.string :as str]
             [cljconf.bb.api]))
 
@@ -37,15 +38,20 @@
    :restrict [:parser :policy :help]})
 
 (defn test
-  [m]
-  (let [{:keys [#_args opts] :as m} (cli/parse-args m test-cli-spec)]
+  [args]
+  (prn "args" args)
+  (let [{:keys [#_args opts] :as m} (cli/parse-args args test-cli-spec)]
     (prn ::parse-args m)
     (if (or (:help opts) (:h opts))
       (println (show-help test-cli-spec))
       (cljconf.bb.api/test m))))
 
 (defn -main
-  [command args]
-  (prn ::args args)
-  (case command
-    :test (test args)))
+  [& args]
+  (let [command (keyword (first args))
+        args (rest args)]
+    (case command
+      :test (test args))))
+
+(comment
+  (-main "test" "test.yaml" "--policy" "test/ilmoraunio/cljconf/example_rules.clj"))
