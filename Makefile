@@ -1,12 +1,15 @@
 BUILD_FILES=target cljconf
 
-pod-conftest-clj/pod-conftest-clj:
-	@make -C pod-conftest-clj build-macos-aarch64
+pod-ilmoraunio-conftest-clj/pod-ilmoraunio-conftest-clj:
+	@make -C pod-ilmoraunio-conftest-clj build-macos-aarch64
+
+pod-ilmoraunio-conftest/pod-ilmoraunio-conftest:
+	@make -C pod-ilmoraunio-conftest build
 
 .PHONY: default
-default: pod-conftest-clj/pod-conftest-clj
+default: pod-ilmoraunio-conftest-clj/pod-ilmoraunio-conftest-clj pod-ilmoraunio-conftest/pod-ilmoraunio-conftest
 
-build-macos-aarch64: pod-conftest-clj/pod-conftest-clj
+build-macos-aarch64: pod-ilmoraunio-conftest-clj/pod-ilmoraunio-conftest-clj
 	./scripts/build_macos.sh
 
 .PHONY: clean

@@ -2,7 +2,7 @@
   (:require [babashka.fs :as fs]
             [clojure.string :as str]
             [ilmoraunio.cljconf.core :as cljconf]
-            [pod-conftest-clj.api :as api]
+            [pod-ilmoraunio-conftest-clj.api :as api]
             [sci.core :as sci]))
 
 (def default-namespaces
