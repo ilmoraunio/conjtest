@@ -53,5 +53,7 @@
   (test {:args ["test.yaml"], :opts {:policy #{"test/ilmoraunio/cljconf/example_rules.clj"}}})
   ;; ```
   ;; $ bb test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj
+  ;; $ bb --jar target/cljconf.jar test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj
+  ;; $ ./cljconf test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj
   ;; ```
   )
