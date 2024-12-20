@@ -33,16 +33,16 @@
                    :default-desc ""
                    :validate {:pred validate-policy
                               :ex-msg (constantly "--policy must be non-empty string")}}
-          :deps {:coerce :string
-                 :alias :d
-                 :desc "Filepath to deps.edn"
-                 :default nil
-                 :default-desc ""
-                 :validate {:pred (complement empty?)
-                            :ex-msg "--deps must be non-empty string"}}
+          :config {:coerce :string
+                   :alias :c
+                   :desc "Filepath to configuration file"
+                   :default nil
+                   :default-desc ""
+                   :validate {:pred (complement empty?)
+                              :ex-msg "--config must be non-empty string"}}
           :help {:coerce :boolean
                  :alias :h}}
-   :restrict [:parser :policy :deps :help]})
+   :restrict [:parser :policy :config :help]})
 
 (defn test
   [args]
@@ -64,4 +64,4 @@
   (-main "test"
          "test.yaml"
          "--policy" "test/ilmoraunio/cljconf/example_rules.clj"
-         "--deps" "deps.edn"))
+         "--config" "cljconf.edn"))

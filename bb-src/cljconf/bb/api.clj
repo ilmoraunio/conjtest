@@ -24,16 +24,16 @@
   [deps-paths path]
   (-> path
       (str/replace (re-pattern (format "^(%s)/" (str/join "|" (map str deps-paths)))) "")
-      (str/replace #"\.cljc?$" "")
+      (str/replace #"\.(cljc|clj|bb)?$" "")
       (str/replace #"/" ".")
       (str/replace #"_" "-")
       symbol))
 
 (defn namespace->source
-  [deps-filename]
-  (let [deps-paths (some-> deps-filename slurp edn/read-string :paths)
+  [config-filename]
+  (let [deps-paths (some-> config-filename slurp edn/read-string :paths)
         source-m (->> deps-paths
-                      (mapcat #(fs/glob % "**{.clj,cljc}"))
+                      (mapcat #(fs/glob % "**{.clj,.cljc,.bb}"))
                       (map str)
                       (map #(-> {:file (fs/file-name %)
                                  :source (slurp %)}))
@@ -47,8 +47,8 @@
 
 (defn eval-and-resolve-vars
   "Evaluates all fns inside a sci context and returns vars"
-  [{:keys [deps] :as _opts} policies]
-  (let [ctx (sci/init (cond-> {} (some? deps) (assoc :load-fn (namespace->source deps))))]
+  [{:keys [config] :as _opts} policies]
+  (let [ctx (sci/init (cond-> {} (some? config) (assoc :load-fn (namespace->source config))))]
     (doseq [policy policies]
       (sci-eval ctx policy))
     (let [user-defined-namespaces (remove (comp default-namespaces str)
@@ -78,10 +78,10 @@
 (comment
   (test {:args ["test.yaml"]
          :opts {:policy #{"test/ilmoraunio/cljconf/example_rules.clj"}
-                :deps "deps.edn"}})
+                :config "cljconf.edn"}})
   ;; ```
-  ;; $ bb test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj
-  ;; $ bb --jar target/cljconf.jar test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj
-  ;; $ ./cljconf test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj
+  ;; $ bb test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
+  ;; $ bb --jar target/cljconf.jar test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
+  ;; $ ./cljconf test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
   ;; ```
   )
