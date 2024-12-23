@@ -51,25 +51,31 @@
     (into (cond
             (map? inputs) {}
             (vector? inputs) [])
-          (keep (fn [input]
-                  (let [result ((rule-function rule) (cond
-                                                       (map? inputs) (second input)
-                                                       (vector? inputs) input))]
-                    (when (case rule-type
-                            :allow (or (not result) (string? result))
-                            :deny result)
-                      (cond
-                        (map? inputs) [(first input) [{:message (or (string-or-nil result)
-                                                                    (rule-message rule)
-                                                                    :cljconf/rule-validation-failed)
-                                                       :name (rule-name rule)
-                                                       :rule-type rule-type}]]
-                        (vector? inputs) {:message (or (string-or-nil result)
-                                                       (rule-message rule)
-                                                       :cljconf/rule-validation-failed)
-                                          :name (rule-name rule)
-                                          :rule-type rule-type}))))
-                inputs))))
+          (map (fn [input]
+                 (let [rule-target (cond
+                                     (map? inputs) (second input)
+                                     (vector? inputs) input)
+                       result ((rule-function rule) rule-target)]
+                   (cond
+                     (map? inputs) [(first input) [{:message (or (string-or-nil result)
+                                                                 (rule-message rule)
+                                                                 :cljconf/rule-validation-failed)
+                                                    :name (rule-name rule)
+                                                    :rule-type rule-type
+                                                    :rule-target (ffirst inputs)
+                                                    :failure? (boolean (case rule-type
+                                                                         :allow (or (not result) (string? result))
+                                                                         :deny result))}]]
+                     (vector? inputs) {:message (or (string-or-nil result)
+                                                    (rule-message rule)
+                                                    :cljconf/rule-validation-failed)
+                                       :name (rule-name rule)
+                                       :rule-type rule-type
+                                       :rule-target rule-target
+                                       :failure? (case rule-type
+                                                   :allow (or (not result) (string? result))
+                                                   :deny result)})))
+               inputs))))
 
 (defn resolve-ns-functions
   [namespace]

@@ -59,15 +59,29 @@
           ns-publics-all (sci/eval-string* ctx command)]
       (mapcat (comp vals :ns-publics) ns-publics-all))))
 
-(defn -report-results
+(defn -summary-report
   [result]
-  (->> result
-       (mapcat (fn [[filename results]]
-                 (map (fn [{:keys [message name]}]
-                        (format "FAIL - %s - %s - %s" filename name message))
-                      results)))
-       (string/join "\n")
-       (format "%s\n")))
+  (let [summary (reduce (fn [m [_filename results]]
+                          (-> m
+                              (update :total (partial + (count results)))
+                              (update :passed (partial + (count (remove :failure? results))))
+                              (update :failures (partial + (count (filter :failure? results))))))
+                        {:total 0 :passed 0 :failures 0}
+                        result)
+        summary-text (format "%d tests, %d passed, %d failures" (:total summary) (:passed summary) (:failures summary))]
+    (format "%s\n" summary-text)))
+
+(defn -failure-report
+  [result]
+  (let [failures-text (->> result
+                           (mapcat (fn [[filename results]]
+                                     (keep (fn [{:keys [message name failure?]}]
+                                             (when failure?
+                                               (format "FAIL - %s - %s - %s" filename name message)))
+                                           results)))
+                           (string/join "\n")
+                           (format "%s\n"))]
+    (format "%s\n%s" failures-text (-summary-report result))))
 
 (defn test
   [{:keys [args opts]}]
@@ -86,11 +100,20 @@
      :vars vars
      :result result}))
 
+(defn any-failures?
+  [result]
+  (boolean (not-empty
+             (mapcat
+               (fn [[_filename results]]
+                 (filter :failure? results))
+               result))))
+
 (defn test!
   [m]
   (let [{:keys [result]} (test m)]
-    (when (not-empty result)
-      (throw (ex-info (-report-results result) {})))))
+    (if (any-failures? result)
+      (throw (ex-info (-failure-report result) {}))
+      (-summary-report result))))
 
 (comment
   (test {:args ["test.yaml"]

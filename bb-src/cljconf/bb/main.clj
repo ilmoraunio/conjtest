@@ -58,10 +58,13 @@
     (prn ::parse-args m)
     (if (or (:help opts) (:h opts))
       (println (show-help test-cli-spec))
-      (try (cljconf.bb.api/test! m)
+      (try (println (cljconf.bb.api/test! m))
            (catch Exception e
-             (print (ex-message e))
-             (if-bb-cli (System/exit 1) nil))))))
+             (if-bb-cli
+               (do
+                 (println (ex-message e))
+                 (System/exit 1))
+               (throw e)))))))
 
 (defn -main
   [& args]
