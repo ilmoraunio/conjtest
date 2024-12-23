@@ -4,6 +4,13 @@
             [clojure.string :as str]
             [cljconf.bb.api]))
 
+(defmacro if-bb-cli
+  [then else]
+  (if (and (System/getProperty "babashka.version")
+           (not (System/getenv "CLJCONF_DEV")))
+    then
+    else))
+
 (defn show-help
   [spec]
   (cli/format-opts (merge spec {:order (vec (keys (:spec spec)))})))
@@ -51,7 +58,10 @@
     (prn ::parse-args m)
     (if (or (:help opts) (:h opts))
       (println (show-help test-cli-spec))
-      (cljconf.bb.api/test m))))
+      (try (cljconf.bb.api/test! m)
+           (catch Exception e
+             (print (ex-message e))
+             (if-bb-cli (System/exit 1) nil))))))
 
 (defn -main
   [& args]
@@ -64,4 +74,10 @@
   (-main "test"
          "test.yaml"
          "--policy" "test/ilmoraunio/cljconf/example_rules.clj"
-         "--config" "cljconf.edn"))
+         "--config" "cljconf.edn")
+  ;; ```
+  ;; $ bb test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
+  ;; $ bb --jar target/cljconf.jar test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
+  ;; $ ./cljconf test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
+  ;; ```
+  )

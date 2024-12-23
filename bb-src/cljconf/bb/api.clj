@@ -1,6 +1,7 @@
 (ns cljconf.bb.api
   (:require [babashka.fs :as fs]
             [clojure.edn :as edn]
+            [clojure.string :as string]
             [clojure.string :as str]
             [ilmoraunio.cljconf.core :as cljconf]
             [pod-ilmoraunio-conftest-clj.api :as api]
@@ -58,6 +59,16 @@
           ns-publics-all (sci/eval-string* ctx command)]
       (mapcat (comp vals :ns-publics) ns-publics-all))))
 
+(defn -report-results
+  [result]
+  (->> result
+       (mapcat (fn [[filename results]]
+                 (map (fn [{:keys [message name]}]
+                        (format "FAIL - %s - %s - %s" filename name message))
+                      results)))
+       (string/join "\n")
+       (format "%s\n")))
+
 (defn test
   [{:keys [args opts]}]
   (let [inputs (apply api/parse args)
@@ -75,13 +86,18 @@
      :vars vars
      :result result}))
 
+(defn test!
+  [m]
+  (let [{:keys [result]} (test m)]
+    (when (not-empty result)
+      (throw (ex-info (-report-results result) {})))))
+
 (comment
   (test {:args ["test.yaml"]
          :opts {:policy #{"test/ilmoraunio/cljconf/example_rules.clj"}
                 :config "cljconf.edn"}})
-  ;; ```
-  ;; $ bb test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
-  ;; $ bb --jar target/cljconf.jar test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
-  ;; $ ./cljconf test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
-  ;; ```
+  ;; or
+  (test! {:args ["test.yaml"]
+         :opts {:policy #{"test/ilmoraunio/cljconf/example_rules.clj"}
+                :config "cljconf.edn"}})
   )
