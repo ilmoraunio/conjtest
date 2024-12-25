@@ -7,22 +7,20 @@
   [x]
   (when (string? x) x))
 
-(defn rule?
-  [x]
-  (or (:type x)
-      (:type (var-get x))
-      (:rule/type (meta x))
-      (clojure.string/starts-with? (str (:name (meta x))) "allow-")
-      (clojure.string/starts-with? (str (:name (meta x))) "deny-")))
-
 (defn rule-type
   [rule]
   (let [m (meta rule)]
     (or (:type rule)
         (:type (var-get rule))
         (:rule/type m)
-        (keyword ((fnil (partial re-find #"^allow|^deny") "") (name (:name m))))
+        (keyword ((fnil (partial re-find #"^allow|^deny|^warn") "") (name (:name m))))
         (throw (ex-info "invalid rule" {:rule rule})))))
+
+(defn rule?
+  [x]
+  (try (some? (rule-type x))
+       (catch Exception _
+         false)))
 
 (defn rule-name
   [rule]
@@ -55,26 +53,27 @@
                  (let [rule-target (cond
                                      (map? inputs) (second input)
                                      (vector? inputs) input)
-                       result ((rule-function rule) rule-target)]
+                       result ((rule-function rule) rule-target)
+                       failure (boolean (case rule-type
+                                          :allow (or (not result) (string? result))
+                                          (:warn :deny) result))]
                    (cond
-                     (map? inputs) [(first input) [{:message (or (string-or-nil result)
-                                                                 (rule-message rule)
-                                                                 :cljconf/rule-validation-failed)
+                     (map? inputs) [(first input) [{:message (when (true? failure)
+                                                               (or (string-or-nil result)
+                                                                   (rule-message rule)
+                                                                   :cljconf/rule-validation-failed))
                                                     :name (rule-name rule)
                                                     :rule-type rule-type
                                                     :rule-target (ffirst inputs)
-                                                    :failure? (boolean (case rule-type
-                                                                         :allow (or (not result) (string? result))
-                                                                         :deny result))}]]
-                     (vector? inputs) {:message (or (string-or-nil result)
-                                                    (rule-message rule)
-                                                    :cljconf/rule-validation-failed)
+                                                    :failure? failure}]]
+                     (vector? inputs) {:message (when (true? failure)
+                                                  (or (string-or-nil result)
+                                                      (rule-message rule)
+                                                      :cljconf/rule-validation-failed))
                                        :name (rule-name rule)
                                        :rule-type rule-type
                                        :rule-target rule-target
-                                       :failure? (case rule-type
-                                                   :allow (or (not result) (string? result))
-                                                   :deny result)})))
+                                       :failure? failure})))
                inputs))))
 
 (defn resolve-ns-functions

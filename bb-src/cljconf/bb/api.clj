@@ -59,29 +59,52 @@
           ns-publics-all (sci/eval-string* ctx command)]
       (mapcat (comp vals :ns-publics) ns-publics-all))))
 
+(defn -summary
+  [result]
+  (reduce (fn [m [_filename results]]
+            (-> m
+                (update :total (partial + (count results)))
+                (update :passed (partial + (count (remove :failure? results))))
+                (update :warnings (partial + (count (filter #(and (#{:warn} (:rule-type %))
+                                                                  (:failure? %))
+                                                            results))))
+                (update :failures (partial + (count (filter #(and (#{:allow :deny} (:rule-type %))
+                                                                  (:failure? %))
+                                                            results))))))
+          {:total 0 :passed 0 :warnings 0 :failures 0}
+          result))
+
 (defn -summary-report
   [result]
-  (let [summary (reduce (fn [m [_filename results]]
-                          (-> m
-                              (update :total (partial + (count results)))
-                              (update :passed (partial + (count (remove :failure? results))))
-                              (update :failures (partial + (count (filter :failure? results))))))
-                        {:total 0 :passed 0 :failures 0}
-                        result)
-        summary-text (format "%d tests, %d passed, %d failures" (:total summary) (:passed summary) (:failures summary))]
-    (format "%s\n" summary-text)))
+  (let [summary (-summary result)
+        summary-text (format "%d tests, %d passed, %d warnings, %d failures"
+                             (:total summary)
+                             (:passed summary)
+                             (:warnings summary)
+                             (:failures summary))]
+    {:summary summary
+     :summary-report (format "%s\n" summary-text)}))
 
 (defn -failure-report
   [result]
   (let [failures-text (->> result
                            (mapcat (fn [[filename results]]
-                                     (keep (fn [{:keys [message name failure?]}]
+                                     (keep (fn [{:keys [message name rule-type failure?]}]
                                              (when failure?
-                                               (format "FAIL - %s - %s - %s" filename name message)))
+                                               (format "%s - %s - %s - %s"
+                                                       (case rule-type
+                                                         (:allow :deny) "FAIL"
+                                                         :warn "WARN")
+                                                       filename
+                                                       name
+                                                       message)))
                                            results)))
                            (string/join "\n")
-                           (format "%s\n"))]
-    (format "%s\n%s" failures-text (-summary-report result))))
+                           (format "%s\n"))
+        summary-report (-summary-report result)]
+    {:failure-report (format "%s\n%s" failures-text (:summary-report summary-report))
+     :summary (:summary summary-report)
+     :summary-report (:report summary-report)}))
 
 (defn test
   [{:keys [args opts]}]
@@ -101,19 +124,25 @@
      :result result}))
 
 (defn any-failures?
-  [result]
+  [{:keys [fail-on-warn]} result]
   (boolean (not-empty
              (mapcat
                (fn [[_filename results]]
-                 (filter :failure? results))
+                 (filter #(and ((cond-> #{:allow :deny}
+                                  fail-on-warn (conj :warn)) (:rule-type %))
+                               (:failure? %))
+                         results))
                result))))
 
 (defn test!
-  [m]
-  (let [{:keys [result]} (test m)]
-    (if (any-failures? result)
-      (throw (ex-info (-failure-report result) {}))
-      (-summary-report result))))
+  ([m]
+   (test! {} m))
+  ([opts m]
+   (let [{:keys [result]} (test m)]
+     (if (any-failures? opts result)
+       (let [failure-report (-failure-report result)]
+         (throw (ex-info (:failure-report failure-report) (select-keys failure-report [:summary]))))
+       (-summary-report result)))))
 
 (comment
   (test {:args ["test.yaml"]

@@ -40,6 +40,8 @@
                    :default-desc ""
                    :validate {:pred validate-policy
                               :ex-msg (constantly "--policy must be non-empty string")}}
+          :fail-on-warn {:coerce :boolean
+                         :desc "Produces exit code 1 for any warnings triggered and exit code 2 for any errors triggered"}
           :config {:coerce :string
                    :alias :c
                    :desc "Filepath to configuration file"
@@ -49,7 +51,7 @@
                               :ex-msg "--config must be non-empty string"}}
           :help {:coerce :boolean
                  :alias :h}}
-   :restrict [:parser :policy :config :help]})
+   :restrict [:parser :policy :config :fail-on-warn :help]})
 
 (defn test
   [args]
@@ -58,11 +60,16 @@
     (prn ::parse-args m)
     (if (or (:help opts) (:h opts))
       (println (show-help test-cli-spec))
-      (try (println (cljconf.bb.api/test! m))
+      (try (println (:summary-report (cljconf.bb.api/test! opts m)))
            (catch Exception e
              (if-bb-cli
-               (do
-                 (println (ex-message e))
+               (if (:fail-on-warn opts)
+                 (do
+                   (println (ex-message e))
+                   (let [{:keys [warnings failures] :as _summary} (:summary (ex-data e))]
+                     (cond
+                       (pos? failures) (System/exit 2)
+                       (pos? warnings) (System/exit 1))))
                  (System/exit 1))
                (throw e)))))))
 
@@ -82,5 +89,6 @@
   ;; $ bb test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
   ;; $ bb --jar target/cljconf.jar test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
   ;; $ ./cljconf test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
+  ;; $ ./cljconf test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn --fail-on-warn
   ;; ```
   )

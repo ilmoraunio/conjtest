@@ -52,27 +52,27 @@
                #'ilmoraunio.cljconf.example-rules/allow-my-absolute-bare-rule
                #'ilmoraunio.cljconf.example-rules/allow-malli-rule))))
     (testing "not triggered"
-      (is (= {"test-resources/test.yaml" [{:message "port should be 80",
+      (is (= {"test-resources/test.yaml" [{:message nil,
                                            :name "allow-malli-rule",
                                            :rule-type :allow,
                                            :rule-target "test-resources/test.yaml",
                                            :failure? false}
-                                          {:message :cljconf/rule-validation-failed,
+                                          {:message nil,
                                            :name "allow-my-absolute-bare-rule",
                                            :rule-type :allow,
                                            :rule-target "test-resources/test.yaml",
                                            :failure? false}
-                                          {:message :cljconf/rule-validation-failed,
+                                          {:message nil,
                                            :name "allow-my-bare-rule",
                                            :rule-type :allow,
                                            :rule-target "test-resources/test.yaml",
                                            :failure? false}
-                                          {:message "port should be 80",
+                                          {:message nil,
                                            :name "allow-my-rule",
                                            :rule-type :allow,
                                            :rule-target "test-resources/test.yaml",
                                            :failure? false}
-                                          {:message "port should be 80",
+                                          {:message nil,
                                            :name "differently-named-allow-rule",
                                            :rule-type :allow,
                                            :rule-target "test-resources/test.yaml",
@@ -119,27 +119,27 @@
                #'ilmoraunio.cljconf.example-rules/deny-my-absolute-bare-rule
                #'ilmoraunio.cljconf.example-rules/deny-malli-rule))))
     (testing "not triggered"
-      (is (= {"test-resources/test.yaml" [{:message "port should not be 80",
+      (is (= {"test-resources/test.yaml" [{:message nil,
                                            :name "deny-malli-rule",
                                            :rule-type :deny,
                                            :rule-target "test-resources/test.yaml",
                                            :failure? false}
-                                          {:message :cljconf/rule-validation-failed,
+                                          {:message nil,
                                            :name "deny-my-absolute-bare-rule",
                                            :rule-type :deny,
                                            :rule-target "test-resources/test.yaml",
                                            :failure? false}
-                                          {:message :cljconf/rule-validation-failed,
+                                          {:message nil,
                                            :name "deny-my-bare-rule",
                                            :rule-type :deny,
                                            :rule-target "test-resources/test.yaml",
                                            :failure? false}
-                                          {:message "port should not be 80",
+                                          {:message nil,
                                            :name "deny-my-rule",
                                            :rule-type :deny,
                                            :rule-target "test-resources/test.yaml",
                                            :failure? false}
-                                          {:message "port should not be 80",
+                                          {:message nil,
                                            :name "differently-named-deny-rule",
                                            :rule-type :deny,
                                            :rule-target "test-resources/test.yaml",
@@ -156,22 +156,22 @@
                #'ilmoraunio.cljconf.example-rules/deny-my-absolute-bare-rule
                #'ilmoraunio.cljconf.example-rules/deny-malli-rule)))))
   (testing "resolve functions via namespace"
-    (is (= {"test-resources/test.yaml" [{:message "port should be 80",
+    (is (= {"test-resources/test.yaml" [{:message nil,
                                          :name "allow-malli-rule",
                                          :rule-type :allow,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? false}
-                                        {:message :cljconf/rule-validation-failed,
+                                        {:message nil,
                                          :name "allow-my-absolute-bare-rule",
                                          :rule-type :allow,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? false}
-                                        {:message :cljconf/rule-validation-failed,
+                                        {:message nil,
                                          :name "allow-my-bare-rule",
                                          :rule-type :allow,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? false}
-                                        {:message "port should be 80",
+                                        {:message nil,
                                          :name "allow-my-rule",
                                          :rule-type :allow,
                                          :rule-target "test-resources/test.yaml",
@@ -196,7 +196,7 @@
                                          :rule-type :deny,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? true}
-                                        {:message "port should be 80",
+                                        {:message nil,
                                          :name "differently-named-allow-rule",
                                          :rule-type :allow,
                                          :rule-target "test-resources/test.yaml",
@@ -204,6 +204,31 @@
                                         {:message "port should not be 80",
                                          :name "differently-named-deny-rule",
                                          :rule-type :deny,
+                                         :rule-target "test-resources/test.yaml",
+                                         :failure? true}
+                                        {:message "port should not be 80",
+                                         :name "differently-named-warn-rule",
+                                         :rule-type :warn,
+                                         :rule-target "test-resources/test.yaml",
+                                         :failure? true}
+                                        {:message "port should not be 80",
+                                         :name "warn-malli-rule",
+                                         :rule-type :warn,
+                                         :rule-target "test-resources/test.yaml",
+                                         :failure? true}
+                                        {:message :cljconf/rule-validation-failed,
+                                         :name "warn-my-absolute-bare-rule",
+                                         :rule-type :warn,
+                                         :rule-target "test-resources/test.yaml",
+                                         :failure? true}
+                                        {:message "port should not be 80",
+                                         :name "warn-my-bare-rule",
+                                         :rule-type :warn,
+                                         :rule-target "test-resources/test.yaml",
+                                         :failure? true}
+                                        {:message "port should not be 80",
+                                         :name "warn-my-rule",
+                                         :rule-type :warn,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? true}]}
            (conftest/test
@@ -232,22 +257,22 @@
                                          :rule-type :allow,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? true}
-                                        {:message "port should not be 80",
+                                        {:message nil,
                                          :name "deny-malli-rule",
                                          :rule-type :deny,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? false}
-                                        {:message :cljconf/rule-validation-failed,
+                                        {:message nil,
                                          :name "deny-my-absolute-bare-rule",
                                          :rule-type :deny,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? false}
-                                        {:message :cljconf/rule-validation-failed,
+                                        {:message nil,
                                          :name "deny-my-bare-rule",
                                          :rule-type :deny,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? false}
-                                        {:message "port should not be 80",
+                                        {:message nil,
                                          :name "deny-my-rule",
                                          :rule-type :deny,
                                          :rule-target "test-resources/test.yaml",
@@ -257,9 +282,34 @@
                                          :rule-type :allow,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? true}
-                                        {:message "port should not be 80",
+                                        {:message nil,
                                          :name "differently-named-deny-rule",
                                          :rule-type :deny,
+                                         :rule-target "test-resources/test.yaml",
+                                         :failure? false}
+                                        {:message nil,
+                                         :name "differently-named-warn-rule",
+                                         :rule-type :warn,
+                                         :rule-target "test-resources/test.yaml",
+                                         :failure? false}
+                                        {:message nil,
+                                         :name "warn-malli-rule",
+                                         :rule-type :warn,
+                                         :rule-target "test-resources/test.yaml",
+                                         :failure? false}
+                                        {:message nil,
+                                         :name "warn-my-absolute-bare-rule",
+                                         :rule-type :warn,
+                                         :rule-target "test-resources/test.yaml",
+                                         :failure? false}
+                                        {:message nil,
+                                         :name "warn-my-bare-rule",
+                                         :rule-type :warn,
+                                         :rule-target "test-resources/test.yaml",
+                                         :failure? false}
+                                        {:message nil,
+                                         :name "warn-my-rule",
+                                         :rule-type :warn,
                                          :rule-target "test-resources/test.yaml",
                                          :failure? false}]}
            (conftest/test
@@ -277,7 +327,7 @@
                                         "port"] 9999.0)
              (the-ns 'ilmoraunio.cljconf.example-rules)))))
   (testing "multiple map entries"
-    (is (= {"test-resources/test.yaml" [{:message "port should be 80",
+    (is (= {"test-resources/test.yaml" [{:message nil,
                                          :name "allow-my-rule",
                                          :rule-type :allow,
                                          :rule-target "test-resources/test.yaml",
@@ -292,7 +342,7 @@
                                            :rule-type :allow,
                                            :rule-target "test-resources/test.yaml",
                                            :failure? true}
-                                          {:message "port should not be 80",
+                                          {:message nil,
                                            :name "deny-my-rule",
                                            :rule-type :deny,
                                            :rule-target "test-resources/test.yaml",
@@ -317,7 +367,7 @@
                                    "ports" [{"port" 80.0, "targetPort" 8080.0}],
                                    "selector" {"app" "hello-kubernetes"}}},
              :failure? true}
-            {:message "port should not be 80",
+            {:message nil,
              :name "deny-my-rule",
              :rule-type :deny,
              :rule-target {"apiVersion" "v1",
