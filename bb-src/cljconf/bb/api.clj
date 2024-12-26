@@ -49,7 +49,23 @@
 (defn eval-and-resolve-vars
   "Evaluates all fns inside a sci context and returns vars"
   [{:keys [config] :as _opts} policies]
-  (let [ctx (sci/init (cond-> {} (some? config) (assoc :load-fn (namespace->source config))))]
+  (let [ctx (sci/init (cond-> {:namespaces {'clojure.core {'abs abs
+                                                           'add-tap add-tap
+                                                           'file-seq file-seq
+                                                           'infinite? infinite?
+                                                           'iteration iteration
+                                                           'NaN? NaN?
+                                                           'parse-boolean parse-boolean
+                                                           'parse-double parse-double
+                                                           'parse-long parse-long
+                                                           'parse-uuid parse-uuid
+                                                           'random-uuid random-uuid
+                                                           'remove-tap remove-tap
+                                                           'slurp slurp
+                                                           'tap> tap>
+                                                           'update-keys update-keys
+                                                           'update-vals update-vals}}}
+                        (some? config) (assoc :load-fn (namespace->source config))))]
     (doseq [policy policies]
       (sci-eval ctx policy))
     (let [user-defined-namespaces (remove (comp default-namespaces str)
