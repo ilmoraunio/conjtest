@@ -156,6 +156,77 @@
                #'ilmoraunio.cljconf.example-deny-rules/deny-my-bare-rule
                #'ilmoraunio.cljconf.example-deny-rules/deny-my-absolute-bare-rule
                #'ilmoraunio.cljconf.example-deny-rules/deny-malli-rule)))))
+  (testing "warn rules"
+    (testing "triggered"
+      (is (= {"test-resources/test.yaml" [{:message "port should not be 80"
+                                           :name "differently-named-warn-rule"
+                                           :rule-type :warn
+                                           :rule-target "test-resources/test.yaml"
+                                           :failure? true}
+                                          {:message "port should not be 80"
+                                           :name "warn-malli-rule"
+                                           :rule-type :warn
+                                           :rule-target "test-resources/test.yaml"
+                                           :failure? true}
+                                          {:message :cljconf/rule-validation-failed
+                                           :name "warn-my-absolute-bare-rule"
+                                           :rule-type :warn
+                                           :rule-target "test-resources/test.yaml"
+                                           :failure? true}
+                                          {:message "port should not be 80"
+                                           :name "warn-my-bare-rule"
+                                           :rule-type :warn
+                                           :rule-target "test-resources/test.yaml"
+                                           :failure? true}
+                                          {:message "port should not be 80"
+                                           :name "warn-my-rule"
+                                           :rule-type :warn
+                                           :rule-target "test-resources/test.yaml"
+                                           :failure? true}]}
+             (conftest/test
+               test-input-yaml
+               #'ilmoraunio.cljconf.example-warn-rules/warn-my-rule
+               #'ilmoraunio.cljconf.example-warn-rules/differently-named-warn-rule
+               #'ilmoraunio.cljconf.example-warn-rules/warn-my-bare-rule
+               #'ilmoraunio.cljconf.example-warn-rules/warn-my-absolute-bare-rule
+               #'ilmoraunio.cljconf.example-warn-rules/warn-malli-rule))))
+    (testing "not triggered"
+      (is (= {"test-resources/test.yaml" [{:message nil,
+                                           :name "differently-named-warn-rule",
+                                           :rule-type :warn,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? false}
+                                          {:message nil,
+                                           :name "warn-malli-rule",
+                                           :rule-type :warn,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? false}
+                                          {:message nil,
+                                           :name "warn-my-absolute-bare-rule",
+                                           :rule-type :warn,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? false}
+                                          {:message nil,
+                                           :name "warn-my-bare-rule",
+                                           :rule-type :warn,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? false}
+                                          {:message nil,
+                                           :name "warn-my-rule",
+                                           :rule-type :warn,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? false}]}
+             (conftest/test
+               (assoc-in test-input-yaml ["test-resources/test.yaml"
+                                          "spec"
+                                          "ports"
+                                          0
+                                          "port"] 9999.0)
+               #'ilmoraunio.cljconf.example-warn-rules/warn-my-rule
+               #'ilmoraunio.cljconf.example-warn-rules/differently-named-warn-rule
+               #'ilmoraunio.cljconf.example-warn-rules/warn-my-bare-rule
+               #'ilmoraunio.cljconf.example-warn-rules/warn-my-absolute-bare-rule
+               #'ilmoraunio.cljconf.example-warn-rules/warn-malli-rule)))))
   (testing "resolve functions via namespace"
     (is (= {"test-resources/test.yaml" [{:message nil,
                                          :name "allow-malli-rule",
