@@ -133,7 +133,6 @@
         result (->> vars
                     (map (partial cljconf/test inputs))
                     (apply merge-with into))]
-    (println result)
     {:inputs inputs
      :policies policies
      :vars vars

@@ -55,9 +55,7 @@
 
 (defn test
   [args]
-  (prn "args" args)
   (let [{:keys [#_args opts] :as m} (cli/parse-args args test-cli-spec)]
-    (prn ::parse-args m)
     (if (or (:help opts) (:h opts))
       (println (show-help test-cli-spec))
       (try (println (:summary-report (cljconf.bb.api/test! opts m)))
