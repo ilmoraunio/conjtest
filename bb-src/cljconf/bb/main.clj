@@ -61,14 +61,14 @@
       (try (println (:summary-report (cljconf.bb.api/test! opts m)))
            (catch Exception e
              (if-bb-cli
-               (if (:fail-on-warn opts)
-                 (do
-                   (println (ex-message e))
+               (do
+                 (println (ex-message e))
+                 (if (:fail-on-warn opts)
                    (let [{:keys [warnings failures] :as _summary} (:summary (ex-data e))]
                      (cond
                        (pos? failures) (System/exit 2)
-                       (pos? warnings) (System/exit 1))))
-                 (System/exit 1))
+                       (pos? warnings) (System/exit 1)))
+                  (System/exit 1)))
                (throw e)))))))
 
 (defn -main
