@@ -1,0 +1,5 @@
+{:paths [".build"]
+ :deps {io.github.borkdude/gh-release-artifact
+        {:git/sha "db5e79559fdbfa009ed4a0921079e20e1e76b269"}}
+ :tasks
+ {release-artifact {:task (exec 'release-artifact/release)}}}

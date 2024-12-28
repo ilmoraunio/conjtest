@@ -1,0 +1,114 @@
+---
+name: Release
+
+on: push
+
+jobs:
+  macos-build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - name: Read version to environment
+        run: echo "VERSION=$(cat resources/CLJCONF_VERSION)" >> $GITHUB_ENV
+      - name: Install babashka
+        uses: DeLaGuardo/setup-clojure@13.0
+        with:
+          cli: 1.11.3.1463
+          bb: 1.3.190
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '^1.23.1'
+      - name: Initialize submodules
+        run: git submodule update --init --recursive
+      - name: Debug
+        run: go version && uname -a
+      - name: Build pod-ilmoraunio-conftest
+        run: |
+          cd pod-ilmoraunio-conftest-clj/pod-ilmoraunio-conftest && go install && go build
+          cd ../../pod-ilmoraunio-conftest && go install && go build
+      - name: Build pod-ilmoraunio-conftest-clj
+        run: |
+          cd pod-ilmoraunio-conftest-clj
+          bb uberjar target/pod-ilmoraunio-conftest-clj.jar -m pod-ilmoraunio-conftest-clj.core
+          cat $(which bb) target/pod-ilmoraunio-conftest-clj.jar > pod-ilmoraunio-conftest-clj && chmod +x pod-ilmoraunio-conftest-clj
+      - name: Build cljconf
+        run: |
+          bb uberjar target/cljconf.jar -m cljconf.bb.main
+          cat $(which bb) target/cljconf.jar > cljconf
+          chmod +x cljconf
+      - name: clj tests
+        run: ./scripts/kaocha
+      - name: babashka & CLI tests
+        run: ./scripts/test
+      - name: Debug
+        run: ls -lart
+      - name: Produce artifact
+        run: zip cljconf-$VERSION-macos-aarch64.zip cljconf
+      - name: Release artifact
+        run: bb --config bb.ci.edn release-artifact --file cljconf-$VERSION-macos-aarch64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  linux-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - name: Read version to environment
+        run: echo "VERSION=$(cat resources/CLJCONF_VERSION)" >> $GITHUB_ENV
+      - name: Install babashka
+        uses: DeLaGuardo/setup-clojure@13.0
+        with:
+          cli: 1.11.3.1463
+          bb: 1.3.190
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '^1.23.1'
+      - name: Initialize submodules
+        run: git submodule update --init --recursive
+      - name: Debug
+        run: go version && uname -a
+      - name: Build pod-ilmoraunio-conftest
+        run: |
+          cd pod-ilmoraunio-conftest-clj/pod-ilmoraunio-conftest && go install && go build
+          cd ../../pod-ilmoraunio-conftest && go install && go build
+      - name: Build pod-ilmoraunio-conftest-clj
+        run: |
+          cd pod-ilmoraunio-conftest-clj
+          bb uberjar target/pod-ilmoraunio-conftest-clj.jar -m pod-ilmoraunio-conftest-clj.core
+          cat $(which bb) target/pod-ilmoraunio-conftest-clj.jar > pod-ilmoraunio-conftest-clj && chmod +x pod-ilmoraunio-conftest-clj
+      - name: Build cljconf
+        run: |
+          bb uberjar target/cljconf.jar -m cljconf.bb.main
+          cat $(which bb) target/cljconf.jar > cljconf
+          chmod +x cljconf
+      - name: clj tests
+        run: ./scripts/kaocha
+      - name: babashka & CLI tests
+        run: ./scripts/test
+      - name: Debug
+        run: ls -lart
+      - name: Produce artifact
+        run: zip cljconf-$VERSION-linux-amd64.zip cljconf
+      - name: Release artifact
+        run: bb --config bb.ci.edn release-artifact --file cljconf-$VERSION-linux-amd64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
