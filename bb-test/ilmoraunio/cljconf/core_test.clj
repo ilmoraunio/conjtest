@@ -91,7 +91,12 @@
   (testing "Docker compose")
   (testing "Dockerfile")
   (testing "Dotenv")
-  (testing "EDN")
+  (testing "EDN"
+    (testing "cljconf parser"
+      (is (= {:exit 0, :out {:tests 2, :passed 2, :warnings 0, :failures 0}}
+             (cljconf-test ["examples/edn/sample_config.edn"]
+                           ["examples/edn/policy/smoke.clj"]))))
+    (testing "conftest parser"))
   (testing "HCL")
   (testing "HCL 2")
   (testing "HOCON")
