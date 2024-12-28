@@ -13,7 +13,7 @@
     (or (:type rule)
         (:type (var-get rule))
         (:rule/type m)
-        (keyword ((fnil (partial re-find #"^allow|^deny|^warn") "") (name (:name m))))
+        (keyword (second ((fnil (partial re-find #"(^allow|^deny|^warn)-") "") (name (:name m)))))
         (throw (ex-info "invalid rule" {:rule rule})))))
 
 (defn rule?
