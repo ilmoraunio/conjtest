@@ -129,14 +129,8 @@
                       (mapcat (partial fs/glob "."))
                       (filter #(-> % fs/extension #{"clj" "bb" "cljc"}))
                       (mapv str))
-        vars (eval-and-resolve-vars opts policies)
-        result (->> vars
-                    (map (partial cljconf/test inputs))
-                    (apply merge-with into))]
-    {:inputs inputs
-     :policies policies
-     :vars vars
-     :result result}))
+        vars (eval-and-resolve-vars opts policies)]
+    {:result (apply cljconf/test inputs vars)}))
 
 (defn any-failures?
   [{:keys [fail-on-warn]} result]
@@ -158,13 +152,3 @@
        (let [failure-report (-failure-report result)]
          (throw (ex-info (:failure-report failure-report) (select-keys failure-report [:summary]))))
        (-summary-report result)))))
-
-(comment
-  (test {:args ["test.yaml"]
-         :opts {:policy #{"test/ilmoraunio/cljconf/example_rules.clj"}
-                :config "cljconf.edn"}})
-  ;; or
-  (test! {:args ["test.yaml"]
-         :opts {:policy #{"test/ilmoraunio/cljconf/example_rules.clj"}
-                :config "cljconf.edn"}})
-  )

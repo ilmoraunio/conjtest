@@ -1,6 +1,7 @@
 (ns ilmoraunio.cljconf.core-test
-  (:require [clojure.test :refer [deftest is testing]]
-            [babashka.process :refer [shell process exec]]))
+  (:require [babashka.process :refer [shell process exec]]
+            [cljconf.bb.api :as api]
+            [clojure.test :refer [deftest is testing]]))
 
 
 (defn cljconf-test
@@ -18,6 +19,33 @@
                            (rest)
                            (map (fn [x] (Integer/parseInt x)))
                            (zipmap [:tests :passed :warnings :failures])))))
+
+(deftest api-test
+  (testing "smoke test"
+    (testing "triggered"
+      (let [args {:args ["test-resources/invalid.yaml"]
+                  :opts {:policy ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"
+                                  "test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
+                                  "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"
+                                  "test-resources/ilmoraunio/cljconf/example_local_require.clj"]
+                         :config "test.cljconf.edn"}}]
+        (is (thrown-with-msg? Exception #"16 tests, 0 passed, 5 warnings, 11 failures"
+                              (api/test! args)))
+        (try
+          (api/test! args)
+          (catch Exception e
+            (is (= {:summary {:total 16, :passed 0, :warnings 5, :failures 11}}
+                   (ex-data e)))))))
+    (testing "not triggered"
+      (is (= {:summary {:total 16, :passed 16, :warnings 0, :failures 0},
+              :summary-report "16 tests, 16 passed, 0 warnings, 0 failures\n"}
+             (api/test!
+               {:args ["test-resources/valid.yaml"]
+                :opts {:policy ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"
+                                "test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
+                                "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"
+                                "test-resources/ilmoraunio/cljconf/example_local_require.clj"]
+                       :config "test.cljconf.edn"}}))))))
 
 (deftest cli-test
   (testing "allow rule"

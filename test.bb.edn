@@ -1,4 +1,8 @@
-{:tasks
+{:paths ["bb-src"]
+ :deps {ilmoraunio/cljconf {:local/root "."}}
+ :pods {pod-ilmoraunio-conftest-clj {:path "pod-ilmoraunio-conftest-clj/pod-ilmoraunio-conftest-clj"
+                                     :cache false}}
+ :tasks
  {test:bb {:extra-paths ["bb-test" "test-resources"]
            :extra-deps {io.github.cognitect-labs/test-runner
                         {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
