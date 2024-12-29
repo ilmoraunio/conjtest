@@ -47,4 +47,4 @@
  :log :debug
  ;; Which environment we're in. Has nothing to say for the app itself, but it's
  ;; attached on the log messages sent to our centralised logging system.
- :env :development}
+ :env :production}
