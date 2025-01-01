@@ -160,7 +160,19 @@
                {:tests 4, :passed 2, :warnings 0, :failures 2}]}
         (cljconf-test ["examples/cue/deployment.cue"]
                       ["examples/cue/policy.clj"]))))
-  (testing "Dockerfile")
+  (testing "Dockerfile"
+    (is (= {:exit 1,
+            :out [[{:type "FAIL",
+                    :file "examples/dockerfile/Dockerfile",
+                    :rule "deny-unallowed-commands",
+                    :message "unallowed commands found [\"apk add --no-cache python3 python3-dev build-base && pip3 install awscli==1.18.1\"]"}
+                   {:type "FAIL",
+                    :file "examples/dockerfile/Dockerfile",
+                    :rule "deny-unallowed-images",
+                    :message "unallowed image found [\"openjdk:8-jdk-alpine\"]"}]
+                  {:tests 2, :passed 0, :warnings 0, :failures 2}]}
+           (cljconf-test ["examples/dockerfile/Dockerfile"]
+                         ["examples/dockerfile/policy.clj"]))))
   (testing "Dotenv")
   (testing "EDN"
     (testing "cljconf parser"
