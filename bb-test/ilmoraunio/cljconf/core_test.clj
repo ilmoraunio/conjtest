@@ -160,7 +160,6 @@
               {:tests 4, :passed 2, :warnings 0, :failures 2}]}
        (cljconf-test ["examples/cue/deployment.cue"]
                      ["examples/cue/policy.clj"])))
-  (testing "Cyclonedx")
   (testing "Docker compose")
   (testing "Dockerfile")
   (testing "Dotenv")
@@ -181,6 +180,11 @@
     (testing ".gitignore")
     (testing ".dockerignore"))
   (testing "INI")
+  (testing "JSON"
+    (testing "CycloneDX"
+      (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
+             (cljconf-test ["examples/json/cyclonedx/cyclonedx.json"]
+                          ["examples/json/cyclonedx/policy.clj"])))))
   (testing "Jsonnet")
   (testing "Kustomize")
   (testing "Properties")
@@ -190,7 +194,11 @@
   (testing "Traefik")
   (testing "Typescript")
   (testing "VCL")
-  (testing "XML")
+  (testing "XML"
+    (testing "CycloneDX"
+      (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
+             (cljconf-test ["examples/xml/cyclonedx/cyclonedx.xml"]
+                           ["examples/xml/cyclonedx/policy.clj"])))))
   (testing "YAML"
     (is (= {:exit 1,
             :out [[{:type "FAIL",
