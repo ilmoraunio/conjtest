@@ -173,7 +173,10 @@
                   {:tests 2, :passed 0, :warnings 0, :failures 2}]}
            (cljconf-test ["examples/dockerfile/Dockerfile"]
                          ["examples/dockerfile/policy.clj"]))))
-  (testing "Dotenv")
+  (testing "Dotenv"
+    (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
+           (cljconf-test ["examples/dotenv/sample.env"]
+                         ["examples/dotenv/policy.clj"]))))
   (testing "EDN"
     (testing "cljconf parser"
       (is (= {:exit 1, :out [[{:type "FAIL"
