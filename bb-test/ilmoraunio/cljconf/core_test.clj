@@ -148,19 +148,18 @@
 (deftest examples-test
   (testing "Configfile")
   (testing "CUE"
-    (= {:exit 1,
-        :out [[{:type "FAIL",
-                :file "examples/cue/deployment.cue",
-                :rule "deny-no-images-tagged",
-                :message "No images tagged latest"}
-               {:type "FAIL",
-                :file "examples/cue/deployment.cue",
-                :rule "deny-ports-outside-of-8080",
-                :message "The image port should be 8080 in deployment.cue. you have: [8081.0]"}]
-              {:tests 4, :passed 2, :warnings 0, :failures 2}]}
-       (cljconf-test ["examples/cue/deployment.cue"]
-                     ["examples/cue/policy.clj"])))
-  (testing "Docker compose")
+    (is (= {:exit 1,
+         :out [[{:type "FAIL",
+                 :file "examples/cue/deployment.cue",
+                 :rule "deny-no-images-tagged",
+                 :message "No images tagged latest"}
+                {:type "FAIL",
+                 :file "examples/cue/deployment.cue",
+                 :rule "deny-ports-outside-of-8080",
+                 :message "The image port should be 8080 in deployment.cue. you have: [8081.0]"}]
+               {:tests 4, :passed 2, :warnings 0, :failures 2}]}
+        (cljconf-test ["examples/cue/deployment.cue"]
+                      ["examples/cue/policy.clj"]))))
   (testing "Dockerfile")
   (testing "Dotenv")
   (testing "EDN"
@@ -222,27 +221,43 @@
              (cljconf-test ["examples/yaml/combine/combine.yaml"]
                            ["examples/yaml/combine/policy.clj"]))))
     (testing "AWS SAM Framework"
-      (= {:exit 1,
-          :out [[{:type "FAIL",
-                  :file "examples/yaml/awssam/lambda.yaml",
-                  :rule "deny-denylisted-runtimes",
-                  :message "'python2.7' runtime not allowed"}
-                 {:type "FAIL",
-                  :file "examples/yaml/awssam/lambda.yaml",
-                  :rule "deny-excessive-action-permissions",
-                  :message "excessive Action permissions not allowed"}
-                 {:type "FAIL",
-                  :file "examples/yaml/awssam/lambda.yaml",
-                  :rule "deny-excessive-resource-permissions",
-                  :message "excessive Resource permissions not allowed"}
-                 {:type "FAIL",
-                  :file "examples/yaml/awssam/lambda.yaml",
-                  :rule "deny-python2.7",
-                  :message "python2.7 runtime not allowed"}
-                 {:type "FAIL",
-                  :file "examples/yaml/awssam/lambda.yaml",
-                  :rule "deny-sensitive-environment-variables",
-                  :message "Sensitive data not allowed in environment variables"}]
-                {:tests 5, :passed 0, :warnings 0, :failures 5}]}
-         (cljconf-test ["examples/yaml/awssam/lambda.yaml"]
-                       ["examples/yaml/awssam/policy.clj"])))))
+      (is (= {:exit 1,
+           :out [[{:type "FAIL",
+                   :file "examples/yaml/awssam/lambda.yaml",
+                   :rule "deny-denylisted-runtimes",
+                   :message "'python2.7' runtime not allowed"}
+                  {:type "FAIL",
+                   :file "examples/yaml/awssam/lambda.yaml",
+                   :rule "deny-excessive-action-permissions",
+                   :message "excessive Action permissions not allowed"}
+                  {:type "FAIL",
+                   :file "examples/yaml/awssam/lambda.yaml",
+                   :rule "deny-excessive-resource-permissions",
+                   :message "excessive Resource permissions not allowed"}
+                  {:type "FAIL",
+                   :file "examples/yaml/awssam/lambda.yaml",
+                   :rule "deny-python2.7",
+                   :message "python2.7 runtime not allowed"}
+                  {:type "FAIL",
+                   :file "examples/yaml/awssam/lambda.yaml",
+                   :rule "deny-sensitive-environment-variables",
+                   :message "Sensitive data not allowed in environment variables"}]
+                 {:tests 5, :passed 0, :warnings 0, :failures 5}]}
+          (cljconf-test ["examples/yaml/awssam/lambda.yaml"]
+                        ["examples/yaml/awssam/policy.clj"]))))
+    (testing "Docker compose"
+      (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
+             (cljconf-test ["examples/yaml/dockercompose/docker-compose-valid.yml"]
+                           ["examples/yaml/dockercompose/policy.clj"])))
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "examples/yaml/dockercompose/docker-compose-invalid.yml",
+                      :rule "deny-latest-tags",
+                      :message "No images tagged latest"}
+                     {:type "FAIL",
+                      :file "examples/yaml/dockercompose/docker-compose-invalid.yml",
+                      :rule "deny-old-compose-versions",
+                      :message "Must be using at least version 3.5 of the Compose file format"}]
+                    {:tests 2, :passed 0, :warnings 0, :failures 2}]}
+             (cljconf-test ["examples/yaml/dockercompose/docker-compose-invalid.yml"]
+                           ["examples/yaml/dockercompose/policy.clj"]))))))
