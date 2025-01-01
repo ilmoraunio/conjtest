@@ -146,7 +146,6 @@
                              "--config" "test.cljconf.edn")))))))
 
 (deftest examples-test
-  (testing "AWS SAM framework")
   (testing "Configfile")
   (testing "CUE")
   (testing "Cyclonedx")
@@ -201,4 +200,29 @@
                       :message "Deployments ['goodbye-kubernetes'] have no matching service"}]
                     {:tests 1, :passed 0, :warnings 0, :failures 1}]}
              (cljconf-test ["examples/yaml/combine/combine.yaml"]
-                           ["examples/yaml/combine/policy.clj"]))))))
+                           ["examples/yaml/combine/policy.clj"]))))
+    (testing "AWS SAM Framework"
+      (= {:exit 1,
+          :out [[{:type "FAIL",
+                  :file "examples/yaml/awssam/lambda.yaml",
+                  :rule "deny-denylisted-runtimes",
+                  :message "'python2.7' runtime not allowed"}
+                 {:type "FAIL",
+                  :file "examples/yaml/awssam/lambda.yaml",
+                  :rule "deny-excessive-action-permissions",
+                  :message "excessive Action permissions not allowed"}
+                 {:type "FAIL",
+                  :file "examples/yaml/awssam/lambda.yaml",
+                  :rule "deny-excessive-resource-permissions",
+                  :message "excessive Resource permissions not allowed"}
+                 {:type "FAIL",
+                  :file "examples/yaml/awssam/lambda.yaml",
+                  :rule "deny-python2.7",
+                  :message "python2.7 runtime not allowed"}
+                 {:type "FAIL",
+                  :file "examples/yaml/awssam/lambda.yaml",
+                  :rule "deny-sensitive-environment-variables",
+                  :message "Sensitive data not allowed in environment variables"}]
+                {:tests 5, :passed 0, :warnings 0, :failures 5}]}
+         (cljconf-test ["examples/yaml/awssam/lambda.yaml"]
+                       ["examples/yaml/awssam/policy.clj"])))))
