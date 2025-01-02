@@ -187,7 +187,22 @@
              (cljconf-test ["examples/edn/sample_config.edn"]
                            ["examples/edn/policy.clj"]))))
     (testing "conftest parser"))
-  (testing "HCL")
+  (testing "HCL"
+    (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
+           (cljconf-test ["examples/hcl1/gke.tf"]
+                         ["examples/hcl1/tf_policy.clj"])))
+    (is (= {:exit 1,
+            :out [[{:type "FAIL",
+                    :file "examples/hcl1/gke-show.json",
+                    :rule "deny-prohibited-resources",
+                    :message "Terraform plan will change prohibited resources in the following namespaces: [\"google_iam\" \"google_container\"]"}]
+                  {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+           (cljconf-test ["examples/hcl1/gke-show.json"]
+                         ["examples/hcl1/json_policy.clj"])))
+    (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
+           (cljconf-test ["examples/hcl1/gke.tf"
+                          "examples/hcl1/gke-show.json"]
+                         ["examples/hcl1/combined_policy.clj"]))))
   (testing "HCL 2")
   (testing "HOCON")
   (testing "Ignore"
@@ -198,7 +213,7 @@
     (testing "CycloneDX"
       (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
              (cljconf-test ["examples/json/cyclonedx/cyclonedx.json"]
-                          ["examples/json/cyclonedx/policy.clj"])))))
+                           ["examples/json/cyclonedx/policy.clj"])))))
   (testing "Jsonnet")
   (testing "Kustomize")
   (testing "Properties")
