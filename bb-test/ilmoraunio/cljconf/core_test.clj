@@ -227,7 +227,15 @@
   (testing "HOCON")
   (testing "Ignore"
     (testing ".gitignore")
-    (testing ".dockerignore"))
+    (testing ".dockerignore"
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "examples/ignore/dockerignore/.dockerignore",
+                      :rule "deny-git-not-ignored",
+                      :message ".git directories should be ignored"}]
+                    {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+             (cljconf-test ["examples/ignore/dockerignore/.dockerignore"]
+                           ["examples/ignore/dockerignore/policy.clj"])))))
   (testing "INI")
   (testing "JSON"
     (testing "CycloneDX"
