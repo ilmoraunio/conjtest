@@ -257,7 +257,15 @@
       (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
              (cljconf-test ["examples/json/cyclonedx/cyclonedx.json"]
                            ["examples/json/cyclonedx/policy.clj"])))))
-  (testing "Jsonnet")
+  (testing "Jsonnet"
+    (is (= {:exit 1,
+            :out [[{:type "FAIL",
+                    :file "examples/jsonnet/arith.jsonnet",
+                    :rule "deny-concat-array",
+                    :message "Concat array should be less than 3"}]
+                  {:tests 2, :passed 1, :warnings 0, :failures 1}]}
+           (cljconf-test ["examples/jsonnet/arith.jsonnet"]
+                         ["examples/jsonnet/policy.clj"]))))
   (testing "Kustomize")
   (testing "Properties")
   (testing "Serverless Framework")
