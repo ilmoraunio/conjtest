@@ -224,7 +224,6 @@
                   {:tests 4, :passed 0, :warnings 0, :failures 4}]}
            (cljconf-test ["examples/hcl2/terraform.tf"]
                          ["examples/hcl2/policy.clj"]))))
-  (testing "HOCON")
   (testing "Ignore"
     (testing ".gitignore")
     (testing ".dockerignore"
