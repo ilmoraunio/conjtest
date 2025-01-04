@@ -203,7 +203,27 @@
            (cljconf-test ["examples/hcl1/gke.tf"
                           "examples/hcl1/gke-show.json"]
                          ["examples/hcl1/combined_policy.clj"]))))
-  (testing "HCL 2")
+  (testing "HCL 2"
+    (is (= {:exit 1,
+            :out [[{:type "FAIL",
+                    :file "examples/hcl2/terraform.tf",
+                    :rule "deny-fully-open-ingress",
+                    :message "ASG rules (\"my-rule\") define a fully open ingress"}
+                   {:type "FAIL",
+                    :file "examples/hcl2/terraform.tf",
+                    :rule "deny-http",
+                    :message "ALB listeners (\"my-alb-listener\") are using HTTP rather than HTTPS"}
+                   {:type "FAIL",
+                    :file "examples/hcl2/terraform.tf",
+                    :rule "deny-missing-tags",
+                    :message "AWS resource: aws_alb_listener named 'my-alb-listener' is missing required tags: #{\"owner\" \"environment\"}, AWS resource: aws_db_security_group named 'my-group' is missing required tags: #{\"owner\" \"environment\"}, AWS resource: aws_security_group_rule named 'my-rule' is missing required tags: #{\"owner\" \"environment\"}"}
+                   {:type "FAIL",
+                    :file "examples/hcl2/terraform.tf",
+                    :rule "deny-unencrypted-azure-disk",
+                    :message "Azure disks (\"source\") are not encrypted"}]
+                  {:tests 4, :passed 0, :warnings 0, :failures 4}]}
+           (cljconf-test ["examples/hcl2/terraform.tf"]
+                         ["examples/hcl2/policy.clj"]))))
   (testing "HOCON")
   (testing "Ignore"
     (testing ".gitignore")
