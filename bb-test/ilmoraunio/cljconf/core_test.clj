@@ -225,7 +225,15 @@
            (cljconf-test ["examples/hcl2/terraform.tf"]
                          ["examples/hcl2/policy.clj"]))))
   (testing "Ignore"
-    (testing ".gitignore")
+    (testing ".gitignore"
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "examples/ignore/gitignore/.gitignore",
+                      :rule "deny-no-id-rsa-files-ignored",
+                      :message "id_rsa files should be ignored"}]
+                    {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+             (cljconf-test ["examples/ignore/gitignore/.gitignore"]
+                           ["examples/ignore/gitignore/policy.clj"]))))
     (testing ".dockerignore"
       (is (= {:exit 1,
               :out [[{:type "FAIL",
