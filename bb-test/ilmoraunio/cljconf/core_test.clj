@@ -243,7 +243,15 @@
                     {:tests 1, :passed 0, :warnings 0, :failures 1}]}
              (cljconf-test ["examples/ignore/dockerignore/.dockerignore"]
                            ["examples/ignore/dockerignore/policy.clj"])))))
-  (testing "INI")
+  (testing "INI"
+    (is (= {:exit 1,
+            :out [[{:type "FAIL",
+                    :file "examples/ini/grafana.ini",
+                    :rule "deny-verify-email-disabled",
+                    :message "Users should verify their e-mail address"}]
+                  {:tests 6, :passed 5, :warnings 0, :failures 1}]}
+           (cljconf-test ["examples/ini/grafana.ini"]
+                         ["examples/ini/policy.clj"]))))
   (testing "JSON"
     (testing "CycloneDX"
       (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
