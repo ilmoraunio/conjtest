@@ -267,7 +267,10 @@
            (cljconf-test ["examples/jsonnet/arith.jsonnet"]
                          ["examples/jsonnet/policy.clj"]))))
   (testing "Kustomize")
-  (testing "Properties")
+  (testing "Properties"
+    (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
+           (cljconf-test ["examples/properties/sample.properties"]
+                         ["examples/properties/policy.clj"]))))
   (testing "Serverless Framework")
   (testing "Spdx")
   (testing "Textproto")
