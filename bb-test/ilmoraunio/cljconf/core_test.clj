@@ -266,7 +266,6 @@
                   {:tests 2, :passed 1, :warnings 0, :failures 1}]}
            (cljconf-test ["examples/jsonnet/arith.jsonnet"]
                          ["examples/jsonnet/policy.clj"]))))
-  (testing "Kustomize")
   (testing "Properties"
     (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
            (cljconf-test ["examples/properties/sample.properties"]
@@ -283,18 +282,19 @@
              (cljconf-test ["examples/xml/cyclonedx/cyclonedx.xml"]
                            ["examples/xml/cyclonedx/policy.clj"])))))
   (testing "YAML"
-    (is (= {:exit 1,
-            :out [[{:type "FAIL",
-                    :file "examples/yaml/deployment.yaml",
-                    :rule "deny-missing-required-deployment-selectors",
-                    :message "Deployment \"hello-kubernetes\" must provide app/release labels for pod selectors"}
-                   {:type "FAIL",
-                    :file "examples/yaml/deployment.yaml",
-                    :rule "deny-should-not-run-as-root",
-                    :message "Containers must not run as root in Deployment \"hello-kubernetes\""}]
-                  {:tests 2, :passed 0, :warnings 0, :failures 2}]}
-           (cljconf-test ["examples/yaml/deployment.yaml"]
-                         ["examples/yaml/policy.clj"])))
+    (testing "Kubernetes"
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "examples/yaml/kubernetes/deployment.yaml",
+                      :rule "deny-missing-required-deployment-selectors",
+                      :message "Deployment \"hello-kubernetes\" must provide app/release labels for pod selectors"}
+                     {:type "FAIL",
+                      :file "examples/yaml/kubernetes/deployment.yaml",
+                      :rule "deny-should-not-run-as-root",
+                      :message "Containers must not run as root in Deployment \"hello-kubernetes\""}]
+                    {:tests 2, :passed 0, :warnings 0, :failures 2}]}
+             (cljconf-test ["examples/yaml/kubernetes/deployment.yaml"]
+                           ["examples/yaml/kubernetes/policy.clj"]))))
     (testing "combine example"
       (is (= {:exit 1,
               :out [[{:type "FAIL",
