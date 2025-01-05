@@ -270,7 +270,15 @@
     (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
            (cljconf-test ["examples/properties/sample.properties"]
                          ["examples/properties/policy.clj"]))))
-  (testing "Spdx")
+  (testing "Spdx"
+    (is (= {:exit 1,
+            :out [[{:type "FAIL",
+                    :file "examples/spdx/sbom.spdx",
+                    :rule "deny-incorrect-license",
+                    :message "DataLicense should be 'correct-license', but found 'conftest-demo'"}]
+                  {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+           (cljconf-test ["examples/spdx/sbom.spdx"]
+                         ["examples/spdx/policy.clj"]))))
   (testing "Textproto")
   (testing "Traefik")
   (testing "Typescript")
