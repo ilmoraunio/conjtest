@@ -280,7 +280,16 @@
            (cljconf-test ["examples/spdx/sbom.spdx"]
                          ["examples/spdx/policy.clj"]))))
   (testing "Textproto")
-  (testing "Traefik")
+  (testing "TOML"
+    (testing "Traefik"
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "examples/toml/traefik/traefik.toml",
+                      :rule "deny-disallowed-ciphers",
+                      :message "Following ciphers are not allowed: [\"TLS_RSA_WITH_AES_256_GCM_SHA384\"]"}]
+                    {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+             (cljconf-test ["examples/toml/traefik/traefik.toml"]
+                           ["examples/toml/traefik/policy.clj"])))))
   (testing "Typescript")
   (testing "VCL")
   (testing "XML"
