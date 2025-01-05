@@ -270,7 +270,6 @@
     (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
            (cljconf-test ["examples/properties/sample.properties"]
                          ["examples/properties/policy.clj"]))))
-  (testing "Serverless Framework")
   (testing "Spdx")
   (testing "Textproto")
   (testing "Traefik")
@@ -344,4 +343,17 @@
                       :message "Must be using at least version 3.5 of the Compose file format"}]
                     {:tests 2, :passed 0, :warnings 0, :failures 2}]}
              (cljconf-test ["examples/yaml/dockercompose/docker-compose-invalid.yml"]
-                           ["examples/yaml/dockercompose/policy.clj"]))))))
+                           ["examples/yaml/dockercompose/policy.clj"]))))
+    (testing "Serverless framework"
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "examples/yaml/serverless/serverless.yaml",
+                      :rule "deny-functions-python2.7",
+                      :message "Python 2.7 cannot be used as the runtime for functions"}
+                     {:type "FAIL",
+                      :file "examples/yaml/serverless/serverless.yaml",
+                      :rule "deny-python2.7",
+                      :message "Python 2.7 cannot be the default provider runtime"}]
+                    {:tests 3, :passed 1, :warnings 0, :failures 2}]}
+             (cljconf-test ["examples/yaml/serverless/serverless.yaml"]
+                           ["examples/yaml/serverless/policy.clj"]))))))
