@@ -293,6 +293,14 @@
   (testing "Typescript")
   (testing "VCL")
   (testing "XML"
+    (is (= {:exit 1,
+            :out [[{:type "FAIL",
+                    :file "examples/xml/pom.xml",
+                    :rule "deny-incorrect-compiler-plugin-version",
+                    :message "maven-compiler-plugin must have the following version: 3.6.1"}]
+                  {:tests 3, :passed 2, :warnings 0, :failures 1}]}
+           (cljconf-test ["examples/xml/pom.xml"]
+                         ["examples/xml/policy.clj"])))
     (testing "CycloneDX"
       (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
              (cljconf-test ["examples/xml/cyclonedx/cyclonedx.xml"]
