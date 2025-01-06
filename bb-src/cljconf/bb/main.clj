@@ -29,7 +29,21 @@
 
 
 (def test-cli-spec
-  {:spec {:parser {:coerce :string
+  {:spec {:config {:coerce :string
+                   :alias :c
+                   :desc "Filepath to configuration file"
+                   :default nil
+                   :default-desc ""
+                   :validate {:pred (complement empty?)
+                              :ex-msg "--config must be non-empty string"}}
+          :fail-on-warn {:coerce :boolean
+                         :desc "Produces exit code 1 for any warnings triggered and exit code 2 for any errors triggered"}
+          :go-parsers-only {:coerce :boolean
+                            :alias :go
+                            :desc "Use Go-based parsers only"}
+          :help {:coerce :boolean
+                 :alias :h}
+          :parser {:coerce :string
                    :desc "Explicitly select parser to deserialize input files"
                    :validate {:pred (complement empty?)
                               :ex-msg (constantly "--parser must be non-empty string")}}
@@ -39,19 +53,8 @@
                    :default #{"*"}
                    :default-desc ""
                    :validate {:pred validate-policy
-                              :ex-msg (constantly "--policy must be non-empty string")}}
-          :fail-on-warn {:coerce :boolean
-                         :desc "Produces exit code 1 for any warnings triggered and exit code 2 for any errors triggered"}
-          :config {:coerce :string
-                   :alias :c
-                   :desc "Filepath to configuration file"
-                   :default nil
-                   :default-desc ""
-                   :validate {:pred (complement empty?)
-                              :ex-msg "--config must be non-empty string"}}
-          :help {:coerce :boolean
-                 :alias :h}}
-   :restrict [:parser :policy :config :fail-on-warn :help]})
+                              :ex-msg (constantly "--policy must be non-empty string")}}}
+   :restrict [:config :fail-on-warn :go-parsers-only :help :parser :policy]})
 
 (defn test
   [args]

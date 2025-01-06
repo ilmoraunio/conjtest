@@ -178,7 +178,7 @@
            (cljconf-test ["examples/dotenv/sample.env"]
                          ["examples/dotenv/policy.clj"]))))
   (testing "EDN"
-    (testing "cljconf parser"
+    (testing "clojure parser"
       (is (= {:exit 1, :out [[{:type "FAIL"
                                :file "examples/edn/sample_config.edn",
                                :rule "deny-incorrect-log-level-production",
@@ -186,7 +186,16 @@
                              {:tests 2, :passed 1, :warnings 0, :failures 1}]}
              (cljconf-test ["examples/edn/sample_config.edn"]
                            ["examples/edn/policy.clj"]))))
-    (testing "conftest parser"))
+    (testing "go parser"
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "examples/edn/sample_config.edn",
+                      :rule "deny-incorrect-log-level-production",
+                      :message "Applications in the production environment should have error only logging"}]
+                    {:tests 2, :passed 1, :warnings 0, :failures 1}]}
+             (cljconf-test ["examples/edn/sample_config.edn"]
+                           ["examples/edn/policy_go.clj"]
+                           "--go-parsers-only")))))
   (testing "HCL"
     (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
            (cljconf-test ["examples/hcl1/gke.tf"]
@@ -253,6 +262,26 @@
            (cljconf-test ["examples/ini/grafana.ini"]
                          ["examples/ini/policy.clj"]))))
   (testing "JSON"
+    (testing "package.json"
+      (testing "clojure parser"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/json/package.json",
+                        :rule "deny-caret-ranges",
+                        :message "caret ranges not allowed, offending libraries: ([:express \"^4.17.3\"])"}]
+                      {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+               (cljconf-test ["examples/json/package.json"]
+                             ["examples/json/policy.clj"]))))
+      (testing "go parser"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/json/package.json",
+                        :rule "deny-caret-ranges",
+                        :message "caret ranges not allowed, offending libraries: ([\"express\" \"^4.17.3\"])"}]
+                      {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+               (cljconf-test ["examples/json/package.json"]
+                             ["examples/json/policy_go.clj"]
+                             "--go-parsers-only")))))
     (testing "CycloneDX"
       (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
              (cljconf-test ["examples/json/cyclonedx/cyclonedx.json"]

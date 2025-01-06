@@ -1,0 +1,39 @@
+{
+  "name": "example-package",
+  "version": "1.0.0",
+  "description": "Example package.json with different version styles",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.17.3",
+    "lodash": "~4.17.21",
+    "axios": "0.21.4",
+    "react": "19.x",
+    "typescript": ">=4.4 <5",
+    "next": "latest",
+    "vue": "beta"
+  },
+  "devDependencies": {
+    "jest": "^29.4.3",
+    "eslint": "~8.28.0",
+    "webpack": "5.76.0",
+    "@babel/core": "*",
+    "rollup": ">=2.0.0 <3.0.0"
+  },
+  "peerDependencies": {
+    "react-dom": "19.x",
+    "redux": "^4.1.0"
+  },
+  "optionalDependencies": {
+    "chokidar": "^3.5.0",
+    "fsevents": "~2.3.2"
+  },
+  "engines": {
+    "node": ">=14.0.0 <16.0.0",
+    "npm": "^6.14.0"
+  },
+  "license": "MIT"
+}
