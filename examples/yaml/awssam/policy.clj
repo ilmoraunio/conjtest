@@ -66,6 +66,5 @@
                                 "Properties"
                                 "Environment"
                                 "Variables"])]
-    (prn ::help (filter (fn [x] (some (fn [y] (re-find y x)) sensitive-denylist)) variables))
     (when (seq (filter (fn [x] (some (fn [y] (re-find y x)) sensitive-denylist)) variables))
       "Sensitive data not allowed in environment variables")))
