@@ -291,7 +291,15 @@
              (cljconf-test ["examples/toml/traefik/traefik.toml"]
                            ["examples/toml/traefik/policy.clj"])))))
   (testing "Typescript")
-  (testing "VCL")
+  (testing "VCL"
+    (is (= {:exit 1,
+            :out [[{:type "FAIL",
+                    :file "examples/vcl/varnish.vcl",
+                    :rule "deny-incorrect-port",
+                    :message "default backend port should be 8080"}]
+                  {:tests 2, :passed 1, :warnings 0, :failures 1}]}
+           (cljconf-test ["examples/vcl/varnish.vcl"]
+                         ["examples/vcl/policy.clj"]))))
   (testing "XML"
     (is (= {:exit 1,
             :out [[{:type "FAIL",
