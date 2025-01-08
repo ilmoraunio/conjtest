@@ -44,7 +44,7 @@
           :help {:coerce :boolean
                  :alias :h}
           :parser {:coerce :string
-                   :desc "Explicitly select parser to deserialize input files"
+                   :desc "Use specific parser to parse files. Supported parsers: cue, dockerfile, edn, hcl1, hcl2, ignore, ini, json, jsonnet, properties, spdx, toml, vcl, xml, yaml, dotenv"
                    :validate {:pred (complement empty?)
                               :ex-msg (constantly "--parser must be non-empty string")}}
           :policy {:coerce #{:string}

@@ -124,7 +124,15 @@
 
 (defn test
   [{:keys [args opts]}]
-  (let [inputs (apply (if (:go-parsers-only opts) api/parse-go api/parse) args)
+  (let [{:keys [go-parsers-only parser] :as opts} opts
+        inputs (apply
+                 (cond
+                   (and (some? parser)
+                        (some? go-parsers-only)) (partial api/parse-go-as parser)
+                   (some? go-parsers-only) api/parse-go
+                   (some? parser) (partial api/parse-as parser)
+                   :else api/parse)
+                 args)
         policies (->> (:policy opts)
                       (mapcat (partial fs/glob "."))
                       (filter #(-> % fs/extension #{"clj" "bb" "cljc"}))

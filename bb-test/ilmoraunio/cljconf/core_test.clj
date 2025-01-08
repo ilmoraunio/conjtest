@@ -185,7 +185,10 @@
                                :message "Applications in the production environment should have error only logging"}]
                              {:tests 2, :passed 1, :warnings 0, :failures 1}]}
              (cljconf-test ["examples/edn/sample_config.edn"]
-                           ["examples/edn/policy.clj"]))))
+                           ["examples/edn/policy.clj"])
+             (cljconf-test ["examples/edn/sample_config.edn"]
+                           ["examples/edn/policy.clj"]
+                           "--parser" "edn"))))
     (testing "go parser"
       (is (= {:exit 1,
               :out [[{:type "FAIL",
@@ -195,7 +198,11 @@
                     {:tests 2, :passed 1, :warnings 0, :failures 1}]}
              (cljconf-test ["examples/edn/sample_config.edn"]
                            ["examples/edn/policy_go.clj"]
-                           "--go-parsers-only")))))
+                           "--go-parsers-only")
+             (cljconf-test ["examples/edn/sample_config.edn"]
+                           ["examples/edn/policy_go.clj"]
+                           "--go-parsers-only"
+                           "--parser" "edn")))))
   (testing "HCL"
     (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
            (cljconf-test ["examples/hcl1/gke.tf"]
@@ -233,6 +240,20 @@
                   {:tests 4, :passed 0, :warnings 0, :failures 4}]}
            (cljconf-test ["examples/hcl2/terraform.tf"]
                          ["examples/hcl2/policy.clj"]))))
+  (testing "HOCON"
+    (is (= {:exit 1,
+            :out [[{:type "FAIL",
+                    :file "examples/hocon/hocon.conf",
+                    :rule "deny-wrong-port",
+                    :message "Play http server port should be 9000"}]
+                  {:tests 2, :passed 1, :warnings 0, :failures 1}]}
+           (cljconf-test ["examples/hocon/hocon.conf"]
+                         ["examples/hocon/policy.clj"]
+                         "--parser" "hocon")
+           (cljconf-test ["examples/hocon/hocon.conf"]
+                         ["examples/hocon/policy.clj"]
+                         "--go-parsers-only"
+                         "--parser" "hocon"))))
   (testing "Ignore"
     (testing ".gitignore"
       (is (= {:exit 1,
@@ -271,7 +292,10 @@
                         :message "caret ranges not allowed, offending libraries: ([:express \"^4.17.3\"])"}]
                       {:tests 1, :passed 0, :warnings 0, :failures 1}]}
                (cljconf-test ["examples/json/package.json"]
-                             ["examples/json/policy.clj"]))))
+                             ["examples/json/policy.clj"])
+               (cljconf-test ["examples/json/package.json"]
+                             ["examples/json/policy.clj"]
+                             "--parser" "json"))))
       (testing "go parser"
         (is (= {:exit 1,
                 :out [[{:type "FAIL",
@@ -281,7 +305,11 @@
                       {:tests 1, :passed 0, :warnings 0, :failures 1}]}
                (cljconf-test ["examples/json/package.json"]
                              ["examples/json/policy_go.clj"]
-                             "--go-parsers-only")))))
+                             "--go-parsers-only")
+               (cljconf-test ["examples/json/package.json"]
+                             ["examples/json/policy_go.clj"]
+                             "--go-parsers-only"
+                             "--parser" "json")))))
     (testing "CycloneDX"
       (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
              (cljconf-test ["examples/json/cyclonedx/cyclonedx.json"]
