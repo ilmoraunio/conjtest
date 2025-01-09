@@ -27,7 +27,6 @@
               (filter (partial = ""))
               (some identity)))))
 
-
 (def test-cli-spec
   {:spec {:config {:coerce :string
                    :alias :c
@@ -56,6 +55,18 @@
                               :ex-msg (constantly "--policy must be non-empty string")}}}
    :restrict [:config :fail-on-warn :go-parsers-only :help :parser :policy]})
 
+(def parse-cli-spec
+  {:spec {:go-parsers-only {:coerce :boolean
+                            :alias :go
+                            :desc "Use Go-based parsers only"}
+          :help {:coerce :boolean
+                 :alias :h}
+          :parser {:coerce :string
+                   :desc "Use specific parser to parse files. Supported parsers: cue, dockerfile, edn, hcl1, hcl2, ignore, ini, json, jsonnet, properties, spdx, toml, vcl, xml, yaml, dotenv"
+                   :validate {:pred (complement empty?)
+                              :ex-msg (constantly "--parser must be non-empty string")}}}
+   :restrict [:go-parsers-only :help :parser]})
+
 (defn test
   [args]
   (let [{:keys [#_args opts] :as m} (cli/parse-args args test-cli-spec)]
@@ -74,12 +85,29 @@
                   (System/exit 1)))
                (throw e)))))))
 
+(defn parse
+  [args]
+  (let [{:keys [args opts] :as _args} (cli/parse-args args parse-cli-spec)]
+    (if (or (:help opts) (:h opts))
+      (println (show-help test-cli-spec))
+      (try (let [parsed (cljconf.bb.api/parse opts args)]
+             (if-bb-cli
+               (println (pr-str parsed))
+               parsed))
+           (catch Exception e
+             (if-bb-cli
+               (do
+                 (println (ex-message e))
+                 (System/exit 1))
+               (throw e)))))))
+
 (defn -main
   [& args]
   (let [command (keyword (first args))
         args (rest args)]
     (case command
-      :test (test args))))
+      :test (test args)
+      :parse (parse args))))
 
 (comment
   (-main "test"

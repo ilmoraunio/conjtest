@@ -23,6 +23,17 @@
                                  (map (fn [x] (Integer/parseInt x)))
                                  (zipmap [:tests :passed :warnings :failures]))))))
 
+(defn cljconf-parse
+  [inputs & extra-args]
+  (assert (and (coll? inputs) (not-empty inputs)))
+  (-> (apply shell (cond-> (-> [{:out :string, :err :string, :continue true}
+                                "./cljconf"
+                                "parse"]
+                               (into inputs))
+                     extra-args (into extra-args)))
+      (select-keys [:exit :out])
+      (update :out clojure.edn/read-string)))
+
 (deftest api-test
   (testing "smoke test"
     (testing "triggered"
@@ -51,99 +62,159 @@
                        :config "test.cljconf.edn"}}))))))
 
 (deftest cli-test
-  (testing "allow rule"
-    (testing "fails when rule returns false"
-      (is (= {:exit 1,
-              :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-malli-rule", :message "port should be 80"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-my-absolute-bare-rule", :message ":cljconf/rule-validation-failed"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-my-bare-rule", :message "port should be 80"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-my-rule", :message "port should be 80"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "differently-named-allow-rule", :message "port should be 80"}]
-                    {:tests 5, :passed 0, :warnings 0, :failures 5}]}
-             (cljconf-test ["test-resources/invalid.yaml"]
-                           ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"]))))
-    (testing "passes when rule returns true"
-      (is (= {:exit 0 :out [[] {:tests 5 :passed 5 :warnings 0 :failures 0}]}
-             (cljconf-test ["test-resources/valid.yaml"]
-                           ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"])))))
-  (testing "deny rule"
-    (testing "fails when rule returns true"
-      (is (= {:exit 0 :out [[] {:tests 5 :passed 5 :warnings 0 :failures 0}]}
-             (cljconf-test ["test-resources/valid.yaml"]
-                           ["test-resources/ilmoraunio/cljconf/example_deny_rules.clj"]))))
-    (testing "passes when rule returns false"
-      (is (= {:exit 1,
-              :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-malli-rule", :message "port should be 80"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-absolute-bare-rule", :message ":cljconf/rule-validation-failed"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-bare-rule", :message "port should be 80"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-rule", :message "port should be 80"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "differently-named-deny-rule", :message "port should be 80"}]
-                    {:tests 5, :passed 0, :warnings 0, :failures 5}]}
-             (cljconf-test ["test-resources/invalid.yaml"]
-                           ["test-resources/ilmoraunio/cljconf/example_deny_rules.clj"])))))
-  (testing "warn rule"
-    (testing "fails when rule returns true and --fail-on-warn flag is provided"
-      (is (= {:exit 1,
-              :out [[{:type "WARN", :file "test-resources/invalid.yaml", :rule "differently-named-warn-rule", :message "port should be 80"}
-                     {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-malli-rule", :message "port should be 80"}
-                     {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-absolute-bare-rule", :message ":cljconf/rule-validation-failed"}
-                     {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-bare-rule", :message "port should be 80"}
-                     {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-rule", :message "port should be 80"}]
-                    {:tests 5, :passed 0, :warnings 5, :failures 0}]}
-             (cljconf-test ["test-resources/invalid.yaml"]
-                           ["test-resources/ilmoraunio/cljconf/example_warn_rules.clj"]
-                           "--fail-on-warn"))))
-    (testing "warns when rule returns true and --fail-on-warn flag is not provided"
-      (is (= {:exit 0 :out [[] {:tests 5 :passed 0 :warnings 5 :failures 0}]}
-             (cljconf-test ["test-resources/invalid.yaml"]
-                           ["test-resources/ilmoraunio/cljconf/example_warn_rules.clj"]))))
-    (testing "passes when rule returns false"
-      (is (= {:exit 0 :out [[] {:tests 5 :passed 5 :warnings 0 :failures 0}]}
-             (cljconf-test ["test-resources/valid.yaml"]
-                           ["test-resources/ilmoraunio/cljconf/example_warn_rules.clj"])))))
-  (testing "combined policies"
-    (testing "smoke test"
-      (is (= {:exit 0, :out [[] {:tests 15, :passed 15, :warnings 0, :failures 0}]}
-             (cljconf-test ["test-resources/valid.yaml"]
-                           ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"
-                            "test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
-                            "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"]))))
-    (testing "duplicates are deduped"
-      (is (= {:exit 0, :out [[] {:tests 5, :passed 5, :warnings 0, :failures 0}]}
-             (cljconf-test ["test-resources/valid.yaml"]
-                           ["test-resources/ilmoraunio/cljconf/example_deny_rules.clj"
-                            "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"]))))
-    (testing "exit code 2 when deny rule returns true and --fail-on-warn flag is provided"
-      (is (= {:exit 2,
-              :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-malli-rule", :message "port should be 80"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-absolute-bare-rule", :message ":cljconf/rule-validation-failed"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-bare-rule", :message "port should be 80"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-rule", :message "port should be 80"}
-                     {:type "FAIL", :file "test-resources/invalid.yaml", :rule "differently-named-deny-rule", :message "port should be 80"}
-                     {:type "WARN", :file "test-resources/invalid.yaml", :rule "differently-named-warn-rule", :message "port should be 80"}
-                     {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-malli-rule", :message "port should be 80"}
-                     {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-absolute-bare-rule", :message ":cljconf/rule-validation-failed"}
-                     {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-bare-rule", :message "port should be 80"}
-                     {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-rule", :message "port should be 80"}]
-                    {:tests 10, :passed 0, :warnings 5, :failures 5}]}
-             (cljconf-test ["test-resources/invalid.yaml"]
-                           ["test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
-                            "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"]
-                           "--fail-on-warn")))))
-  (testing "support locally required namespaces"
-    (testing "smoke test"
-      (testing "pass"
-        (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
-               (cljconf-test ["test-resources/valid.yaml"]
-                             ["test-resources/ilmoraunio/cljconf/example_local_require.clj"]
-                             "--config" "test.cljconf.edn"))))
-      (testing "failure"
+  (testing "cljconf test"
+    (testing "allow rule"
+      (testing "fails when rule returns false"
         (is (= {:exit 1,
-                :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-allowlisted-selector-only", :message ":cljconf/rule-validation-failed"}]
-                      {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+                :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-malli-rule", :message "port should be 80"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-my-absolute-bare-rule", :message ":cljconf/rule-validation-failed"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-my-bare-rule", :message "port should be 80"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-my-rule", :message "port should be 80"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "differently-named-allow-rule", :message "port should be 80"}]
+                      {:tests 5, :passed 0, :warnings 0, :failures 5}]}
                (cljconf-test ["test-resources/invalid.yaml"]
-                             ["test-resources/ilmoraunio/cljconf/example_local_require.clj"]
-                             "--config" "test.cljconf.edn")))))))
+                             ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"]))))
+      (testing "passes when rule returns true"
+        (is (= {:exit 0 :out [[] {:tests 5 :passed 5 :warnings 0 :failures 0}]}
+               (cljconf-test ["test-resources/valid.yaml"]
+                             ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"])))))
+    (testing "deny rule"
+      (testing "fails when rule returns true"
+        (is (= {:exit 0 :out [[] {:tests 5 :passed 5 :warnings 0 :failures 0}]}
+               (cljconf-test ["test-resources/valid.yaml"]
+                             ["test-resources/ilmoraunio/cljconf/example_deny_rules.clj"]))))
+      (testing "passes when rule returns false"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-malli-rule", :message "port should be 80"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-absolute-bare-rule", :message ":cljconf/rule-validation-failed"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-bare-rule", :message "port should be 80"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-rule", :message "port should be 80"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "differently-named-deny-rule", :message "port should be 80"}]
+                      {:tests 5, :passed 0, :warnings 0, :failures 5}]}
+               (cljconf-test ["test-resources/invalid.yaml"]
+                             ["test-resources/ilmoraunio/cljconf/example_deny_rules.clj"])))))
+    (testing "warn rule"
+      (testing "fails when rule returns true and --fail-on-warn flag is provided"
+        (is (= {:exit 1,
+                :out [[{:type "WARN", :file "test-resources/invalid.yaml", :rule "differently-named-warn-rule", :message "port should be 80"}
+                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-malli-rule", :message "port should be 80"}
+                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-absolute-bare-rule", :message ":cljconf/rule-validation-failed"}
+                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-bare-rule", :message "port should be 80"}
+                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-rule", :message "port should be 80"}]
+                      {:tests 5, :passed 0, :warnings 5, :failures 0}]}
+               (cljconf-test ["test-resources/invalid.yaml"]
+                             ["test-resources/ilmoraunio/cljconf/example_warn_rules.clj"]
+                             "--fail-on-warn"))))
+      (testing "warns when rule returns true and --fail-on-warn flag is not provided"
+        (is (= {:exit 0 :out [[] {:tests 5 :passed 0 :warnings 5 :failures 0}]}
+               (cljconf-test ["test-resources/invalid.yaml"]
+                             ["test-resources/ilmoraunio/cljconf/example_warn_rules.clj"]))))
+      (testing "passes when rule returns false"
+        (is (= {:exit 0 :out [[] {:tests 5 :passed 5 :warnings 0 :failures 0}]}
+               (cljconf-test ["test-resources/valid.yaml"]
+                             ["test-resources/ilmoraunio/cljconf/example_warn_rules.clj"])))))
+    (testing "combined policies"
+      (testing "smoke test"
+        (is (= {:exit 0, :out [[] {:tests 15, :passed 15, :warnings 0, :failures 0}]}
+               (cljconf-test ["test-resources/valid.yaml"]
+                             ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"
+                              "test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
+                              "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"]))))
+      (testing "duplicates are deduped"
+        (is (= {:exit 0, :out [[] {:tests 5, :passed 5, :warnings 0, :failures 0}]}
+               (cljconf-test ["test-resources/valid.yaml"]
+                             ["test-resources/ilmoraunio/cljconf/example_deny_rules.clj"
+                              "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"]))))
+      (testing "exit code 2 when deny rule returns true and --fail-on-warn flag is provided"
+        (is (= {:exit 2,
+                :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-malli-rule", :message "port should be 80"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-absolute-bare-rule", :message ":cljconf/rule-validation-failed"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-bare-rule", :message "port should be 80"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-rule", :message "port should be 80"}
+                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "differently-named-deny-rule", :message "port should be 80"}
+                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "differently-named-warn-rule", :message "port should be 80"}
+                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-malli-rule", :message "port should be 80"}
+                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-absolute-bare-rule", :message ":cljconf/rule-validation-failed"}
+                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-bare-rule", :message "port should be 80"}
+                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-rule", :message "port should be 80"}]
+                      {:tests 10, :passed 0, :warnings 5, :failures 5}]}
+               (cljconf-test ["test-resources/invalid.yaml"]
+                             ["test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
+                              "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"]
+                             "--fail-on-warn")))))
+    (testing "support locally required namespaces"
+      (testing "smoke test"
+        (testing "pass"
+          (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
+                 (cljconf-test ["test-resources/valid.yaml"]
+                               ["test-resources/ilmoraunio/cljconf/example_local_require.clj"]
+                               "--config" "test.cljconf.edn"))))
+        (testing "failure"
+          (is (= {:exit 1,
+                  :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-allowlisted-selector-only", :message ":cljconf/rule-validation-failed"}]
+                        {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+                 (cljconf-test ["test-resources/invalid.yaml"]
+                               ["test-resources/ilmoraunio/cljconf/example_local_require.clj"]
+                               "--config" "test.cljconf.edn")))))))
+  (testing "cljconf parse"
+    (testing "clojure parser"
+      (is (= {:exit 0,
+              :out {"test-resources/deps.edn" {:paths ["src" "resources"],
+                                               :deps {'org.clojure/clojure {:mvn/version "1.12.0"}, 'metosin/malli {:mvn/version "0.16.4"}},
+                                               :aliases {:build {:deps {'io.github.clojure/tools.build {:mvn/version "0.10.5"},
+                                                                        'slipset/deps-deploy {:mvn/version "0.2.2"}},
+                                                                 :ns-default 'build},
+                                                         :test {:extra-paths ["test" "test-resources" "examples"],
+                                                                :extra-deps {'lambdaisland/kaocha {:mvn/version "1.82.1306"},
+                                                                             'lambdaisland/kaocha-cljs {:mvn/version "1.4.130"},
+                                                                             'lambdaisland/kaocha-junit-xml {:mvn/version "1.17.101"}}}}}}}
+             (cljconf-parse ["test-resources/deps.edn"])
+             (cljconf-parse ["test-resources/deps.edn"] "--parser" "edn"))))
+    (testing "go parser"
+      (is (= {:exit 0,
+              :out {"test-resources/deps.edn" {":deps" {"org.clojure/clojure" {":mvn/version" "1.12.0"}, "metosin/malli" {":mvn/version" "0.16.4"}},
+                                               ":aliases" {":build" {":deps" {"io.github.clojure/tools.build" {":mvn/version" "0.10.5"},
+                                                                              "slipset/deps-deploy" {":mvn/version" "0.2.2"}},
+                                                                     ":ns-default" "build"},
+                                                           ":test" {":extra-paths" ["test" "test-resources" "examples"],
+                                                                    ":extra-deps" {"lambdaisland/kaocha-cljs" {":mvn/version" "1.4.130"},
+                                                                                   "lambdaisland/kaocha-junit-xml" {":mvn/version" "1.17.101"},
+                                                                                   "lambdaisland/kaocha" {":mvn/version" "1.82.1306"}}}},
+                                               ":paths" ["src" "resources"]}}}
+             (cljconf-parse ["test-resources/deps.edn"] "--go-parsers-only"))))
+    (testing "--parser"
+      (is (= {:exit 0, :out {"test-resources/test.json" {:hello [1 2 4], "@foo" "bar"}}}
+             (cljconf-parse ["test-resources/test.json"])
+             (cljconf-parse ["test-resources/test.json"] "--parser" "json")))
+      (is (= {:exit 0, :out {"test-resources/test.json" {"hello" [1.0 2.0 4.0], "@foo" "bar"}}}
+             (cljconf-parse ["test-resources/test.json"] "--parser" "yaml"))))
+    (testing "multiple arguments"
+      (is (= {:exit 0,
+              :out {"test-resources/test.json" {:hello [1 2 4], "@foo" "bar"},
+                    "test-resources/deps.edn" {:paths ["src" "resources"],
+                                               :deps {'org.clojure/clojure {:mvn/version "1.12.0"},
+                                                      'metosin/malli {:mvn/version "0.16.4"}},
+                                               :aliases {:build {:deps {'io.github.clojure/tools.build {:mvn/version "0.10.5"},
+                                                                        'slipset/deps-deploy {:mvn/version "0.2.2"}},
+                                                                 :ns-default 'build},
+                                                         :test {:extra-paths ["test" "test-resources" "examples"],
+                                                                :extra-deps {'lambdaisland/kaocha {:mvn/version "1.82.1306"},
+                                                                             'lambdaisland/kaocha-cljs {:mvn/version "1.4.130"},
+                                                                             'lambdaisland/kaocha-junit-xml {:mvn/version "1.17.101"}}}}},
+                    "test-resources/invalid.yaml" {"metadata" {"name" "hello-kubernetes"},
+                                                   "spec" {"type" "LoadBalancer",
+                                                           "ports" [{"port" 81.0, "targetPort" 8080.0}],
+                                                           "selector" {"app" "bad-hello-kubernetes"}},
+                                                   "apiVersion" "v1",
+                                                   "kind" "Service"},
+                    "test-resources/valid.yaml" {"metadata" {"name" "hello-kubernetes"},
+                                                 "spec" {"type" "LoadBalancer",
+                                                         "ports" [{"port" 80.0, "targetPort" 8080.0}],
+                                                         "selector" {"app" "hello-kubernetes"}},
+                                                 "apiVersion" "v1",
+                                                 "kind" "Service"}}}
+             (cljconf-parse ["test-resources/test.json" "test-resources/deps.edn" "test-resources/valid.yaml" "test-resources/invalid.yaml"])
+             (cljconf-parse ["test-resources/*.{json,edn,yaml}"]))))))
 
 (deftest examples-test
   (testing "Configfile")

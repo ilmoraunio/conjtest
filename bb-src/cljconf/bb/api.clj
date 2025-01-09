@@ -122,17 +122,20 @@
      :summary (:summary summary-report)
      :summary-report (:report summary-report)}))
 
+(defn parse
+  [{:keys [go-parsers-only parser] :as _opts} args]
+  (apply
+    (cond
+      (and (some? parser)
+           (some? go-parsers-only)) (partial api/parse-go-as parser)
+      (some? go-parsers-only) api/parse-go
+      (some? parser) (partial api/parse-as parser)
+      :else api/parse)
+    args))
+
 (defn test
   [{:keys [args opts]}]
-  (let [{:keys [go-parsers-only parser] :as opts} opts
-        inputs (apply
-                 (cond
-                   (and (some? parser)
-                        (some? go-parsers-only)) (partial api/parse-go-as parser)
-                   (some? go-parsers-only) api/parse-go
-                   (some? parser) (partial api/parse-as parser)
-                   :else api/parse)
-                 args)
+  (let [inputs (parse opts args)
         policies (->> (:policy opts)
                       (mapcat (partial fs/glob "."))
                       (filter #(-> % fs/extension #{"clj" "bb" "cljc"}))
