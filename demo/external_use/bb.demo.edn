@@ -1,0 +1,7 @@
+{:paths ["."]
+ :deps {ilmoraunio/cljconf {:local/root "../.."}} ; TODO: publish
+ :pods {pod-ilmoraunio-conftest-clj {:path "pod-ilmoraunio-conftest-clj/pod-ilmoraunio-conftest-clj" ; TODO: publish
+                                     :cache false}}
+ :tasks
+ {:requires ([main])
+  test (apply main/test *command-line-args*)}}
