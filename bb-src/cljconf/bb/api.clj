@@ -101,19 +101,27 @@
     {:summary summary
      :summary-report (format "%s\n" summary-text)}))
 
+(defn -format-message
+  ([filename rule-type name message]
+   (format "%s - %s - %s - %s"
+           (case rule-type
+             (:allow :deny) "FAIL"
+             :warn "WARN")
+           filename
+           name
+           message))
+  ([filename {:keys [message name rule-type]}]
+   (cond
+     (string? message) (-format-message filename rule-type name message)
+     (coll? message) (clojure.string/join "\n" (map (partial -format-message filename rule-type name) message)))))
+
 (defn -failure-report
   [result]
   (let [failures-text (->> result
                            (mapcat (fn [[filename results]]
-                                     (keep (fn [{:keys [message name rule-type failure?]}]
+                                     (keep (fn [{:keys [failure?] :as rule-eval}]
                                              (when failure?
-                                               (format "%s - %s - %s - %s"
-                                                       (case rule-type
-                                                         (:allow :deny) "FAIL"
-                                                         :warn "WARN")
-                                                       filename
-                                                       name
-                                                       message)))
+                                               (-format-message filename rule-eval)))
                                            results)))
                            (string/join "\n")
                            (format "%s\n"))

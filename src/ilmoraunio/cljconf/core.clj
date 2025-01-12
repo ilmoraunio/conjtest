@@ -7,6 +7,10 @@
   [x]
   (when (string? x) x))
 
+(defn coll-or-nil
+  [x]
+  (when (coll? x) x))
+
 (defn rule-type
   [rule]
   (let [m (meta rule)]
@@ -57,11 +61,18 @@
                                      (vector? inputs) input)
                        result ((rule-function rule) rule-target)
                        failure (boolean (case rule-type
-                                          :allow (or (not result) (string? result))
-                                          (:warn :deny) result))]
+                                          :allow (or (not result)
+                                                     (string? result)
+                                                     (and (coll? result)
+                                                          (not-empty result)))
+                                          (:warn :deny) (when result
+                                                          (if (coll? result)
+                                                            (not-empty result)
+                                                            true))))]
                    (cond
                      (map? inputs) [(first input) [{:message (when (true? failure)
                                                                (or (string-or-nil result)
+                                                                   (coll-or-nil result)
                                                                    (rule-message rule)
                                                                    :cljconf/rule-validation-failed))
                                                     :name (rule-name rule)
@@ -70,6 +81,7 @@
                                                     :failure? failure}]]
                      (vector? inputs) {:message (when (true? failure)
                                                   (or (string-or-nil result)
+                                                      (coll-or-nil result)
                                                       (rule-message rule)
                                                       :cljconf/rule-validation-failed))
                                        :name (rule-name rule)
