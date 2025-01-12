@@ -11,7 +11,7 @@
   [rule]
   (let [m (meta rule)]
     (or (:type rule)
-        (:type (var-get rule))
+        (and (var? rule) (:type (var-get rule)))
         (:rule/type m)
         (keyword (second ((fnil (partial re-find #"(^allow|^deny|^warn)-") "") (name (:name m)))))
         (throw (ex-info "invalid rule" {:rule rule})))))
@@ -25,19 +25,21 @@
 (defn rule-name
   [rule]
   (name (or (:name rule)
-            (:name (var-get rule))
-            (:name (meta rule)))))
+            (and (var? rule) (:name (var-get rule)))
+            (:name (meta rule))
+            (:rule/name (meta rule))
+            (throw (ex-info "rule name not found" {:rule rule})))))
 
 (defn rule-message
   [rule]
   (or (:message rule)
-      (:message (var-get rule))
+      (and (var? rule) (:message (var-get rule)))
       (:rule/message (meta rule))))
 
 (defn rule-function
   [rule]
   (let [f-or-schema (or (:rule rule)
-                        (:rule (var-get rule))
+                        (and (var? rule) (:rule (var-get rule)))
                         rule)]
     (if (vector? f-or-schema)
       (partial m/validate f-or-schema)
@@ -86,6 +88,7 @@
   (->> (mapcat (fn [x]
                  (cond
                    (map? x) [x]
+                   (fn? x) [x]
                    (var? x) (filter rule? [x])
                    (instance? clojure.lang.Namespace x) (resolve-ns-functions x)
                    (symbol? x) (resolve-ns-functions x)))

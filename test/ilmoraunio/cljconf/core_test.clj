@@ -408,6 +408,93 @@
                (the-ns 'ilmoraunio.cljconf.example-allow-rules)
                (the-ns 'ilmoraunio.cljconf.example-deny-rules)
                (the-ns 'ilmoraunio.cljconf.example-warn-rules))))))
+  (testing "pass functions directly"
+    (testing "triggered"
+      (is (= {"test-resources/test.yaml" [{:message "port should be 80",
+                                           :name "allow-my-rule",
+                                           :rule-type :allow,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? true}
+                                          {:message "port should be 80",
+                                           :name "deny-my-rule",
+                                           :rule-type :deny,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? true}
+                                          {:message "port should be 80",
+                                           :name "warn-my-rule",
+                                           :rule-type :warn,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? true}]}
+             (conftest/test
+               (assoc-in test-input-yaml ["test-resources/test.yaml"
+                                          "spec"
+                                          "ports"
+                                          0
+                                          "port"] 9999.0)
+               ^{:rule/type :allow
+                 :rule/name :allow-my-rule
+                 :rule/message "port should be 80"}
+               (fn [input]
+                 (and (= "v1" (get input "apiVersion"))
+                      (= "Service" (get input "kind"))
+                      (= 80.0 (get-in input ["spec" "ports" 0 "port"]))))
+
+               ^{:rule/type :deny
+                 :rule/name :deny-my-rule
+                 :rule/message "port should be 80"}
+               (fn [input]
+                 (and (= "v1" (get input "apiVersion"))
+                      (= "Service" (get input "kind"))
+                      (not= 80.0 (get-in input ["spec" "ports" 0 "port"]))))
+
+               ^{:rule/type :warn
+                 :rule/name :warn-my-rule
+                 :rule/message "port should be 80"}
+               (fn [input]
+                 (and (= "v1" (get input "apiVersion"))
+                      (= "Service" (get input "kind"))
+                      (not= 80.0 (get-in input ["spec" "ports" 0 "port"]))))))))
+    (testing "not triggered"
+      (is (= {"test-resources/test.yaml" [{:message nil,
+                                           :name "allow-my-rule",
+                                           :rule-type :allow,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? false}
+                                          {:message nil,
+                                           :name "deny-my-rule",
+                                           :rule-type :deny,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? false}
+                                          {:message nil,
+                                           :name "warn-my-rule",
+                                           :rule-type :warn,
+                                           :rule-target "test-resources/test.yaml",
+                                           :failure? false}]}
+             (conftest/test
+               test-input-yaml
+               ^{:rule/type :allow
+                 :rule/name :allow-my-rule
+                 :rule/message "port should be 80"}
+               (fn [input]
+                 (and (= "v1" (get input "apiVersion"))
+                      (= "Service" (get input "kind"))
+                      (= 80.0 (get-in input ["spec" "ports" 0 "port"]))))
+
+               ^{:rule/type :deny
+                 :rule/name :deny-my-rule
+                 :rule/message "port should be 80"}
+               (fn [input]
+                 (and (= "v1" (get input "apiVersion"))
+                      (= "Service" (get input "kind"))
+                      (not= 80.0 (get-in input ["spec" "ports" 0 "port"]))))
+
+               ^{:rule/type :warn
+                 :rule/name :warn-my-rule
+                 :rule/message "port should be 80"}
+               (fn [input]
+                 (and (= "v1" (get input "apiVersion"))
+                      (= "Service" (get input "kind"))
+                      (not= 80.0 (get-in input ["spec" "ports" 0 "port"])))))))))
   (testing "multiple map entries"
     (is (= {"test-resources/test.yaml" [{:message nil,
                                          :name "allow-my-rule",
