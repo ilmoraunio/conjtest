@@ -468,7 +468,7 @@
               :out [[{:type "FAIL",
                       :file "examples/yaml/combine/combine.yaml",
                       :rule "deny-deployments-with-no-matching-service",
-                      :message "Deployments ['goodbye-kubernetes'] have no matching service"}]
+                      :message "Deployment 'goodbye-kubernetes' has no matching service"}]
                     {:tests 1, :passed 0, :warnings 0, :failures 1}]}
              (cljconf-test ["examples/yaml/combine/combine.yaml"]
                            ["examples/yaml/combine/policy.clj"]))))
