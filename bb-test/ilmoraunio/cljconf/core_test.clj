@@ -236,11 +236,11 @@
             :out [[{:type "FAIL",
                     :file "examples/dockerfile/Dockerfile",
                     :rule "deny-unallowed-commands",
-                    :message "unallowed commands found [\"apk add --no-cache python3 python3-dev build-base && pip3 install awscli==1.18.1\"]"}
+                    :message "unallowed command found 'apk add --no-cache python3 python3-dev build-base && pip3 install awscli==1.18.1'"}
                    {:type "FAIL",
                     :file "examples/dockerfile/Dockerfile",
                     :rule "deny-unallowed-images",
-                    :message "unallowed image found [\"openjdk:8-jdk-alpine\"]"}]
+                    :message "unallowed image found 'openjdk:8-jdk-alpine'"}]
                   {:tests 2, :passed 0, :warnings 0, :failures 2}]}
            (cljconf-test ["examples/dockerfile/Dockerfile"]
                          ["examples/dockerfile/policy.clj"]))))
@@ -295,19 +295,27 @@
             :out [[{:type "FAIL",
                     :file "examples/hcl2/terraform.tf",
                     :rule "deny-fully-open-ingress",
-                    :message "ASG rules (\"my-rule\") define a fully open ingress"}
+                    :message "ASG rule 'my-rule' defines a fully open ingress"}
                    {:type "FAIL",
                     :file "examples/hcl2/terraform.tf",
                     :rule "deny-http",
-                    :message "ALB listeners (\"my-alb-listener\") are using HTTP rather than HTTPS"}
+                    :message "ALB listener 'my-alb-listener' is using HTTP rather than HTTPS"}
                    {:type "FAIL",
                     :file "examples/hcl2/terraform.tf",
                     :rule "deny-missing-tags",
-                    :message "AWS resource: aws_alb_listener named 'my-alb-listener' is missing required tags: #{\"owner\" \"environment\"}, AWS resource: aws_db_security_group named 'my-group' is missing required tags: #{\"owner\" \"environment\"}, AWS resource: aws_security_group_rule named 'my-rule' is missing required tags: #{\"owner\" \"environment\"}"}
+                    :message "AWS resource: aws_alb_listener named 'my-alb-listener' is missing required tags: #{\"owner\" \"environment\"}"}
+                   {:type "FAIL",
+                    :file "examples/hcl2/terraform.tf",
+                    :rule "deny-missing-tags",
+                    :message "AWS resource: aws_db_security_group named 'my-group' is missing required tags: #{\"owner\" \"environment\"}"}
+                   {:type "FAIL",
+                    :file "examples/hcl2/terraform.tf",
+                    :rule "deny-missing-tags",
+                    :message "AWS resource: aws_security_group_rule named 'my-rule' is missing required tags: #{\"owner\" \"environment\"}"}
                    {:type "FAIL",
                     :file "examples/hcl2/terraform.tf",
                     :rule "deny-unencrypted-azure-disk",
-                    :message "Azure disks (\"source\") are not encrypted"}]
+                    :message "Azure disk 'source' is not encrypted"}]
                   {:tests 4, :passed 0, :warnings 0, :failures 4}]}
            (cljconf-test ["examples/hcl2/terraform.tf"]
                          ["examples/hcl2/policy.clj"]))))
@@ -360,7 +368,7 @@
                 :out [[{:type "FAIL",
                         :file "examples/json/package.json",
                         :rule "deny-caret-ranges",
-                        :message "caret ranges not allowed, offending libraries: ([:express \"^4.17.3\"])"}]
+                        :message "caret ranges not allowed, offending library: [:express \"^4.17.3\"]"}]
                       {:tests 1, :passed 0, :warnings 0, :failures 1}]}
                (cljconf-test ["examples/json/package.json"]
                              ["examples/json/policy.clj"])
@@ -372,7 +380,7 @@
                 :out [[{:type "FAIL",
                         :file "examples/json/package.json",
                         :rule "deny-caret-ranges",
-                        :message "caret ranges not allowed, offending libraries: ([\"express\" \"^4.17.3\"])"}]
+                        :message "caret ranges not allowed, offending library: [\"express\" \"^4.17.3\"]"}]
                       {:tests 1, :passed 0, :warnings 0, :failures 1}]}
                (cljconf-test ["examples/json/package.json"]
                              ["examples/json/policy_go.clj"]
@@ -460,7 +468,7 @@
               :out [[{:type "FAIL",
                       :file "examples/yaml/combine/combine.yaml",
                       :rule "deny-deployments-with-no-matching-service",
-                      :message "Deployments ['goodbye-kubernetes'] have no matching service"}]
+                      :message "Deployment 'goodbye-kubernetes' has no matching service"}]
                     {:tests 1, :passed 0, :warnings 0, :failures 1}]}
              (cljconf-test ["examples/yaml/combine/combine.yaml"]
                            ["examples/yaml/combine/policy.clj"]))))
