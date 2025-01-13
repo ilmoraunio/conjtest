@@ -236,11 +236,11 @@
             :out [[{:type "FAIL",
                     :file "examples/dockerfile/Dockerfile",
                     :rule "deny-unallowed-commands",
-                    :message "unallowed commands found [\"apk add --no-cache python3 python3-dev build-base && pip3 install awscli==1.18.1\"]"}
+                    :message "unallowed command found 'apk add --no-cache python3 python3-dev build-base && pip3 install awscli==1.18.1'"}
                    {:type "FAIL",
                     :file "examples/dockerfile/Dockerfile",
                     :rule "deny-unallowed-images",
-                    :message "unallowed image found [\"openjdk:8-jdk-alpine\"]"}]
+                    :message "unallowed image found 'openjdk:8-jdk-alpine'"}]
                   {:tests 2, :passed 0, :warnings 0, :failures 2}]}
            (cljconf-test ["examples/dockerfile/Dockerfile"]
                          ["examples/dockerfile/policy.clj"]))))
