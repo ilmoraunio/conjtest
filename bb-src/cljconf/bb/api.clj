@@ -112,7 +112,7 @@
            message))
   ([filename {:keys [message name rule-type]}]
    (cond
-     (string? message) (-format-message filename rule-type name message)
+     (or (string? message) (keyword? message)) (-format-message filename rule-type name message)
      (coll? message) (clojure.string/join "\n" (map (partial -format-message filename rule-type name) message)))))
 
 (defn -failure-report
