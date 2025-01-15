@@ -48,7 +48,7 @@
 
 (defn eval-and-resolve-vars
   "Evaluates all fns inside a sci context and returns vars"
-  [{:keys [config] :as _opts} policies]
+  [policies {:keys [config] :as _opts}]
   (let [ctx (sci/init (cond-> {:namespaces {'clojure.core {'abs abs
                                                            'add-tap add-tap
                                                            'file-seq file-seq
@@ -75,32 +75,6 @@
           ns-publics-all (sci/eval-string* ctx command)]
       (mapcat (comp vals :ns-publics) ns-publics-all))))
 
-(defn -summary
-  [result]
-  (reduce (fn [m [_filename results]]
-            (-> m
-                (update :total (partial + (count results)))
-                (update :passed (partial + (count (remove :failure? results))))
-                (update :warnings (partial + (count (filter #(and (#{:warn} (:rule-type %))
-                                                                  (:failure? %))
-                                                            results))))
-                (update :failures (partial + (count (filter #(and (#{:allow :deny} (:rule-type %))
-                                                                  (:failure? %))
-                                                            results))))))
-          {:total 0 :passed 0 :warnings 0 :failures 0}
-          result))
-
-(defn -summary-report
-  [result]
-  (let [summary (-summary result)
-        summary-text (format "%d tests, %d passed, %d warnings, %d failures"
-                             (:total summary)
-                             (:passed summary)
-                             (:warnings summary)
-                             (:failures summary))]
-    {:summary summary
-     :summary-report (format "%s\n" summary-text)}))
-
 (defn -format-message
   ([filename rule-type name message]
    (format "%s - %s - %s - %s"
@@ -115,23 +89,8 @@
      (or (string? message) (keyword? message)) (-format-message filename rule-type name message)
      (coll? message) (clojure.string/join "\n" (map (partial -format-message filename rule-type name) message)))))
 
-(defn -failure-report
-  [result]
-  (let [failures-text (->> result
-                           (mapcat (fn [[filename results]]
-                                     (keep (fn [{:keys [failure?] :as rule-eval}]
-                                             (when failure?
-                                               (-format-message filename rule-eval)))
-                                           results)))
-                           (string/join "\n")
-                           (format "%s\n"))
-        summary-report (-summary-report result)]
-    {:failure-report (format "%s\n%s" failures-text (:summary-report summary-report))
-     :summary (:summary summary-report)
-     :summary-report (:report summary-report)}))
-
 (defn parse
-  [{:keys [go-parsers-only parser] :as _opts} args]
+  [args {:keys [go-parsers-only parser] :as _opts}]
   (apply
     (cond
       (and (some? parser)
@@ -141,33 +100,12 @@
       :else api/parse)
     args))
 
-(defn test
-  [{:keys [args opts]}]
-  (let [inputs (parse opts args)
-        policies (->> (:policy opts)
+(defn test!
+  [inputs {:keys [policy] :as opts}]
+  (let [inputs (parse inputs opts)
+        policies (->> policy
                       (mapcat (partial fs/glob "."))
                       (filter #(-> % fs/extension #{"clj" "bb" "cljc"}))
                       (mapv str))
-        vars (eval-and-resolve-vars opts policies)]
-    {:result (apply cljconf/test inputs vars)}))
-
-(defn any-failures?
-  [{:keys [fail-on-warn]} result]
-  (boolean (not-empty
-             (mapcat
-               (fn [[_filename results]]
-                 (filter #(and ((cond-> #{:allow :deny}
-                                  fail-on-warn (conj :warn)) (:rule-type %))
-                               (:failure? %))
-                         results))
-               result))))
-
-(defn test!
-  ([m]
-   (test! {} m))
-  ([opts m]
-   (let [{:keys [result]} (test m)]
-     (if (any-failures? opts result)
-       (let [failure-report (-failure-report result)]
-         (throw (ex-info (:failure-report failure-report) (select-keys failure-report [:summary]))))
-       (-summary-report result)))))
+        vars (eval-and-resolve-vars policies opts)]
+    (cljconf/test-with-opts! inputs vars opts)))

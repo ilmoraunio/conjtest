@@ -69,16 +69,16 @@
 
 (defn test
   [args]
-  (let [{:keys [#_args opts] :as m} (cli/parse-args args test-cli-spec)]
+  (let [{:keys [args opts] :as m} (cli/parse-args args test-cli-spec)]
     (if (or (:help opts) (:h opts))
       (println (show-help test-cli-spec))
-      (try (println (:summary-report (cljconf.bb.api/test! opts m)))
+      (try (println (:summary-report (cljconf.bb.api/test! args opts)))
            (catch Exception e
              (if-bb-cli
                (do
                  (println (ex-message e))
                  (if (:fail-on-warn opts)
-                   (let [{:keys [warnings failures] :as _summary} (:summary (ex-data e))]
+                   (let [{:keys [warnings failures] :as _summary} (ex-data e)]
                      (cond
                        (pos? failures) (System/exit 2)
                        (pos? warnings) (System/exit 1)))
@@ -90,7 +90,7 @@
   (let [{:keys [args opts] :as _args} (cli/parse-args args parse-cli-spec)]
     (if (or (:help opts) (:h opts))
       (println (show-help test-cli-spec))
-      (try (let [parsed (cljconf.bb.api/parse opts args)]
+      (try (let [parsed (cljconf.bb.api/parse args opts)]
              (if-bb-cli
                (println (pr-str parsed))
                parsed))

@@ -37,29 +37,34 @@
 (deftest api-test
   (testing "smoke test"
     (testing "triggered"
-      (let [args {:args ["test-resources/invalid.yaml"]
-                  :opts {:policy ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"
-                                  "test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
-                                  "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"
-                                  "test-resources/ilmoraunio/cljconf/example_local_require.clj"]
-                         :config "test.cljconf.edn"}}]
-        (is (thrown-with-msg? Exception #"16 tests, 0 passed, 5 warnings, 11 failures"
-                              (api/test! args)))
-        (try
-          (api/test! args)
-          (catch Exception e
-            (is (= {:summary {:total 16, :passed 0, :warnings 5, :failures 11}}
-                   (ex-data e)))))))
+      (is (thrown-with-msg? Exception #"16 tests, 0 passed, 5 warnings, 11 failures"
+                            (api/test! ["test-resources/invalid.yaml"]
+                                       {:policy ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"
+                                                 "test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
+                                                 "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"
+                                                 "test-resources/ilmoraunio/cljconf/example_local_require.clj"]
+                                        :config "test.cljconf.edn"})))
+      (try
+        (api/test! ["test-resources/invalid.yaml"]
+                   {:policy ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"
+                             "test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
+                             "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"
+                             "test-resources/ilmoraunio/cljconf/example_local_require.clj"]
+                    :config "test.cljconf.edn"})
+        (catch Exception e
+          (is (= {:total 16, :passed 0, :warnings 5, :failures 11}
+                 (ex-data e))))))
     (testing "not triggered"
       (is (= {:summary {:total 16, :passed 16, :warnings 0, :failures 0},
               :summary-report "16 tests, 16 passed, 0 warnings, 0 failures\n"}
-             (api/test!
-               {:args ["test-resources/valid.yaml"]
-                :opts {:policy ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"
-                                "test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
-                                "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"
-                                "test-resources/ilmoraunio/cljconf/example_local_require.clj"]
-                       :config "test.cljconf.edn"}}))))))
+             (select-keys
+              (api/test! ["test-resources/valid.yaml"]
+                         {:policy ["test-resources/ilmoraunio/cljconf/example_allow_rules.clj"
+                                   "test-resources/ilmoraunio/cljconf/example_warn_rules.clj"
+                                   "test-resources/ilmoraunio/cljconf/example_deny_rules.clj"
+                                   "test-resources/ilmoraunio/cljconf/example_local_require.clj"]
+                          :config "test.cljconf.edn"})
+              [:summary :summary-report]))))))
 
 (deftest cli-test
   (testing "cljconf test"
