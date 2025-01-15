@@ -152,7 +152,7 @@
                              (:warnings summary)
                              (:failures summary))]
     {:summary summary
-     :summary-report (format "%s\n" summary-text)
+     :summary-report (when summary (format "%s\n" summary-text))
      :result result}))
 
 (defn -failure-report
@@ -167,48 +167,53 @@
                            (format "%s\n"))
         summary-report (-summary-report result)]
     {:summary (:summary summary-report)
-     :failure-report (format "%s\n%s" failures-text (:summary-report summary-report))
+     :failure-report (when (:summary summary-report)
+                       (format "%s\n%s" failures-text (:summary-report summary-report)))
      :result result}))
 
 (defn filter-results
-  [{:keys [fail-on-warn]} results]
+  [results {:keys [fail-on-warn]}]
   (filter #(and ((cond-> #{:allow :deny}
                    fail-on-warn (conj :warn)) (:rule-type %))
                 (:failure? %))
           results))
 
 (defn any-failures?
-  [opts result]
+  [result opts]
   (boolean (not-empty
              (mapcat
                (cond
-                 (map? result) (fn [[_filename evaluations]] (filter-results opts evaluations))
-                 (coll? result) (fn [evaluations] (filter-results opts evaluations)))
+                 (map? result) (fn [[_filename evaluations]] (filter-results evaluations opts))
+                 (coll? result) (fn [evaluations] (filter-results evaluations opts)))
                result))))
 
 (defn test-with-opts
-  [inputs rules & opts]
-  (let [result (cond
-                 (map? inputs)
-                 (apply merge-with into (map (partial -test inputs)
-                                             (resolve-functions rules)))
-                 (vector? inputs)
-                 (mapcat identity (keep (comp not-empty (partial -test inputs))
-                                        (resolve-functions rules))))]
-    (if (any-failures? opts result)
-      (-failure-report result)
-      (-summary-report result))))
+  ([inputs rules]
+   (test-with-opts inputs rules nil))
+  ([inputs rules opts]
+   (let [result (cond
+                  (map? inputs)
+                  (apply merge-with into (map (partial -test inputs)
+                                              (resolve-functions rules)))
+                  (vector? inputs)
+                  (mapcat identity (keep (comp not-empty (partial -test inputs))
+                                         (resolve-functions rules))))]
+     (if (any-failures? result opts)
+       (-failure-report result)
+       (-summary-report result)))))
 
 (defn test
   [inputs & rules]
   (test-with-opts inputs rules))
 
 (defn test-with-opts!
-  [inputs rules & opts]
-  (let [{:keys [failure-report summary-report summary] :as report} (test-with-opts inputs rules opts)]
-    (cond
-      (some? summary-report) report
-      (some? failure-report) (throw (ex-info failure-report summary)))))
+  ([inputs rules]
+   (test-with-opts! inputs rules nil))
+  ([inputs rules opts]
+   (let [{:keys [failure-report summary-report summary] :as report} (test-with-opts inputs rules opts)]
+     (cond
+       (some? failure-report) (throw (ex-info failure-report summary))
+       (some? summary-report) report))))
 
 (defn test!
   [inputs & rules]
