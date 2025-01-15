@@ -13,6 +13,13 @@
                                        "ports" [{"port" 80.0 "targetPort" 8080.0}]
                                        "selector" {"app" "hello-kubernetes"}}}})
 
+(def test-invalid-yaml
+  (assoc-in test-input-yaml ["test-resources/test.yaml"
+                             "spec"
+                             "ports"
+                             0
+                             "port"] 9999.0))
+
 (deftest rules-test
   (testing "allow rules"
     (testing "triggered"
@@ -426,9 +433,9 @@
                    (the-ns 'ilmoraunio.cljconf.example-deny-rules)
                    (the-ns 'ilmoraunio.cljconf.example-warn-rules))
                  (select-keys [:result :summary]))))))
-  (testing "pass functions directly"
+  (testing "anonymous functions"
     (testing "triggered"
-      (is (= {:summary {:total 3, :passed 0, :warnings 1, :failures 2}
+      (is (= {:summary {:total 4, :passed 0, :warnings 1, :failures 3}
               :result {"test-resources/test.yaml" [{:message "port should be 80",
                                                     :name "allow-my-rule",
                                                     :rule-type :allow,
@@ -436,6 +443,11 @@
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "deny-my-rule",
+                                                    :rule-type :deny,
+                                                    :rule-target "test-resources/test.yaml",
+                                                    :failure? true}
+                                                   {:message :cljconf/rule-validation-failed,
+                                                    :name nil,
                                                     :rule-type :deny,
                                                     :rule-target "test-resources/test.yaml",
                                                     :failure? true}
@@ -466,6 +478,12 @@
                           (= "Service" (get input "kind"))
                           (not= 80.0 (get-in input ["spec" "ports" 0 "port"]))))
 
+                   ;; "plain" anonymous functions (with no overriding metadata) are implicitly deny rules
+                   (fn [input]
+                     (and (= "v1" (get input "apiVersion"))
+                          (= "Service" (get input "kind"))
+                          (not= 80.0 (get-in input ["spec" "ports" 0 "port"]))))
+
                    ^{:rule/type :warn
                      :rule/name :warn-my-rule
                      :rule/message "port should be 80"}
@@ -475,7 +493,7 @@
                           (not= 80.0 (get-in input ["spec" "ports" 0 "port"])))))
                  (select-keys [:result :summary])))))
     (testing "not triggered"
-      (is (= {:summary {:total 3, :passed 3, :warnings 0, :failures 0}
+      (is (= {:summary {:total 4, :passed 4, :warnings 0, :failures 0}
               :result {"test-resources/test.yaml" [{:message nil,
                                                     :name "allow-my-rule",
                                                     :rule-type :allow,
@@ -483,6 +501,11 @@
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "deny-my-rule",
+                                                    :rule-type :deny,
+                                                    :rule-target "test-resources/test.yaml",
+                                                    :failure? false}
+                                                   {:message nil,
+                                                    :name nil,
                                                     :rule-type :deny,
                                                     :rule-target "test-resources/test.yaml",
                                                     :failure? false}
@@ -509,6 +532,11 @@
                           (= "Service" (get input "kind"))
                           (not= 80.0 (get-in input ["spec" "ports" 0 "port"]))))
 
+                   (fn [input]
+                     (and (= "v1" (get input "apiVersion"))
+                          (= "Service" (get input "kind"))
+                          (not= 80.0 (get-in input ["spec" "ports" 0 "port"]))))
+
                    ^{:rule/type :warn
                      :rule/name :warn-my-rule
                      :rule/message "port should be 80"}
@@ -516,7 +544,93 @@
                      (and (= "v1" (get input "apiVersion"))
                           (= "Service" (get input "kind"))
                           (not= 80.0 (get-in input ["spec" "ports" 0 "port"])))))
-                 (select-keys [:result :summary]))))))
+                 (select-keys [:result :summary])))))
+    (testing "rule/type affect rule evaluation"
+      (testing "anonymous functions are deny rules by default"
+        (let [deny-rule (fn [input]
+                          (and (= "v1" (get input "apiVersion"))
+                               (= "Service" (get input "kind"))
+                               (not= 80.0 (get-in input ["spec" "ports" 0 "port"]))))]
+          (is (= {:summary {:total 1, :passed 0, :warnings 0, :failures 1},
+                  :failure-report "FAIL - test-resources/test.yaml - :cljconf/rule-validation-failed\n\n1 tests, 0 passed, 0 warnings, 1 failures\n"
+                  :result {"test-resources/test.yaml" [{:message :cljconf/rule-validation-failed,
+                                                        :name nil,
+                                                        :rule-type :deny,
+                                                        :rule-target "test-resources/test.yaml",
+                                                        :failure? true}]}}
+                 (conftest/test test-invalid-yaml deny-rule)
+                 (conftest/test test-invalid-yaml {:rule deny-rule})))))
+      (testing "you can instruct anonymous functions to be allow-based rules"
+        (let [allow-rule ^{:rule/type :allow} (fn [input]
+                                                (and (= "v1" (get input "apiVersion"))
+                                                     (= "Service" (get input "kind"))
+                                                     (= 80.0 (get-in input ["spec" "ports" 0 "port"]))))]
+          (is (= {:summary {:total 1, :passed 0, :warnings 0, :failures 1},
+                  :failure-report "FAIL - test-resources/test.yaml - :cljconf/rule-validation-failed\n\n1 tests, 0 passed, 0 warnings, 1 failures\n"
+                  :result {"test-resources/test.yaml" [{:message :cljconf/rule-validation-failed,
+                                                        :name nil,
+                                                        :rule-type :allow,
+                                                        :rule-target "test-resources/test.yaml",
+                                                        :failure? true}]}}
+                 (conftest/test test-invalid-yaml allow-rule)
+                 (conftest/test test-invalid-yaml {:type :allow :rule allow-rule})))))
+      (testing "you can instruct anonymous functions to be warn-based rules"
+        (let [warn-rule ^{:rule/type :warn} (fn [input]
+                                              (and (= "v1" (get input "apiVersion"))
+                                                   (= "Service" (get input "kind"))
+                                                   (not= 80.0 (get-in input ["spec" "ports" 0 "port"]))))]
+          (is (= {:result {"test-resources/test.yaml" [{:failure? true
+                                                        :message :cljconf/rule-validation-failed
+                                                        :name nil
+                                                        :rule-target "test-resources/test.yaml"
+                                                        :rule-type :warn}]}
+                  :summary {:failures 0 :passed 0 :total 1 :warnings 1}
+                  :summary-report "1 tests, 0 passed, 1 warnings, 0 failures\n"}
+                 (conftest/test test-invalid-yaml warn-rule)
+                 (conftest/test test-invalid-yaml {:type :warn :rule warn-rule}))))))
+    (testing "rule/name are shown in reporting for failing tests"
+      (let [deny-rule ^{:rule/name "my-deny-rule"} (fn [input]
+                                                     (and (= "v1" (get input "apiVersion"))
+                                                          (= "Service" (get input "kind"))
+                                                          (not= 80.0 (get-in input ["spec" "ports" 0 "port"]))))]
+        (is (= {:summary {:total 1, :passed 0, :warnings 0, :failures 1},
+                :failure-report "FAIL - test-resources/test.yaml - my-deny-rule - :cljconf/rule-validation-failed\n\n1 tests, 0 passed, 0 warnings, 1 failures\n",
+                :result {"test-resources/test.yaml" [{:message :cljconf/rule-validation-failed,
+                                                      :name "my-deny-rule",
+                                                      :rule-type :deny,
+                                                      :rule-target "test-resources/test.yaml",
+                                                      :failure? true}]}}
+               (conftest/test test-invalid-yaml deny-rule)
+               (conftest/test test-invalid-yaml {:name "my-deny-rule" :rule deny-rule})))))
+    (testing "rule/message adds top-level error message that is shown by default"
+      (is (= {:summary {:total 1, :passed 0, :warnings 0, :failures 1},
+              :failure-report "FAIL - test-resources/test.yaml - default top-level message\n\n1 tests, 0 passed, 0 warnings, 1 failures\n",
+              :result {"test-resources/test.yaml" [{:message "default top-level message",
+                                                    :name nil,
+                                                    :rule-type :deny,
+                                                    :rule-target "test-resources/test.yaml",
+                                                    :failure? true}]}}
+             (conftest/test test-invalid-yaml
+                            ^{:rule/message "default top-level message"}
+                            (fn [input]
+                              (and (= "v1" (get input "apiVersion"))
+                                   (= "Service" (get input "kind"))
+                                   (not= 80.0 (get-in input ["spec" "ports" 0 "port"])))))))
+      (testing "messages returned from function override rule/message"
+        (is (= {:summary {:total 1, :passed 0, :warnings 0, :failures 1},
+                :failure-report "FAIL - test-resources/test.yaml - overridden local-level message\n\n1 tests, 0 passed, 0 warnings, 1 failures\n",
+                :result {"test-resources/test.yaml" [{:message "overridden local-level message",
+                                                      :name nil,
+                                                      :rule-type :deny,
+                                                      :rule-target "test-resources/test.yaml",
+                                                      :failure? true}]}}
+               (conftest/test test-invalid-yaml
+                              ^{:rule/message "default top-level message"}
+                              (fn [input]
+                                (when (and (= "v1" (get input "apiVersion"))
+                                           (= "Service" (get input "kind"))
+                                           (not= 80.0 (get-in input ["spec" "ports" 0 "port"])))
+                                  "overridden local-level message"))))))))
   (testing "multiple map entries"
     (is (= {:summary {:total 4, :passed 2, :warnings 0, :failures 2}
             :result {"test-resources/test.yaml" [{:message nil,

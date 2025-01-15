@@ -18,8 +18,11 @@
     (or (:type rule)
         (and (var? rule) (:type (var-get rule)))
         (:rule/type m)
-        (keyword (second ((fnil (partial re-find #"(^allow|^deny|^warn)-") "") (name (:name m)))))
-        (throw (ex-info "invalid rule" {:rule rule})))))
+        (some->> (:name m)
+                 name
+                 (re-find #"(^allow|^deny|^warn)-")
+                 second
+                 keyword))))
 
 (defn rule?
   [x]
@@ -29,11 +32,11 @@
 
 (defn rule-name
   [rule]
-  (name (or (:name rule)
-            (and (var? rule) (:name (var-get rule)))
-            (:name (meta rule))
-            (:rule/name (meta rule))
-            (throw (ex-info "rule name not found" {:rule rule})))))
+  (some-> (or (:name rule)
+              (and (var? rule) (:name (var-get rule)))
+              (:name (meta rule))
+              (:rule/name (meta rule)))
+          (name)))
 
 (defn rule-message
   [rule]
@@ -52,7 +55,7 @@
 
 (defn -test
   [inputs rule]
-  (let [rule-type (rule-type rule)]
+  (let [rule-type (or (rule-type rule) :deny)]
     (into (cond
             (map? inputs) {}
             (vector? inputs) [])
@@ -111,13 +114,22 @@
 
 (defn -format-message
   ([filename rule-type name message]
-   (format "%s - %s - %s - %s"
-           (case rule-type
-             (:allow :deny) "FAIL"
-             :warn "WARN")
-           filename
-           name
-           message))
+   (cond
+     (and filename rule-type name message)
+     (format "%s - %s - %s - %s"
+             (case rule-type
+               (:allow :deny) "FAIL"
+               :warn "WARN")
+             filename
+             name
+             message)
+     (and filename rule-type message)
+     (format "%s - %s - %s"
+             (case rule-type
+               (:allow :deny) "FAIL"
+               :warn "WARN")
+             filename
+             message)))
   ([filename {:keys [message name rule-type]}]
    (cond
      (or (string? message) (keyword? message)) (-format-message filename rule-type name message)
