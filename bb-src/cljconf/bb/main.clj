@@ -2,7 +2,8 @@
   (:require [babashka.cli :as cli]
             [babashka.tasks :as tasks]
             [clojure.string :as str]
-            [cljconf.bb.api]))
+            [cljconf.bb.api]
+            [cljconf.bb.repl :as repl]))
 
 (defmacro if-bb-cli
   [then else]
@@ -107,7 +108,8 @@
         args (rest args)]
     (case command
       :test (test args)
-      :parse (parse args))))
+      :parse (parse args)
+      :repl (repl/-main))))
 
 (comment
   (-main "test"
