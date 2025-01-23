@@ -54,7 +54,7 @@
       f-or-schema)))
 
 (defn -test
-  [inputs rule]
+  [inputs rule {:keys [trace] :as _opts}]
   (let [rule-type (or (rule-type rule) :deny)]
     (into (cond
             (map? inputs) {}
@@ -63,7 +63,8 @@
                  (let [rule-target (cond
                                      (map? inputs) (second input)
                                      (vector? inputs) input)
-                       result ((rule-function rule) rule-target)
+                       rule-name (rule-name rule)
+                       result ((rule-function rule) rule-target) ; TODO: try-catch
                        failure (boolean (case rule-type
                                           :allow (or (not result)
                                                      (string? result)
@@ -74,24 +75,28 @@
                                                             (not-empty result)
                                                             true))))]
                    (cond
-                     (map? inputs) [(first input) [{:message (when (true? failure)
-                                                               (or (string-or-nil result)
-                                                                   (coll-or-nil result)
-                                                                   (rule-message rule)
-                                                                   :cljconf/rule-validation-failed))
-                                                    :name (rule-name rule)
-                                                    :rule-type rule-type
-                                                    :rule-target (ffirst inputs)
-                                                    :failure? failure}]]
-                     (vector? inputs) {:message (when (true? failure)
-                                                  (or (string-or-nil result)
-                                                      (coll-or-nil result)
-                                                      (rule-message rule)
-                                                      :cljconf/rule-validation-failed))
-                                       :name (rule-name rule)
-                                       :rule-type rule-type
-                                       :rule-target rule-target
-                                       :failure? failure})))
+                     (map? inputs) [(first input) [(cond-> {:message (when (true? failure)
+                                                                       (or (string-or-nil result)
+                                                                           (coll-or-nil result)
+                                                                           (rule-message rule)
+                                                                           :cljconf/rule-validation-failed))
+                                                            :name rule-name
+                                                            :rule-type rule-type
+                                                            :failure? failure}
+                                                     trace (assoc :result result
+                                                                  :rule rule
+                                                                  :rule-target rule-target))]]
+                     (vector? inputs) (cond-> {:message (when (true? failure)
+                                                          (or (string-or-nil result)
+                                                              (coll-or-nil result)
+                                                              (rule-message rule)
+                                                              :cljconf/rule-validation-failed))
+                                               :name rule-name
+                                               :rule-type rule-type
+                                               :failure? failure}
+                                        trace (assoc :result result
+                                                     :rule rule
+                                                     :rule-target rule-target)))))
                inputs))))
 
 (defn resolve-ns-functions
@@ -155,20 +160,41 @@
     (map? result) (reduce (fn [m [_filename results]] (-count-results m results)) initial-count-state result)
     (coll? result) (-count-results initial-count-state result)))
 
-(defn -summary-report
+(defn -trace-entries
+  [filename results]
+  (map (fn [{:keys [name rule-target result] :as _rule-eval}]
+         (format "Rule name: %s\nInput file: %s\nParsed input: %sResult: %s"
+                 name
+                 filename
+                 (with-out-str (clojure.pprint/pprint rule-target))
+                 (pr-str result)))
+       results))
+
+(defn -trace-report
   [result]
+  (->> (cond
+         (map? result) (mapcat (fn [[filename results]]
+                                 (-trace-entries filename results))
+                               result)
+         (coll? result) (-trace-entries nil result))
+       (string/join "\n---\n")
+       (format "---\n%s\n---\n")))
+
+(defn -summary-report
+  [result {:keys [trace] :as _opts}]
   (let [summary (-summary result)
         summary-text (format "%d tests, %d passed, %d warnings, %d failures"
                              (:total summary)
                              (:passed summary)
                              (:warnings summary)
                              (:failures summary))]
-    {:summary summary
-     :summary-report (when summary (format "%s\n" summary-text))
-     :result result}))
+    (cond-> {:summary summary
+             :summary-report (when summary (format "%s\n" summary-text))
+             :result result}
+      trace (assoc :trace-report (-trace-report result)))))
 
 (defn -failure-report
-  [result]
+  [result {:keys [trace] :as opts}]
   (let [failures-text (->> result
                            (mapcat (fn [[filename results]]
                                      (keep (fn [{:keys [failure?] :as rule-eval}]
@@ -177,11 +203,12 @@
                                            results)))
                            (string/join "\n")
                            (format "%s\n"))
-        summary-report (-summary-report result)]
-    {:summary (:summary summary-report)
-     :failure-report (when (:summary summary-report)
-                       (format "%s\n%s" failures-text (:summary-report summary-report)))
-     :result result}))
+        summary-report (-summary-report result opts)]
+    (cond-> {:summary (:summary summary-report)
+             :failure-report (when (:summary summary-report)
+                               (format "%s\n%s" failures-text (:summary-report summary-report)))
+             :result result}
+      trace (assoc :trace-report (-trace-report result)))))
 
 (defn filter-results
   [results {:keys [fail-on-warn]}]
@@ -205,14 +232,14 @@
   ([inputs rules opts]
    (let [result (cond
                   (map? inputs)
-                  (apply merge-with into (map (partial -test inputs)
+                  (apply merge-with into (map #(-test inputs % opts)
                                               (resolve-functions rules)))
                   (vector? inputs)
-                  (mapcat identity (keep (comp not-empty (partial -test inputs))
+                  (mapcat identity (keep (comp not-empty #(-test inputs % opts))
                                          (resolve-functions rules))))]
      (if (any-failures? result opts)
-       (-failure-report result)
-       (-summary-report result)))))
+       (-failure-report result opts)
+       (-summary-report result opts)))))
 
 (defn test
   [inputs & rules]
@@ -222,7 +249,9 @@
   ([inputs rules]
    (test-with-opts! inputs rules nil))
   ([inputs rules opts]
-   (let [{:keys [failure-report summary-report summary] :as report} (test-with-opts inputs rules opts)]
+   (let [{:keys [failure-report summary-report summary trace-report] :as report} (test-with-opts inputs rules opts)]
+     (when trace-report
+       (println (format "TRACE:\n%s" trace-report)))
      (cond
        (some? failure-report) (throw (ex-info failure-report summary))
        (some? summary-report) report))))

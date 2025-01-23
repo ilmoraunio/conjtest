@@ -53,8 +53,12 @@
                    :default #{"*"}
                    :default-desc ""
                    :validate {:pred validate-policy
-                              :ex-msg (constantly "--policy must be non-empty string")}}}
-   :restrict [:config :fail-on-warn :go-parsers-only :help :parser :policy]})
+                              :ex-msg (constantly "--policy must be non-empty string")}}
+          :trace {:coerce :boolean
+                  :desc "Enable more verbose trace output"
+                  :default nil
+                  :default-desc ""}}
+   :restrict [:config :fail-on-warn :go-parsers-only :help :parser :policy :trace]})
 
 (def parse-cli-spec
   {:spec {:go-parsers-only {:coerce :boolean

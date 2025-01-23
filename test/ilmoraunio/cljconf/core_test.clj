@@ -27,27 +27,22 @@
               :result {"test-resources/test.yaml" [{:message "port should be 80"
                                                     :name "allow-malli-rule"
                                                     :rule-type :allow
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message :cljconf/rule-validation-failed
                                                     :name "allow-my-absolute-bare-rule"
                                                     :rule-type :allow
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message "port should be 80"
                                                     :name "allow-my-bare-rule"
                                                     :rule-type :allow
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message "port should be 80"
                                                     :name "allow-my-rule"
                                                     :rule-type :allow
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message "port should be 80"
                                                     :name "differently-named-allow-rule"
                                                     :rule-type :allow
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}]}}
              (-> (conftest/test
                    (assoc-in test-input-yaml ["test-resources/test.yaml"
@@ -66,27 +61,22 @@
               :result {"test-resources/test.yaml" [{:message nil,
                                                     :name "allow-malli-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "allow-my-absolute-bare-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "allow-my-bare-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "allow-my-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "differently-named-allow-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}]}}
              (-> (conftest/test
                    test-input-yaml
@@ -102,27 +92,22 @@
               :result {"test-resources/test.yaml" [{:message "port should be 80"
                                                     :name "deny-malli-rule"
                                                     :rule-type :deny
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message :cljconf/rule-validation-failed
                                                     :name "deny-my-absolute-bare-rule"
                                                     :rule-type :deny
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message "port should be 80"
                                                     :name "deny-my-bare-rule"
                                                     :rule-type :deny
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message "port should be 80"
                                                     :name "deny-my-rule"
                                                     :rule-type :deny
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message "port should be 80"
                                                     :name "differently-named-deny-rule"
                                                     :rule-type :deny
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}]}}
              (-> (conftest/test
                    (assoc-in test-input-yaml ["test-resources/test.yaml"
@@ -141,27 +126,22 @@
               :result {"test-resources/test.yaml" [{:message nil,
                                                     :name "deny-malli-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "deny-my-absolute-bare-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "deny-my-bare-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "deny-my-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "differently-named-deny-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}]}}
              (-> (conftest/test
                    test-input-yaml
@@ -177,27 +157,22 @@
               :result {"test-resources/test.yaml" [{:message "port should be 80"
                                                     :name "differently-named-warn-rule"
                                                     :rule-type :warn
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message "port should be 80"
                                                     :name "warn-malli-rule"
                                                     :rule-type :warn
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message :cljconf/rule-validation-failed
                                                     :name "warn-my-absolute-bare-rule"
                                                     :rule-type :warn
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message "port should be 80"
                                                     :name "warn-my-bare-rule"
                                                     :rule-type :warn
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}
                                                    {:message "port should be 80"
                                                     :name "warn-my-rule"
                                                     :rule-type :warn
-                                                    :rule-target "test-resources/test.yaml"
                                                     :failure? true}]}}
              (-> (conftest/test
                    (assoc-in test-input-yaml ["test-resources/test.yaml"
@@ -216,27 +191,22 @@
               :result {"test-resources/test.yaml" [{:message nil,
                                                     :name "differently-named-warn-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "warn-malli-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "warn-my-absolute-bare-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "warn-my-bare-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "warn-my-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}]}}
              (-> (conftest/test
                    test-input-yaml
@@ -252,77 +222,62 @@
               :result {"test-resources/test.yaml" [{:message "port should be 80",
                                                     :name "allow-malli-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message :cljconf/rule-validation-failed,
                                                     :name "allow-my-absolute-bare-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "allow-my-bare-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "allow-my-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "differently-named-allow-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "deny-malli-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message :cljconf/rule-validation-failed,
                                                     :name "deny-my-absolute-bare-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "deny-my-bare-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "deny-my-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "differently-named-deny-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "differently-named-warn-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "warn-malli-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message :cljconf/rule-validation-failed,
                                                     :name "warn-my-absolute-bare-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "warn-my-bare-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "warn-my-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}]}}
              (-> (conftest/test
                    (assoc-in test-input-yaml ["test-resources/test.yaml"
@@ -349,77 +304,62 @@
               :result {"test-resources/test.yaml" [{:message nil,
                                                     :name "allow-malli-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "allow-my-absolute-bare-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "allow-my-bare-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "allow-my-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "differently-named-allow-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "deny-malli-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "deny-my-absolute-bare-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "deny-my-bare-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "deny-my-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "differently-named-deny-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "differently-named-warn-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "warn-malli-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "warn-my-absolute-bare-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "warn-my-bare-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "warn-my-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}]}}
              (-> (conftest/test
                    test-input-yaml
@@ -439,22 +379,18 @@
               :result {"test-resources/test.yaml" [{:message "port should be 80",
                                                     :name "allow-my-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "deny-my-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message :cljconf/rule-validation-failed,
                                                     :name nil,
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "warn-my-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}]}}
              (-> (conftest/test
                    (assoc-in test-input-yaml ["test-resources/test.yaml"
@@ -497,22 +433,18 @@
               :result {"test-resources/test.yaml" [{:message nil,
                                                     :name "allow-my-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "deny-my-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name nil,
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "warn-my-rule",
                                                     :rule-type :warn,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? false}]}}
              (-> (conftest/test
                    test-input-yaml
@@ -556,7 +488,6 @@
                   :result {"test-resources/test.yaml" [{:message :cljconf/rule-validation-failed,
                                                         :name nil,
                                                         :rule-type :deny,
-                                                        :rule-target "test-resources/test.yaml",
                                                         :failure? true}]}}
                  (conftest/test test-invalid-yaml deny-rule)
                  (conftest/test test-invalid-yaml {:rule deny-rule})))))
@@ -570,7 +501,6 @@
                   :result {"test-resources/test.yaml" [{:message :cljconf/rule-validation-failed,
                                                         :name nil,
                                                         :rule-type :allow,
-                                                        :rule-target "test-resources/test.yaml",
                                                         :failure? true}]}}
                  (conftest/test test-invalid-yaml allow-rule)
                  (conftest/test test-invalid-yaml {:type :allow :rule allow-rule})))))
@@ -582,7 +512,6 @@
           (is (= {:result {"test-resources/test.yaml" [{:failure? true
                                                         :message :cljconf/rule-validation-failed
                                                         :name nil
-                                                        :rule-target "test-resources/test.yaml"
                                                         :rule-type :warn}]}
                   :summary {:failures 0 :passed 0 :total 1 :warnings 1}
                   :summary-report "1 tests, 0 passed, 1 warnings, 0 failures\n"}
@@ -598,7 +527,6 @@
                 :result {"test-resources/test.yaml" [{:message :cljconf/rule-validation-failed,
                                                       :name "my-deny-rule",
                                                       :rule-type :deny,
-                                                      :rule-target "test-resources/test.yaml",
                                                       :failure? true}]}}
                (conftest/test test-invalid-yaml deny-rule)
                (conftest/test test-invalid-yaml {:name "my-deny-rule" :rule deny-rule})))))
@@ -608,7 +536,6 @@
               :result {"test-resources/test.yaml" [{:message "default top-level message",
                                                     :name nil,
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}]}}
              (conftest/test test-invalid-yaml
                             ^{:rule/message "default top-level message"}
@@ -622,7 +549,6 @@
                 :result {"test-resources/test.yaml" [{:message "overridden local-level message",
                                                       :name nil,
                                                       :rule-type :deny,
-                                                      :rule-target "test-resources/test.yaml",
                                                       :failure? true}]}}
                (conftest/test test-invalid-yaml
                               ^{:rule/message "default top-level message"}
@@ -636,22 +562,18 @@
             :result {"test-resources/test.yaml" [{:message nil,
                                                   :name "allow-my-rule",
                                                   :rule-type :allow,
-                                                  :rule-target "test-resources/test.yaml",
                                                   :failure? false}
                                                  {:message nil,
                                                   :name "deny-my-rule",
                                                   :rule-type :deny,
-                                                  :rule-target "test-resources/test.yaml",
                                                   :failure? false}],
                      "test-resources/test.2.yaml" [{:message "port should be 80",
                                                     :name "allow-my-rule",
                                                     :rule-type :allow,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "deny-my-rule",
                                                     :rule-type :deny,
-                                                    :rule-target "test-resources/test.yaml",
                                                     :failure? true}]}}
            (-> (conftest/test (merge test-input-yaml
                                      (assoc-in {"test-resources/test.2.yaml" (first (vals test-input-yaml))}
@@ -668,22 +590,10 @@
             :result [{:message nil,
                       :name "deny-my-rule",
                       :rule-type :deny,
-                      :rule-target {"apiVersion" "v1",
-                                    "kind" "Service",
-                                    "metadata" {"name" "hello-kubernetes"},
-                                    "spec" {"type" "LoadBalancer",
-                                            "ports" [{"port" 80.0, "targetPort" 8080.0}],
-                                            "selector" {"app" "hello-kubernetes"}}},
                       :failure? false}
                      {:message "port should be 80",
                       :name "deny-my-rule",
                       :rule-type :deny,
-                      :rule-target {"apiVersion" "v1",
-                                    "kind" "Service",
-                                    "metadata" {"name" "hello-kubernetes"},
-                                    "spec" {"type" "LoadBalancer",
-                                            "ports" [{"port" 9999.0, "targetPort" 8080.0}],
-                                            "selector" {"app" "hello-kubernetes"}}},
                       :failure? true}]}
            (-> (conftest/test [(first (vals test-input-yaml))
                                (assoc-in (first (vals test-input-yaml))
@@ -692,4 +602,73 @@
                                           0
                                           "port"] 9999.0)]
                               #'ilmoraunio.cljconf.example-deny-rules/deny-my-rule)
-               (select-keys [:summary :result]))))))
+               (select-keys [:summary :result])))))
+  (testing "trace report is shown when trace flag is given"
+    (testing "single rule traced"
+      (testing "when rule is triggered"
+        (is (string?
+               (:trace-report
+                 (conftest/test-with-opts
+                   (assoc-in test-input-yaml ["test-resources/test.yaml"
+                                              "spec"
+                                              "ports"
+                                              0
+                                              "port"] 9999.0)
+                   [#'ilmoraunio.cljconf.example-deny-rules/deny-my-rule]
+                   {:trace true})))))
+      (testing "when rule is not triggered"
+        (is (string?
+              (:trace-report
+                (conftest/test-with-opts
+                  test-input-yaml
+                  [#'ilmoraunio.cljconf.example-deny-rules/deny-my-rule]
+                  {:trace true}))))))
+    (testing "multiple rules traced"
+      (testing "when rule is triggered"
+        (is (string?
+              (:trace-report
+                (conftest/test-with-opts
+                  test-invalid-yaml
+                  [#'ilmoraunio.cljconf.example-deny-rules/deny-my-rule
+                   #'ilmoraunio.cljconf.example-deny-rules/differently-named-deny-rule
+                   #'ilmoraunio.cljconf.example-deny-rules/deny-my-bare-rule
+                   #'ilmoraunio.cljconf.example-deny-rules/deny-my-absolute-bare-rule
+                   #'ilmoraunio.cljconf.example-deny-rules/deny-malli-rule]
+                  {:trace true})))))
+      (testing "when rule is not triggered"
+        (is (string?
+              (:trace-report
+                (conftest/test-with-opts
+                  test-input-yaml
+                  [#'ilmoraunio.cljconf.example-deny-rules/deny-my-rule
+                   #'ilmoraunio.cljconf.example-deny-rules/differently-named-deny-rule
+                   #'ilmoraunio.cljconf.example-deny-rules/deny-my-bare-rule
+                   #'ilmoraunio.cljconf.example-deny-rules/deny-my-absolute-bare-rule
+                   #'ilmoraunio.cljconf.example-deny-rules/deny-malli-rule]
+                  {:trace true}))))))
+    (testing "vector inputs"
+      (testing "when rule is trigerred"
+        (is (string?
+              (:trace-report
+                (conftest/test-with-opts [(assoc-in (first (vals test-input-yaml))
+                                                    ["spec"
+                                                     "ports"
+                                                     0
+                                                     "port"] 9999.0)]
+                                         [#'ilmoraunio.cljconf.example-deny-rules/deny-my-rule]
+                                         {:trace true})))))
+      (testing "when rule is not triggered"
+        (is (string?
+              (:trace-report
+                (conftest/test-with-opts [(first (vals test-input-yaml))]
+                                         [#'ilmoraunio.cljconf.example-deny-rules/deny-my-rule]
+                                         {:trace true})))))))
+  (testing "trace report is not shown when trace flag is not given"
+    (is (nil?
+          (:trace-report
+            (conftest/test [(first (vals test-input-yaml))]
+                           [#'ilmoraunio.cljconf.example-deny-rules/deny-my-rule]))))
+    (is (nil?
+          (:trace-report
+            (conftest/test test-invalid-yaml
+                           [#'ilmoraunio.cljconf.example-deny-rules/deny-my-rule]))))))

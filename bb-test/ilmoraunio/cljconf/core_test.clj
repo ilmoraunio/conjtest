@@ -3,8 +3,11 @@
             [cljconf.bb.api :as api]
             [clojure.test :refer [deftest is testing]]))
 
+(defn copy
+  [m k new-k f & args]
+  (merge m {new-k (apply f (get m k) args)}))
 
-(defn cljconf-test
+(defn cljconf-test*
   [inputs policies & extra-args]
   (assert (and (coll? inputs) (not-empty inputs)))
   (assert (and (coll? policies) (not-empty policies)))
@@ -14,14 +17,18 @@
                                (into inputs)
                                (into (interleave (cycle ["--policy"]) policies)))
                      extra-args (into extra-args)))
-        (select-keys [:exit :out])
-        (update :out (juxt #(->> (re-seq #"(?m)(FAIL|WARN) - (.+) - (.+) - (.+)" %)
-                                 (map rest)
-                                 (mapv (partial zipmap [:type :file :rule :message])))
-                           #(->> (re-find #"(\d+) tests, (\d+) passed, (\d+) warnings, (\d+) failures" %)
-                                 (rest)
-                                 (map (fn [x] (Integer/parseInt x)))
-                                 (zipmap [:tests :passed :warnings :failures]))))))
+      (copy :out :out-original identity)
+      (update :out (juxt #(->> (re-seq #"(?m)(FAIL|WARN) - (.+) - (.+) - (.+)" %)
+                               (map rest)
+                               (mapv (partial zipmap [:type :file :rule :message])))
+                         #(->> (re-find #"(\d+) tests, (\d+) passed, (\d+) warnings, (\d+) failures" %)
+                               (rest)
+                               (map (fn [x] (Integer/parseInt x)))
+                               (zipmap [:tests :passed :warnings :failures]))))))
+
+(defn cljconf-test
+  [inputs policies & extra-args]
+  (select-keys (apply cljconf-test* inputs policies extra-args) [:exit :out]))
 
 (defn cljconf-parse
   [inputs & extra-args]
@@ -160,7 +167,32 @@
                         {:tests 1, :passed 0, :warnings 0, :failures 1}]}
                  (cljconf-test ["test-resources/invalid.yaml"]
                                ["test-resources/ilmoraunio/cljconf/example_local_require.clj"]
-                               "--config" "test.cljconf.edn")))))))
+                               "--config" "test.cljconf.edn"))))))
+    (testing "--trace"
+      (testing "triggered"
+        (is (= ["deny-malli-rule"
+                "deny-my-absolute-bare-rule"
+                "deny-my-bare-rule"
+                "deny-my-rule"
+                "differently-named-deny-rule"]
+               (map second
+                    (re-seq
+                      #"(?m)Rule name: (.*)"
+                      (:out-original (cljconf-test* ["test-resources/invalid.yaml"]
+                                                    ["test-resources/ilmoraunio/cljconf/example_deny_rules.clj"]
+                                                    "--trace")))))))
+      (testing "not triggered"
+        (is (= ["deny-malli-rule"
+                "deny-my-absolute-bare-rule"
+                "deny-my-bare-rule"
+                "deny-my-rule"
+                "differently-named-deny-rule"]
+               (map second
+                    (re-seq
+                      #"(?m)Rule name: (.*)"
+                      (:out-original (cljconf-test* ["test-resources/valid.yaml"]
+                                                    ["test-resources/ilmoraunio/cljconf/example_deny_rules.clj"]
+                                                    "--trace")))))))))
   (testing "cljconf parse"
     (testing "clojure parser"
       (is (= {:exit 0,
