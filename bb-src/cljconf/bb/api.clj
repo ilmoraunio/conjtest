@@ -75,20 +75,6 @@
           ns-publics-all (sci/eval-string* ctx command)]
       (mapcat (comp vals :ns-publics) ns-publics-all))))
 
-(defn -format-message
-  ([filename rule-type name message]
-   (format "%s - %s - %s - %s"
-           (case rule-type
-             (:allow :deny) "FAIL"
-             :warn "WARN")
-           filename
-           name
-           message))
-  ([filename {:keys [message name rule-type]}]
-   (cond
-     (or (string? message) (keyword? message)) (-format-message filename rule-type name message)
-     (coll? message) (clojure.string/join "\n" (map (partial -format-message filename rule-type name) message)))))
-
 (defn parse
   [args {:keys [go-parsers-only parser] :as _opts}]
   (apply
