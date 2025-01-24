@@ -87,11 +87,14 @@
     args))
 
 (defn test!
-  [inputs {:keys [policy] :as opts}]
-  (let [inputs (parse inputs opts)
+  [inputs {:keys [policy trace] :as opts}]
+  (let [_ (when trace (println "Policy argument(s):" (clojure.string/join ", " policy)))
+        inputs (parse inputs opts)
+        _ (when trace (println "Filenames parsed:" (clojure.string/join ", " (keys inputs))))
         policies (->> policy
                       (mapcat (partial fs/glob "."))
                       (filter #(-> % fs/extension #{"clj" "bb" "cljc"}))
                       (mapv str))
+        _ (when trace (println "Policies used:" (clojure.string/join ", " policies)))
         vars (eval-and-resolve-vars policies opts)]
     (cljconf/test-with-opts! inputs vars opts)))
