@@ -12,9 +12,44 @@
     then
     else))
 
+(defn format-table
+  "A vendored version of `babashka.cli/format-table` (omits invoking `babashka.cli/pad-cells` for `rows`)."
+  [{:keys [rows indent]}]
+  (let [fmt-row (fn [leader divider trailer row]
+                  (str leader
+                       (apply str (interpose divider row))
+                       trailer))]
+    (->> rows
+         (map (fn [row]
+                #_(fmt-row "| " " | " " |" row)
+                (fmt-row (apply str (repeat indent " ")) " " "" row)))
+         (map str/trimr)
+         (str/join "\n"))))
+
 (defn show-help
-  [spec]
-  (cli/format-opts (merge spec {:order (vec (keys (:spec spec)))})))
+  ([]
+   ;; root-level help
+   (let [command-rows (cli/pad-cells [["help" " " "Show available commands"]
+                                      ["test" " " "Tests configuration files against Clojure policies"]
+                                      ["parse" " " "Parses configuration files and prints them out as Clojure data structures"]
+                                      ["repl" " " "Opens up a nREPL session inside cljconf allowing"]])
+         rows (-> [["Test your configuration files using Clojure!"]
+                   []
+                   ["Usage:"]
+                   ["cljconf [command]"]
+                   []
+                   ["Available commands:"]]
+                  (into command-rows)
+                  (into [[]
+                         ["See `cljconf [command] --help` for more information about a command."]]))]
+     (format-table {:rows rows
+                    :indent 2})))
+  ([spec]
+   (format
+     "%s\n\n%s"
+     (format-table {:rows (:desc spec)
+                    :indent 2})
+     (cli/format-opts (merge spec {:order (vec (keys (:spec spec)))})))))
 
 (defmulti validate-policy type)
 (defmethod validate-policy java.lang.String
@@ -29,7 +64,21 @@
               (some identity)))))
 
 (def test-cli-spec
-  {:spec {:config {:coerce :string
+  {:desc [["Tests configuration files against Clojure policies"]
+          []
+          ["Usage:"]
+          ["cljconf test <configuration_file> [configuration_file [...]] [flags]"]
+          []
+          ["Examples:"]
+          ["cljconf test deployment.yaml --policy policy.clj"]
+          ["cljconf test deployment.yaml --policy policy.clj --policy another-policy.clj"]
+          ["cljconf test deployment.yaml --policy policies/*.clj"]
+          ["cljconf test hocon.conf --policy policy.clj --parser hocon"]
+          ["cljconf test deployment.yaml --policy policy.clj --config cljconf.edn"]
+          []
+          ["Config file can be provided to support local file requires via `:paths`. Eg:"]
+          ["{:paths [\"util/\"]}"]]
+   :spec {:config {:coerce :string
                    :alias :c
                    :desc "Filepath to configuration file"
                    :default nil
@@ -44,12 +93,12 @@
           :help {:coerce :boolean
                  :alias :h}
           :parser {:coerce :string
-                   :desc "Use specific parser to parse files. Supported parsers: cue, dockerfile, edn, hcl1, hcl2, ignore, ini, json, jsonnet, properties, spdx, toml, vcl, xml, yaml, dotenv"
+                   :desc "Use specific parser to parse files. Supported parsers: cue, dockerfile, edn, hcl1, hcl2, hocon, ignore, ini, json, jsonnet, properties, spdx, toml, vcl, xml, yaml, dotenv"
                    :validate {:pred (complement empty?)
                               :ex-msg (constantly "--parser must be non-empty string")}}
           :policy {:coerce #{:string}
                    :alias :p
-                   :desc "Filepath to look for policy files, supports globs, defaults to current dir"
+                   :desc "Filepath to look for policy files, supports globs, defaults to current dir. Accepts file and glob pattern."
                    :default #{"*"}
                    :default-desc ""
                    :validate {:pred validate-policy
@@ -61,13 +110,22 @@
    :restrict [:config :fail-on-warn :go-parsers-only :help :parser :policy :trace]})
 
 (def parse-cli-spec
-  {:spec {:go-parsers-only {:coerce :boolean
+  {:desc [["Parses configuration files and prints them out as Clojure data structures"]
+          []
+          ["Usage:"]
+          ["cljconf parse <configuration_file> [configuration_file [...]] [flags]"]
+          []
+          ["Examples:"]
+          ["cljconf parse deployment.yaml"]
+          ["conftest parse hocon.conf --parser hocon"]
+          ["cljconf parse deps.edn --parser edn --go-parsers-only"]]
+   :spec {:go-parsers-only {:coerce :boolean
                             :alias :go
                             :desc "Use Go-based parsers only"}
           :help {:coerce :boolean
                  :alias :h}
           :parser {:coerce :string
-                   :desc "Use specific parser to parse files. Supported parsers: cue, dockerfile, edn, hcl1, hcl2, ignore, ini, json, jsonnet, properties, spdx, toml, vcl, xml, yaml, dotenv"
+                   :desc "Use specific parser to parse files. Supported parsers: cue, dockerfile, edn, hcl1, hcl2, hocon, ignore, ini, json, jsonnet, properties, spdx, toml, vcl, xml, yaml, dotenv"
                    :validate {:pred (complement empty?)
                               :ex-msg (constantly "--parser must be non-empty string")}}}
    :restrict [:go-parsers-only :help :parser]})
@@ -75,7 +133,7 @@
 (defn test
   [args]
   (let [{:keys [args opts] :as m} (cli/parse-args args test-cli-spec)]
-    (if (or (:help opts) (:h opts))
+    (if (or (:help opts) (:h opts) (empty? args))
       (println (show-help test-cli-spec))
       (try (println (:summary-report (cljconf.bb.api/test! args opts)))
            (catch Exception e
@@ -93,8 +151,8 @@
 (defn parse
   [args]
   (let [{:keys [args opts] :as _args} (cli/parse-args args parse-cli-spec)]
-    (if (or (:help opts) (:h opts))
-      (println (show-help test-cli-spec))
+    (if (or (:help opts) (:h opts) (empty? args))
+      (println (show-help parse-cli-spec))
       (try (let [parsed (cljconf.bb.api/parse args opts)]
              (if-bb-cli
                (println (pr-str parsed))
@@ -111,19 +169,8 @@
   (let [command (keyword (first args))
         args (rest args)]
     (case command
+      :help (println (show-help))
       :test (test args)
       :parse (parse args)
-      :repl (repl/-main))))
-
-(comment
-  (-main "test"
-         "test.yaml"
-         "--policy" "test/ilmoraunio/cljconf/example_rules.clj"
-         "--config" "cljconf.edn")
-  ;; ```
-  ;; $ bb test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
-  ;; $ bb --jar target/cljconf.jar test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
-  ;; $ ./cljconf test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn
-  ;; $ ./cljconf test test.yaml --policy test/ilmoraunio/cljconf/example_rules.clj --config cljconf.edn --fail-on-warn
-  ;; ```
-  )
+      :repl (repl/-main)
+      (println (show-help)))))
