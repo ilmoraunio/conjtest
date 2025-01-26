@@ -251,7 +251,45 @@
                                                  "apiVersion" "v1",
                                                  "kind" "Service"}}}
              (cljconf-parse ["test-resources/test.json" "test-resources/deps.edn" "test-resources/valid.yaml" "test-resources/invalid.yaml"])
-             (cljconf-parse ["test-resources/*.{json,edn,yaml}"]))))))
+             (cljconf-parse ["test-resources/*.{json,edn,yaml}"])))))
+  (testing "exception reporting"
+    (testing "stack trace is not shown by default"
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "test-resources/valid.yaml",
+                      :rule "deny-broken-malli-rule",
+                      :message "clojure.lang.ExceptionInfo: :malli.core/invalid-schema {:type :malli.core/invalid-schema, :message :malli.core/invalid-schema, :data {:schema :mapxxx, :form [:mapxxx [\"apiVersion\" [:= \"v1\"]] [\"kind\" [:= \"Service\"]] [\"spec\" [:map [\"ports\" [:+ [:map [\"port\" [:not= 80.0]]]]]]]]}}"}
+                     {:type "FAIL",
+                      :file "test-resources/valid.yaml",
+                      :rule "deny-will-trigger-cleanly",
+                      :message ":cljconf/rule-validation-failed"}
+                     {:type "FAIL",
+                      :file "test-resources/valid.yaml",
+                      :rule "deny-will-trigger-with-exception",
+                      :message "java.lang.NullPointerException"}]
+                    {:tests 4, :passed 1, :warnings 0, :failures 3}]}
+             (cljconf-test ["test-resources/valid.yaml"]
+                           ["test-resources/ilmoraunio/cljconf/example_broken_rules.clj"]))))
+    (testing "when --trace is provided, stack trace is shown"
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "test-resources/valid.yaml",
+                      :rule "deny-broken-malli-rule",
+                      ;; the full stack trace continues beyond what we assert here
+                      :message "clojure.lang.ExceptionInfo: :malli.core/invalid-schema"}
+                     {:type "FAIL",
+                      :file "test-resources/valid.yaml",
+                      :rule "deny-will-trigger-cleanly",
+                      :message ":cljconf/rule-validation-failed"}
+                     {:type "FAIL",
+                      :file "test-resources/valid.yaml",
+                      :rule "deny-will-trigger-with-exception",
+                      ;; ditto; the full stack trace continues beyond what we assert here
+                      :message "java.lang.NullPointerException: null"}]
+                    {:tests 4, :passed 1, :warnings 0, :failures 3}]}
+             (cljconf-test ["test-resources/valid.yaml"]
+                           ["test-resources/ilmoraunio/cljconf/example_broken_rules.clj"]
+                           "--trace"))))))
 
 (deftest examples-test
   (testing "Configfile")

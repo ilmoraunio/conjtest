@@ -671,4 +671,50 @@
     (is (nil?
           (:trace-report
             (cljconf/test test-invalid-yaml
-                          [#'ilmoraunio.cljconf.example-deny-rules/deny-my-rule]))))))
+                          [#'ilmoraunio.cljconf.example-deny-rules/deny-my-rule])))))
+  (testing "exceptions bubble up to reporting and all rules are evaluated"
+    (testing "by default, don't expose the stack trace"
+      (let [report (cljconf/test
+                     test-input-yaml
+                     ^{:rule/name "deny-will-trigger-with-exception"}
+                     #(clojure.string/starts-with? (:nilly-field %) "foo")
+                     ^{:rule/name "deny-will-trigger-cleanly"}
+                     (fn [_] true)
+                     ^{:rule/name "deny-will-not-trigger"}
+                     (fn [_] false))]
+        (is (clojure.string/starts-with?
+              (get-in report [:result "test-resources/test.yaml" 0 :message])
+              "java.lang.NullPointerException"))
+        (is (nil? (re-find #"ilmoraunio\.cljconf\.core\$_test\.invoke"
+                           (get-in (cljconf/test
+                                     test-input-yaml
+                                     ^{:rule/name "deny-will-trigger-with-exception"}
+                                     #(clojure.string/starts-with? (:nilly-field %) "foo")
+                                     ^{:rule/name "deny-will-trigger-cleanly"}
+                                     (fn [_] true)
+                                     ^{:rule/name "deny-will-not-trigger"}
+                                     (fn [_] false)) [:result "test-resources/test.yaml" 0 :message]))))
+        (is (= {:total 3, :passed 1, :warnings 0, :failures 2}
+               (:summary report)))))
+    (testing "enabling `trace` allows you to see the stack trace"
+      (let [report (cljconf/test-with-opts
+                     test-input-yaml
+                     [^{:rule/name "deny-will-trigger-with-exception"}
+                      #(clojure.string/starts-with? (:nilly-field %) "foo")
+                      ^{:rule/name "deny-will-trigger-cleanly"}
+                      (fn [_] true)
+                      ^{:rule/name "deny-will-not-trigger"}
+                      (fn [_] false)]
+                     {:trace true})]
+        (is (clojure.string/starts-with?
+              (get-in report [:result "test-resources/test.yaml" 0 :message])
+              "java.lang.NullPointerException"))
+        (is (clojure.string/starts-with?
+              (get-in report [:result "test-resources/test.yaml" 0 :result])
+              "java.lang.NullPointerException"))
+        (is (some? (re-find #"ilmoraunio\.cljconf\.core\$_test\.invoke"
+                            (get-in report [:result "test-resources/test.yaml" 0 :message]))))
+        (is (some? (re-find #"ilmoraunio\.cljconf\.core\$_test\.invoke"
+                            (get-in report [:result "test-resources/test.yaml" 0 :result]))))
+        (is (= {:total 3, :passed 1, :warnings 0, :failures 2}
+               (:summary report)))))))

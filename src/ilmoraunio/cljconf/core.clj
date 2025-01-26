@@ -64,7 +64,12 @@
                                      (map? inputs) (second input)
                                      (vector? inputs) input)
                        rule-name (rule-name rule)
-                       result ((rule-function rule) rule-target) ; TODO: try-catch
+                       result (try ((rule-function rule) rule-target)
+                                   (catch Exception e
+                                     (cond
+                                       trace (with-out-str (clojure.stacktrace/print-stack-trace e))
+                                       (instance? clojure.lang.ExceptionInfo (class e)) (ex-message e)
+                                       :else (str e))))
                        failure (boolean (case rule-type
                                           :allow (or (not result)
                                                      (string? result)
