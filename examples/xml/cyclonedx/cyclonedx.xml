@@ -12,7 +12,7 @@
         </tools>
         <component type="container">
             <name>devopps/busybox:latest</name>
-            <version>sha256:d7ec60cf8390612b360c857688b383068b580d9a6ab78417c9493170ad3f1616</version>
+            <version>sha256:WRONG_VERSION</version>
             <hashes />
             <externalReferences />
             <components />

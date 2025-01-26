@@ -465,7 +465,12 @@
                              "--go-parsers-only"
                              "--parser" "json")))))
     (testing "CycloneDX"
-      (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "examples/json/cyclonedx/cyclonedx.json",
+                      :rule "deny-incorrect-sha",
+                      :message "current SHA256 sha256:WRONG_VERSION is not equal to expected SHA256 sha256:d7ec60cf8390612b360c857688b383068b580d9a6ab78417c9493170ad3f1616"}]
+                    {:tests 1, :passed 0, :warnings 0, :failures 1}]}
              (cljconf-test ["examples/json/cyclonedx/cyclonedx.json"]
                            ["examples/json/cyclonedx/policy.clj"])))))
   (testing "Jsonnet"
@@ -521,7 +526,12 @@
            (cljconf-test ["examples/xml/pom.xml"]
                          ["examples/xml/policy.clj"])))
     (testing "CycloneDX"
-      (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
+      (is (= {:exit 1,
+              :out [[{:type "FAIL",
+                      :file "examples/xml/cyclonedx/cyclonedx.xml",
+                      :rule "deny-incorrect-sha",
+                      :message "current SHA256 sha256:WRONG_VERSION is not equal to expected SHA256 sha256:d7ec60cf8390612b360c857688b383068b580d9a6ab78417c9493170ad3f1616"}]
+                    {:tests 1, :passed 0, :warnings 0, :failures 1}]}
              (cljconf-test ["examples/xml/cyclonedx/cyclonedx.xml"]
                            ["examples/xml/cyclonedx/policy.clj"])))))
   (testing "YAML"
