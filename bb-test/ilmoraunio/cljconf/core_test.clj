@@ -3,6 +3,8 @@
             [cljconf.bb.api :as api]
             [clojure.test :refer [deftest is testing]]))
 
+(set! *data-readers* {'ordered/map #'flatland.ordered.map/ordered-map})
+
 (defn copy
   [m k new-k f & args]
   (merge m {new-k (apply f (get m k) args)}))
@@ -39,7 +41,7 @@
                                (into inputs))
                      extra-args (into extra-args)))
       (select-keys [:exit :out])
-      (update :out clojure.edn/read-string)))
+      (update :out (partial clojure.edn/read-string {:readers {'ordered/map #'flatland.ordered.map/ordered-map}}))))
 
 (deftest api-test
   (testing "smoke test"
@@ -223,7 +225,7 @@
       (is (= {:exit 0, :out {"test-resources/test.json" {:hello [1 2 4], "@foo" "bar"}}}
              (cljconf-parse ["test-resources/test.json"])
              (cljconf-parse ["test-resources/test.json"] "--parser" "json")))
-      (is (= {:exit 0, :out {"test-resources/test.json" {"hello" [1.0 2.0 4.0], "@foo" "bar"}}}
+      (is (= {:exit 0, :out {"test-resources/test.json" #ordered/map([:hello [1 2 4]] ["@foo" "bar"])}}
              (cljconf-parse ["test-resources/test.json"] "--parser" "yaml"))))
     (testing "multiple arguments"
       (is (= {:exit 0,
@@ -238,18 +240,20 @@
                                                                 :extra-deps {'lambdaisland/kaocha {:mvn/version "1.82.1306"},
                                                                              'lambdaisland/kaocha-cljs {:mvn/version "1.4.130"},
                                                                              'lambdaisland/kaocha-junit-xml {:mvn/version "1.17.101"}}}}},
-                    "test-resources/invalid.yaml" {"metadata" {"name" "hello-kubernetes"},
-                                                   "spec" {"type" "LoadBalancer",
-                                                           "ports" [{"port" 81.0, "targetPort" 8080.0}],
-                                                           "selector" {"app" "bad-hello-kubernetes"}},
-                                                   "apiVersion" "v1",
-                                                   "kind" "Service"},
-                    "test-resources/valid.yaml" {"metadata" {"name" "hello-kubernetes"},
-                                                 "spec" {"type" "LoadBalancer",
-                                                         "ports" [{"port" 80.0, "targetPort" 8080.0}],
-                                                         "selector" {"app" "hello-kubernetes"}},
-                                                 "apiVersion" "v1",
-                                                 "kind" "Service"}}}
+                    "test-resources/invalid.yaml" #ordered/map([:apiVersion "v1"]
+                                                               [:kind "Service"]
+                                                               [:metadata #ordered/map([:name "hello-kubernetes"])]
+                                                               [:spec
+                                                                #ordered/map([:type "LoadBalancer"]
+                                                                             [:ports [#ordered/map([:port 81] [:targetPort 8080])]]
+                                                                             [:selector #ordered/map([:app "bad-hello-kubernetes"])])]),
+                    "test-resources/valid.yaml" #ordered/map([:apiVersion "v1"]
+                                                             [:kind "Service"]
+                                                             [:metadata #ordered/map([:name "hello-kubernetes"])]
+                                                             [:spec
+                                                              #ordered/map([:type "LoadBalancer"]
+                                                                           [:ports [#ordered/map([:port 80] [:targetPort 8080])]]
+                                                                           [:selector #ordered/map([:app "hello-kubernetes"])])])}}
              (cljconf-parse ["test-resources/test.json" "test-resources/deps.edn" "test-resources/valid.yaml" "test-resources/invalid.yaml"])
              (cljconf-parse ["test-resources/*.{json,edn,yaml}"])))))
   (testing "exception reporting"
@@ -536,78 +540,165 @@
                            ["examples/xml/cyclonedx/policy.clj"])))))
   (testing "YAML"
     (testing "Kubernetes"
-      (is (= {:exit 1,
-              :out [[{:type "FAIL",
-                      :file "examples/yaml/kubernetes/deployment.yaml",
-                      :rule "deny-missing-required-deployment-selectors",
-                      :message "Deployment \"hello-kubernetes\" must provide app/release labels for pod selectors"}
-                     {:type "FAIL",
-                      :file "examples/yaml/kubernetes/deployment.yaml",
-                      :rule "deny-should-not-run-as-root",
-                      :message "Containers must not run as root in Deployment \"hello-kubernetes\""}]
-                    {:tests 2, :passed 0, :warnings 0, :failures 2}]}
-             (cljconf-test ["examples/yaml/kubernetes/deployment.yaml"]
-                           ["examples/yaml/kubernetes/policy.clj"]))))
+      (testing "clojure parser"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/yaml/kubernetes/deployment.yaml",
+                        :rule "deny-missing-required-deployment-selectors",
+                        :message "Deployment \"hello-kubernetes\" must provide app/release labels for pod selectors"}
+                       {:type "FAIL",
+                        :file "examples/yaml/kubernetes/deployment.yaml",
+                        :rule "deny-should-not-run-as-root",
+                        :message "Containers must not run as root in Deployment \"hello-kubernetes\""}]
+                      {:tests 2, :passed 0, :warnings 0, :failures 2}]}
+               (cljconf-test ["examples/yaml/kubernetes/deployment.yaml"]
+                             ["examples/yaml/kubernetes/policy.clj"]))))
+      (testing "go parser"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/yaml/kubernetes/deployment.yaml",
+                        :rule "deny-missing-required-deployment-selectors",
+                        :message "Deployment \"hello-kubernetes\" must provide app/release labels for pod selectors"}
+                       {:type "FAIL",
+                        :file "examples/yaml/kubernetes/deployment.yaml",
+                        :rule "deny-should-not-run-as-root",
+                        :message "Containers must not run as root in Deployment \"hello-kubernetes\""}]
+                      {:tests 2, :passed 0, :warnings 0, :failures 2}]}
+               (cljconf-test ["examples/yaml/kubernetes/deployment.yaml"]
+                             ["examples/yaml/kubernetes/policy_go.clj"]
+                             "--go-parsers-only")))))
     (testing "combine example"
-      (is (= {:exit 1,
-              :out [[{:type "FAIL",
-                      :file "examples/yaml/combine/combine.yaml",
-                      :rule "deny-deployments-with-no-matching-service",
-                      :message "Deployment 'goodbye-kubernetes' has no matching service"}]
-                    {:tests 1, :passed 0, :warnings 0, :failures 1}]}
-             (cljconf-test ["examples/yaml/combine/combine.yaml"]
-                           ["examples/yaml/combine/policy.clj"]))))
+      (testing "clojure parser"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/yaml/combine/combine.yaml",
+                        :rule "deny-deployments-with-no-matching-service",
+                        :message "Deployment 'goodbye-kubernetes' has no matching service"}]
+                      {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+               (cljconf-test ["examples/yaml/combine/combine.yaml"]
+                             ["examples/yaml/combine/policy.clj"]))))
+      (testing "go parser"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/yaml/combine/combine.yaml",
+                        :rule "deny-deployments-with-no-matching-service",
+                        :message "Deployment 'goodbye-kubernetes' has no matching service"}]
+                      {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+               (cljconf-test ["examples/yaml/combine/combine.yaml"]
+                             ["examples/yaml/combine/policy_go.clj"]
+                             "--go-parsers-only")))))
     (testing "AWS SAM Framework"
-      (is (= {:exit 1,
-           :out [[{:type "FAIL",
-                   :file "examples/yaml/awssam/lambda.yaml",
-                   :rule "deny-denylisted-runtimes",
-                   :message "'python2.7' runtime not allowed"}
-                  {:type "FAIL",
-                   :file "examples/yaml/awssam/lambda.yaml",
-                   :rule "deny-excessive-action-permissions",
-                   :message "excessive Action permissions not allowed"}
-                  {:type "FAIL",
-                   :file "examples/yaml/awssam/lambda.yaml",
-                   :rule "deny-excessive-resource-permissions",
-                   :message "excessive Resource permissions not allowed"}
-                  {:type "FAIL",
-                   :file "examples/yaml/awssam/lambda.yaml",
-                   :rule "deny-python2.7",
-                   :message "python2.7 runtime not allowed"}
-                  {:type "FAIL",
-                   :file "examples/yaml/awssam/lambda.yaml",
-                   :rule "deny-sensitive-environment-variables",
-                   :message "Sensitive data not allowed in environment variables"}]
-                 {:tests 5, :passed 0, :warnings 0, :failures 5}]}
-          (cljconf-test ["examples/yaml/awssam/lambda.yaml"]
-                        ["examples/yaml/awssam/policy.clj"]))))
+      (testing "clojure parser"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/yaml/awssam/lambda.yaml",
+                        :rule "deny-denylisted-runtimes",
+                        :message "'python2.7' runtime not allowed"}
+                       {:type "FAIL",
+                        :file "examples/yaml/awssam/lambda.yaml",
+                        :rule "deny-excessive-action-permissions",
+                        :message "excessive Action permissions not allowed"}
+                       {:type "FAIL",
+                        :file "examples/yaml/awssam/lambda.yaml",
+                        :rule "deny-excessive-resource-permissions",
+                        :message "excessive Resource permissions not allowed"}
+                       {:type "FAIL",
+                        :file "examples/yaml/awssam/lambda.yaml",
+                        :rule "deny-python2.7",
+                        :message "python2.7 runtime not allowed"}
+                       {:type "FAIL",
+                        :file "examples/yaml/awssam/lambda.yaml",
+                        :rule "deny-sensitive-environment-variables",
+                        :message "Sensitive data not allowed in environment variables"}]
+                      {:tests 5, :passed 0, :warnings 0, :failures 5}]}
+               (cljconf-test ["examples/yaml/awssam/lambda.yaml"]
+                             ["examples/yaml/awssam/policy.clj"]))))
+      (testing "go parser"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/yaml/awssam/lambda.yaml",
+                        :rule "deny-denylisted-runtimes",
+                        :message "'python2.7' runtime not allowed"}
+                       {:type "FAIL",
+                        :file "examples/yaml/awssam/lambda.yaml",
+                        :rule "deny-excessive-action-permissions",
+                        :message "excessive Action permissions not allowed"}
+                       {:type "FAIL",
+                        :file "examples/yaml/awssam/lambda.yaml",
+                        :rule "deny-excessive-resource-permissions",
+                        :message "excessive Resource permissions not allowed"}
+                       {:type "FAIL",
+                        :file "examples/yaml/awssam/lambda.yaml",
+                        :rule "deny-python2.7",
+                        :message "python2.7 runtime not allowed"}
+                       {:type "FAIL",
+                        :file "examples/yaml/awssam/lambda.yaml",
+                        :rule "deny-sensitive-environment-variables",
+                        :message "Sensitive data not allowed in environment variables"}]
+                      {:tests 5, :passed 0, :warnings 0, :failures 5}]}
+               (cljconf-test ["examples/yaml/awssam/lambda.yaml"]
+                             ["examples/yaml/awssam/policy_go.clj"]
+                             "--go-parsers-only")))))
     (testing "Docker compose"
-      (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
-             (cljconf-test ["examples/yaml/dockercompose/docker-compose-valid.yml"]
-                           ["examples/yaml/dockercompose/policy.clj"])))
-      (is (= {:exit 1,
-              :out [[{:type "FAIL",
-                      :file "examples/yaml/dockercompose/docker-compose-invalid.yml",
-                      :rule "deny-latest-tags",
-                      :message "No images tagged latest"}
-                     {:type "FAIL",
-                      :file "examples/yaml/dockercompose/docker-compose-invalid.yml",
-                      :rule "deny-old-compose-versions",
-                      :message "Must be using at least version 3.5 of the Compose file format"}]
-                    {:tests 2, :passed 0, :warnings 0, :failures 2}]}
-             (cljconf-test ["examples/yaml/dockercompose/docker-compose-invalid.yml"]
-                           ["examples/yaml/dockercompose/policy.clj"]))))
+      (testing "clojure parser"
+        (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
+               (cljconf-test ["examples/yaml/dockercompose/docker-compose-valid.yml"]
+                             ["examples/yaml/dockercompose/policy.clj"])))
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/yaml/dockercompose/docker-compose-invalid.yml",
+                        :rule "deny-latest-tags",
+                        :message "No images tagged latest"}
+                       {:type "FAIL",
+                        :file "examples/yaml/dockercompose/docker-compose-invalid.yml",
+                        :rule "deny-old-compose-versions",
+                        :message "Must be using at least version 3.5 of the Compose file format"}]
+                      {:tests 2, :passed 0, :warnings 0, :failures 2}]}
+               (cljconf-test ["examples/yaml/dockercompose/docker-compose-invalid.yml"]
+                             ["examples/yaml/dockercompose/policy.clj"]))))
+      (testing "go parser"
+        (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
+               (cljconf-test ["examples/yaml/dockercompose/docker-compose-valid.yml"]
+                             ["examples/yaml/dockercompose/policy_go.clj"]
+                             "--go-parsers-only")))
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/yaml/dockercompose/docker-compose-invalid.yml",
+                        :rule "deny-latest-tags",
+                        :message "No images tagged latest"}
+                       {:type "FAIL",
+                        :file "examples/yaml/dockercompose/docker-compose-invalid.yml",
+                        :rule "deny-old-compose-versions",
+                        :message "Must be using at least version 3.5 of the Compose file format"}]
+                      {:tests 2, :passed 0, :warnings 0, :failures 2}]}
+               (cljconf-test ["examples/yaml/dockercompose/docker-compose-invalid.yml"]
+                             ["examples/yaml/dockercompose/policy_go.clj"]
+                             "--go-parsers-only")))))
     (testing "Serverless framework"
-      (is (= {:exit 1,
-              :out [[{:type "FAIL",
-                      :file "examples/yaml/serverless/serverless.yaml",
-                      :rule "deny-functions-python2.7",
-                      :message "Python 2.7 cannot be used as the runtime for functions"}
-                     {:type "FAIL",
-                      :file "examples/yaml/serverless/serverless.yaml",
-                      :rule "deny-python2.7",
-                      :message "Python 2.7 cannot be the default provider runtime"}]
-                    {:tests 3, :passed 1, :warnings 0, :failures 2}]}
-             (cljconf-test ["examples/yaml/serverless/serverless.yaml"]
-                           ["examples/yaml/serverless/policy.clj"]))))))
+      (testing "clojure parser"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/yaml/serverless/serverless.yaml",
+                        :rule "deny-functions-python2.7",
+                        :message "Python 2.7 cannot be used as the runtime for functions"}
+                       {:type "FAIL",
+                        :file "examples/yaml/serverless/serverless.yaml",
+                        :rule "deny-python2.7",
+                        :message "Python 2.7 cannot be the default provider runtime"}]
+                      {:tests 3, :passed 1, :warnings 0, :failures 2}]}
+               (cljconf-test ["examples/yaml/serverless/serverless.yaml"]
+                             ["examples/yaml/serverless/policy.clj"]))))
+      (testing "go parser"
+        (is (= {:exit 1,
+                :out [[{:type "FAIL",
+                        :file "examples/yaml/serverless/serverless.yaml",
+                        :rule "deny-functions-python2.7",
+                        :message "Python 2.7 cannot be used as the runtime for functions"}
+                       {:type "FAIL",
+                        :file "examples/yaml/serverless/serverless.yaml",
+                        :rule "deny-python2.7",
+                        :message "Python 2.7 cannot be the default provider runtime"}]
+                      {:tests 3, :passed 1, :warnings 0, :failures 2}]}
+               (cljconf-test ["examples/yaml/serverless/serverless.yaml"]
+                             ["examples/yaml/serverless/policy_go.clj"]
+                             "--go-parsers-only")))))))

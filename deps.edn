@@ -8,4 +8,5 @@
   :test {:extra-paths ["test" "test-resources" "examples"]
          :extra-deps {lambdaisland/kaocha {:mvn/version "1.82.1306"}
                       lambdaisland/kaocha-cljs {:mvn/version "1.4.130"}
-                      lambdaisland/kaocha-junit-xml {:mvn/version "1.17.101"}}}}}
+                      lambdaisland/kaocha-junit-xml {:mvn/version "1.17.101"}
+                      org.flatland/ordered {:mvn/version "1.15.12"}}}}}

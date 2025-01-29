@@ -5,5 +5,5 @@
 
 (defn allow-allowlisted-selector-only
   [input]
-  (and (= "Service" (get input "kind"))
-       (util/is-allowlisted? allowlist (get-in input ["spec" "selector" "app"]))))
+  (and (= "Service" (:kind input))
+       (util/is-allowlisted? allowlist (get-in input [:spec :selector :app]))))
