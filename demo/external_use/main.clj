@@ -1,5 +1,5 @@
 (ns main
-  (:require [ilmoraunio.cljconf.core :as cljconf]
+  (:require [cljconf.core :as cljconf]
             [pod-ilmoraunio-cljconf.api :as parser]
             [policy]))
 

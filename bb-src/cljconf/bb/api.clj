@@ -3,7 +3,7 @@
             [clojure.edn :as edn]
             [clojure.string :as string]
             [clojure.string :as str]
-            [ilmoraunio.cljconf.core :as cljconf]
+            [cljconf.core :as cljconf]
             [pod-ilmoraunio-cljconf.api :as api]
             [sci.core :as sci]))
 
