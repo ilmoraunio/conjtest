@@ -34,13 +34,13 @@ jobs:
         run: go version && uname -a
       - name: Build pod-ilmoraunio-conftest
         run: |
-          cd pod-ilmoraunio-conftest-clj/pod-ilmoraunio-conftest && go install && go build
+          cd pod-ilmoraunio-cljconf/pod-ilmoraunio-conftest && go install && go build
           cd ../../pod-ilmoraunio-conftest && go install && go build
-      - name: Build pod-ilmoraunio-conftest-clj
+      - name: Build pod-ilmoraunio-cljconf
         run: |
-          cd pod-ilmoraunio-conftest-clj
-          bb uberjar target/pod-ilmoraunio-conftest-clj.jar -m pod-ilmoraunio-conftest-clj.core
-          cat $(which bb) target/pod-ilmoraunio-conftest-clj.jar > pod-ilmoraunio-conftest-clj && chmod +x pod-ilmoraunio-conftest-clj
+          cd pod-ilmoraunio-cljconf
+          bb uberjar target/pod-ilmoraunio-cljconf.jar -m pod-ilmoraunio-cljconf.core
+          cat $(which bb) target/pod-ilmoraunio-cljconf.jar > pod-ilmoraunio-cljconf && chmod +x pod-ilmoraunio-cljconf
       - name: Build cljconf
         run: |
           bb uberjar target/cljconf.jar -m cljconf.bb.main
@@ -88,13 +88,13 @@ jobs:
         run: go version && uname -a
       - name: Build pod-ilmoraunio-conftest
         run: |
-          cd pod-ilmoraunio-conftest-clj/pod-ilmoraunio-conftest && go install && go build
+          cd pod-ilmoraunio-cljconf/pod-ilmoraunio-conftest && go install && go build
           cd ../../pod-ilmoraunio-conftest && go install && go build
-      - name: Build pod-ilmoraunio-conftest-clj
+      - name: Build pod-ilmoraunio-cljconf
         run: |
-          cd pod-ilmoraunio-conftest-clj
-          bb uberjar target/pod-ilmoraunio-conftest-clj.jar -m pod-ilmoraunio-conftest-clj.core
-          cat $(which bb) target/pod-ilmoraunio-conftest-clj.jar > pod-ilmoraunio-conftest-clj && chmod +x pod-ilmoraunio-conftest-clj
+          cd pod-ilmoraunio-cljconf
+          bb uberjar target/pod-ilmoraunio-cljconf.jar -m pod-ilmoraunio-cljconf.core
+          cat $(which bb) target/pod-ilmoraunio-cljconf.jar > pod-ilmoraunio-cljconf && chmod +x pod-ilmoraunio-cljconf
       - name: Build cljconf
         run: |
           bb uberjar target/cljconf.jar -m cljconf.bb.main

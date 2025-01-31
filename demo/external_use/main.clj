@@ -1,6 +1,6 @@
 (ns main
   (:require [ilmoraunio.cljconf.core :as cljconf]
-            [pod-ilmoraunio-conftest-clj.api :as parser]
+            [pod-ilmoraunio-cljconf.api :as parser]
             [policy]))
 
 (defn test

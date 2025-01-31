@@ -4,7 +4,7 @@
             [clojure.string :as string]
             [clojure.string :as str]
             [ilmoraunio.cljconf.core :as cljconf]
-            [pod-ilmoraunio-conftest-clj.api :as api]
+            [pod-ilmoraunio-cljconf.api :as api]
             [sci.core :as sci]))
 
 (def default-namespaces

@@ -1,6 +1,6 @@
 [submodule "pod-ilmoraunio-conftest"]
 	path = pod-ilmoraunio-conftest
 	url = git@github.com:ilmoraunio/pod-ilmoraunio-conftest.git
-[submodule "pod-ilmoraunio-conftest-clj"]
-	path = pod-ilmoraunio-conftest-clj
-	url = git@github.com:ilmoraunio/pod-ilmoraunio-conftest-clj.git
+[submodule "pod-ilmoraunio-cljconf"]
+	path = pod-ilmoraunio-cljconf
+	url = git@github.com:ilmoraunio/pod-ilmoraunio-cljconf.git
