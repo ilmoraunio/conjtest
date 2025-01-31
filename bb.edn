@@ -1,7 +1,7 @@
 {:paths ["bb-src"]
  :deps {ilmoraunio/cljconf {:local/root "."}}
- :pods {pod-ilmoraunio-conftest-clj {:path "pod-ilmoraunio-conftest-clj/pod-ilmoraunio-conftest-clj"
-                                     :cache false}}
+ :pods {pod-ilmoraunio-cljconf {:path "pod-ilmoraunio-cljconf/pod-ilmoraunio-cljconf"
+                                :cache false}}
  :tasks
  {:requires ([cljconf.bb.main :as main])
   test (main/test *command-line-args*)}}
