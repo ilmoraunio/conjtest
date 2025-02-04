@@ -60,6 +60,7 @@
                              "test-resources/cljconf/example_deny_rules.clj"
                              "test-resources/cljconf/example_local_require.clj"]
                     :config "test.cljconf.edn"})
+        (is false)
         (catch Exception e
           (is (= {:total 16, :passed 0, :warnings 5, :failures 11}
                  (ex-data e))))))
@@ -73,7 +74,16 @@
                                    "test-resources/cljconf/example_deny_rules.clj"
                                    "test-resources/cljconf/example_local_require.clj"]
                           :config "test.cljconf.edn"})
-              [:summary :summary-report]))))))
+              [:summary :summary-report])))))
+  (testing "support passing plain folder directory to policy"
+    (try
+      (api/test! ["test-resources/invalid.yaml"]
+                 {:policy ["test-resources/cljconf/"]
+                  :config "test.cljconf.edn"})
+      (is false)
+      (catch Exception e
+        (is (= {:total 20, :passed 1, :warnings 5, :failures 14}
+               (ex-data e)))))))
 
 (deftest cli-test
   (testing "cljconf test"

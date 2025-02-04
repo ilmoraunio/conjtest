@@ -86,13 +86,30 @@
       :else api/parse)
     args))
 
+(defn ls-files
+  [& dir-or-filename]
+  (mapcat #(if (fs/directory? %)
+             (fs/list-dirs [%] (fn [p] (and (fs/regular-file? p) (not (fs/executable? p)))))
+             (let [[relative-path filename] (split-with
+                                              (partial = "..")
+                                              (clojure.string/split
+                                                (str (fs/relativize
+                                                       (fs/cwd)
+                                                       (fs/canonicalize %)))
+                                                #"/"))]
+               (filter fs/regular-file?
+                       (fs/glob (clojure.string/join "/" relative-path)
+                                (clojure.string/join "/" filename)
+                                {:hidden true}))))
+          dir-or-filename))
+
 (defn test!
   [inputs {:keys [policy trace] :as opts}]
   (let [_ (when trace (println "Policy argument(s):" (clojure.string/join ", " policy)))
         inputs (parse inputs opts)
         _ (when trace (println "Filenames parsed:" (clojure.string/join ", " (keys inputs))))
         policies (->> policy
-                      (mapcat (partial fs/glob "."))
+                      (mapcat ls-files)
                       (filter #(-> % fs/extension #{"clj" "bb" "cljc"}))
                       (mapv str))
         _ (when trace (println "Policies used:" (clojure.string/join ", " policies)))
