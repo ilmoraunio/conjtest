@@ -6,13 +6,13 @@
 
 (defn release [{:keys [file]}]
   (let [ght (System/getenv "GITHUB_TOKEN")
-        current-version (-> (slurp "resources/CLJCONF_VERSION")
+        current-version (-> (slurp "resources/CONJTEST_VERSION")
                             str/trim)]
     (when ght (println "Github token found"))
     (println "File" file)
     (do (assert file "File name must be provided")
         (ghr/overwrite-asset {:org "ilmoraunio"
-                              :repo "cljconf"
+                              :repo "conjtest"
                               :file file
                               :tag (str "v" current-version)
                               :draft true

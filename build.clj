@@ -4,7 +4,7 @@
             [clojure.tools.build.api :as b]
             [deps-deploy.deps-deploy :as dd]))
 
-(def lib 'net.clojars.ilmoraunio/cljconf)
+(def lib 'net.clojars.ilmoraunio/conjtest)
 (def version "0.1.0-SNAPSHOT")
 #_ ; alternatively, use MAJOR.MINOR.COMMITS:
 (def version (format "1.0.%s" (b/git-count-revs nil)))
@@ -25,7 +25,7 @@
 
 (defn- pom-template [version]
   [[:description "FIXME: my new library."]
-   [:url "https://github.com/ilmoraunio/cljconf"]
+   [:url "https://github.com/ilmoraunio/conjtest"]
    [:licenses
     [:license
      [:name "Eclipse Public License"]
@@ -34,9 +34,9 @@
     [:developer
      [:name "Ilmo.raunio"]]]
    [:scm
-    [:url "https://github.com/ilmoraunio/cljconf"]
-    [:connection "scm:git:https://github.com/ilmoraunio/cljconf.git"]
-    [:developerConnection "scm:git:ssh:git@github.com:ilmoraunio/cljconf.git"]
+    [:url "https://github.com/ilmoraunio/conjtest"]
+    [:connection "scm:git:https://github.com/ilmoraunio/conjtest.git"]
+    [:developerConnection "scm:git:ssh:git@github.com:ilmoraunio/conjtest.git"]
     [:tag (str "v" version)]]])
 
 (defn- jar-opts [opts]

@@ -18,7 +18,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
       - name: Read version to environment
-        run: echo "VERSION=$(cat resources/CLJCONF_VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=$(cat resources/CONJTEST_VERSION)" >> $GITHUB_ENV
       - name: Install babashka
         uses: DeLaGuardo/setup-clojure@13.0
         with:
@@ -34,18 +34,18 @@ jobs:
         run: go version && uname -a
       - name: Build pod-ilmoraunio-conftest
         run: |
-          cd pod-ilmoraunio-cljconf/pod-ilmoraunio-conftest && go install && go build
+          cd pod-ilmoraunio-conjtest/pod-ilmoraunio-conftest && go install && go build
           cd ../../pod-ilmoraunio-conftest && go install && go build
-      - name: Build pod-ilmoraunio-cljconf
+      - name: Build pod-ilmoraunio-conjtest
         run: |
-          cd pod-ilmoraunio-cljconf
-          bb uberjar target/pod-ilmoraunio-cljconf.jar -m pod-ilmoraunio-cljconf.core
-          cat $(which bb) target/pod-ilmoraunio-cljconf.jar > pod-ilmoraunio-cljconf && chmod +x pod-ilmoraunio-cljconf
-      - name: Build cljconf
+          cd pod-ilmoraunio-conjtest
+          bb uberjar target/pod-ilmoraunio-conjtest.jar -m pod-ilmoraunio-conjtest.core
+          cat $(which bb) target/pod-ilmoraunio-conjtest.jar > pod-ilmoraunio-conjtest && chmod +x pod-ilmoraunio-conjtest
+      - name: Build conjtest
         run: |
-          bb uberjar target/cljconf.jar -m cljconf.bb.main
-          cat $(which bb) target/cljconf.jar > cljconf
-          chmod +x cljconf
+          bb uberjar target/conjtest.jar -m conjtest.bb.main
+          cat $(which bb) target/conjtest.jar > conjtest
+          chmod +x conjtest
       - name: clj tests
         run: ./scripts/kaocha
       - name: babashka & CLI tests
@@ -53,9 +53,9 @@ jobs:
       - name: Debug
         run: ls -lart
       - name: Produce artifact
-        run: zip cljconf-$VERSION-macos-aarch64.zip cljconf
+        run: zip conjtest-$VERSION-macos-aarch64.zip conjtest
       - name: Release artifact
-        run: bb --config bb.ci.edn release-artifact --file cljconf-$VERSION-macos-aarch64.zip
+        run: bb --config bb.ci.edn release-artifact --file conjtest-$VERSION-macos-aarch64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   linux-build:
@@ -72,7 +72,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
       - name: Read version to environment
-        run: echo "VERSION=$(cat resources/CLJCONF_VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=$(cat resources/CONJTEST_VERSION)" >> $GITHUB_ENV
       - name: Install babashka
         uses: DeLaGuardo/setup-clojure@13.0
         with:
@@ -88,18 +88,18 @@ jobs:
         run: go version && uname -a
       - name: Build pod-ilmoraunio-conftest
         run: |
-          cd pod-ilmoraunio-cljconf/pod-ilmoraunio-conftest && go install && go build
+          cd pod-ilmoraunio-conjtest/pod-ilmoraunio-conftest && go install && go build
           cd ../../pod-ilmoraunio-conftest && go install && go build
-      - name: Build pod-ilmoraunio-cljconf
+      - name: Build pod-ilmoraunio-conjtest
         run: |
-          cd pod-ilmoraunio-cljconf
-          bb uberjar target/pod-ilmoraunio-cljconf.jar -m pod-ilmoraunio-cljconf.core
-          cat $(which bb) target/pod-ilmoraunio-cljconf.jar > pod-ilmoraunio-cljconf && chmod +x pod-ilmoraunio-cljconf
-      - name: Build cljconf
+          cd pod-ilmoraunio-conjtest
+          bb uberjar target/pod-ilmoraunio-conjtest.jar -m pod-ilmoraunio-conjtest.core
+          cat $(which bb) target/pod-ilmoraunio-conjtest.jar > pod-ilmoraunio-conjtest && chmod +x pod-ilmoraunio-conjtest
+      - name: Build conjtest
         run: |
-          bb uberjar target/cljconf.jar -m cljconf.bb.main
-          cat $(which bb) target/cljconf.jar > cljconf
-          chmod +x cljconf
+          bb uberjar target/conjtest.jar -m conjtest.bb.main
+          cat $(which bb) target/conjtest.jar > conjtest
+          chmod +x conjtest
       - name: clj tests
         run: ./scripts/kaocha
       - name: babashka & CLI tests
@@ -107,8 +107,8 @@ jobs:
       - name: Debug
         run: ls -lart
       - name: Produce artifact
-        run: zip cljconf-$VERSION-linux-amd64.zip cljconf
+        run: zip conjtest-$VERSION-linux-amd64.zip conjtest
       - name: Release artifact
-        run: bb --config bb.ci.edn release-artifact --file cljconf-$VERSION-linux-amd64.zip
+        run: bb --config bb.ci.edn release-artifact --file conjtest-$VERSION-linux-amd64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

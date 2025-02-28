@@ -1,7 +1,7 @@
 {:paths ["bb-src"]
- :deps {ilmoraunio/cljconf {:local/root "."}}
- :pods {pod-ilmoraunio-cljconf {:path "pod-ilmoraunio-cljconf/pod-ilmoraunio-cljconf"
-                                :cache false}}
+ :deps {ilmoraunio/conjtest {:local/root "."}}
+ :pods {pod-ilmoraunio-conjtest {:path "pod-ilmoraunio-conjtest/pod-ilmoraunio-conjtest"
+                                 :cache false}}
  :tasks
  {test:bb {:extra-paths ["bb-test" "test-resources"]
            :extra-deps {io.github.cognitect-labs/test-runner

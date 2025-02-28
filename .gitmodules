@@ -2,5 +2,5 @@
 	path = pod-ilmoraunio-conftest
 	url = git@github.com:ilmoraunio/pod-ilmoraunio-conftest.git
 [submodule "pod-ilmoraunio-cljconf"]
-	path = pod-ilmoraunio-cljconf
+	path = pod-ilmoraunio-conjtest
 	url = git@github.com:ilmoraunio/pod-ilmoraunio-cljconf.git
