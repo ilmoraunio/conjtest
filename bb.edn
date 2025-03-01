@@ -1,6 +1,6 @@
-{:paths ["bb-src"]
+{:paths ["bb-src" "pod-ilmoraunio-conjtest/src"]
  :deps {ilmoraunio/conjtest {:local/root "."}}
- :pods {pod-ilmoraunio-conjtest {:path "pod-ilmoraunio-conjtest/pod-ilmoraunio-conjtest"
+ :pods {pod-ilmoraunio-conftest {:path "pod-ilmoraunio-conftest/pod-ilmoraunio-conftest"
                                  :cache false}}
  :tasks
  {:requires ([conjtest.bb.main :as main])
