@@ -29,12 +29,8 @@
 (deftest rules-test
   (testing "allow rules"
     (testing "triggered"
-      (is (= {:summary {:total 5, :passed 0, :warnings 0, :failures 5}
-              :result {"test-resources/test.yaml" [{:message "port should be 80"
-                                                    :name "allow-malli-rule"
-                                                    :rule-type :allow
-                                                    :failure? true}
-                                                   {:message :conjtest/rule-validation-failed
+      (is (= {:summary {:total 4, :passed 0, :warnings 0, :failures 4}
+              :result {"test-resources/test.yaml" [{:message :conjtest/rule-validation-failed
                                                     :name "allow-my-absolute-bare-rule"
                                                     :rule-type :allow
                                                     :failure? true}
@@ -54,16 +50,11 @@
                                 #'conjtest.example-allow-rules/allow-my-rule
                                 #'conjtest.example-allow-rules/differently-named-allow-rule
                                 #'conjtest.example-allow-rules/allow-my-bare-rule
-                                #'conjtest.example-allow-rules/allow-my-absolute-bare-rule
-                                #'conjtest.example-allow-rules/allow-malli-rule)
+                                #'conjtest.example-allow-rules/allow-my-absolute-bare-rule)
                  (select-keys [:result :summary])))))
     (testing "not triggered"
-      (is (= {:summary {:total 5, :passed 5, :warnings 0, :failures 0}
+      (is (= {:summary {:total 4, :passed 4, :warnings 0, :failures 0}
               :result {"test-resources/test.yaml" [{:message nil,
-                                                    :name "allow-malli-rule",
-                                                    :rule-type :allow,
-                                                    :failure? false}
-                                                   {:message nil,
                                                     :name "allow-my-absolute-bare-rule",
                                                     :rule-type :allow,
                                                     :failure? false}
@@ -83,17 +74,12 @@
                                 #'conjtest.example-allow-rules/allow-my-rule
                                 #'conjtest.example-allow-rules/differently-named-allow-rule
                                 #'conjtest.example-allow-rules/allow-my-bare-rule
-                                #'conjtest.example-allow-rules/allow-my-absolute-bare-rule
-                                #'conjtest.example-allow-rules/allow-malli-rule)
+                                #'conjtest.example-allow-rules/allow-my-absolute-bare-rule)
                  (select-keys [:result :summary]))))))
   (testing "deny rules"
     (testing "triggered"
-      (is (= {:summary {:total 5, :passed 0, :warnings 0, :failures 5}
-              :result {"test-resources/test.yaml" [{:message "port should be 80"
-                                                    :name "deny-malli-rule"
-                                                    :rule-type :deny
-                                                    :failure? true}
-                                                   {:message :conjtest/rule-validation-failed
+      (is (= {:summary {:total 4, :passed 0, :warnings 0, :failures 4}
+              :result {"test-resources/test.yaml" [{:message :conjtest/rule-validation-failed
                                                     :name "deny-my-absolute-bare-rule"
                                                     :rule-type :deny
                                                     :failure? true}
@@ -113,16 +99,11 @@
                                 #'conjtest.example-deny-rules/deny-my-rule
                                 #'conjtest.example-deny-rules/differently-named-deny-rule
                                 #'conjtest.example-deny-rules/deny-my-bare-rule
-                                #'conjtest.example-deny-rules/deny-my-absolute-bare-rule
-                                #'conjtest.example-deny-rules/deny-malli-rule)
+                                #'conjtest.example-deny-rules/deny-my-absolute-bare-rule)
                  (select-keys [:result :summary])))))
     (testing "not triggered"
-      (is (= {:summary {:total 5, :passed 5, :warnings 0, :failures 0}
+      (is (= {:summary {:total 4, :passed 4, :warnings 0, :failures 0}
               :result {"test-resources/test.yaml" [{:message nil,
-                                                    :name "deny-malli-rule",
-                                                    :rule-type :deny,
-                                                    :failure? false}
-                                                   {:message nil,
                                                     :name "deny-my-absolute-bare-rule",
                                                     :rule-type :deny,
                                                     :failure? false}
@@ -142,18 +123,13 @@
                                 #'conjtest.example-deny-rules/deny-my-rule
                                 #'conjtest.example-deny-rules/differently-named-deny-rule
                                 #'conjtest.example-deny-rules/deny-my-bare-rule
-                                #'conjtest.example-deny-rules/deny-my-absolute-bare-rule
-                                #'conjtest.example-deny-rules/deny-malli-rule)
+                                #'conjtest.example-deny-rules/deny-my-absolute-bare-rule)
                  (select-keys [:result :summary]))))))
   (testing "warn rules"
     (testing "triggered"
-      (is (= {:summary {:total 5, :passed 0, :warnings 5, :failures 0}
+      (is (= {:summary {:total 4, :passed 0, :warnings 4, :failures 0}
               :result {"test-resources/test.yaml" [{:message "port should be 80"
                                                     :name "differently-named-warn-rule"
-                                                    :rule-type :warn
-                                                    :failure? true}
-                                                   {:message "port should be 80"
-                                                    :name "warn-malli-rule"
                                                     :rule-type :warn
                                                     :failure? true}
                                                    {:message :conjtest/rule-validation-failed
@@ -172,17 +148,12 @@
                                 #'conjtest.example-warn-rules/warn-my-rule
                                 #'conjtest.example-warn-rules/differently-named-warn-rule
                                 #'conjtest.example-warn-rules/warn-my-bare-rule
-                                #'conjtest.example-warn-rules/warn-my-absolute-bare-rule
-                                #'conjtest.example-warn-rules/warn-malli-rule)
+                                #'conjtest.example-warn-rules/warn-my-absolute-bare-rule)
                  (select-keys [:result :summary])))))
     (testing "not triggered"
-      (is (= {:summary {:total 5, :passed 5, :warnings 0, :failures 0}
+      (is (= {:summary {:total 4, :passed 4, :warnings 0, :failures 0}
               :result {"test-resources/test.yaml" [{:message nil,
                                                     :name "differently-named-warn-rule",
-                                                    :rule-type :warn,
-                                                    :failure? false}
-                                                   {:message nil,
-                                                    :name "warn-malli-rule",
                                                     :rule-type :warn,
                                                     :failure? false}
                                                    {:message nil,
@@ -201,17 +172,12 @@
                                 #'conjtest.example-warn-rules/warn-my-rule
                                 #'conjtest.example-warn-rules/differently-named-warn-rule
                                 #'conjtest.example-warn-rules/warn-my-bare-rule
-                                #'conjtest.example-warn-rules/warn-my-absolute-bare-rule
-                                #'conjtest.example-warn-rules/warn-malli-rule)
+                                #'conjtest.example-warn-rules/warn-my-absolute-bare-rule)
                  (select-keys [:result :summary]))))))
   (testing "resolve functions via namespace"
     (testing "triggered"
-      (is (= {:summary {:total 15, :passed 0, :warnings 5, :failures 10}
-              :result {"test-resources/test.yaml" [{:message "port should be 80",
-                                                    :name "allow-malli-rule",
-                                                    :rule-type :allow,
-                                                    :failure? true}
-                                                   {:message :conjtest/rule-validation-failed,
+      (is (= {:summary {:total 12, :passed 0, :warnings 4, :failures 8}
+              :result {"test-resources/test.yaml" [{:message :conjtest/rule-validation-failed,
                                                     :name "allow-my-absolute-bare-rule",
                                                     :rule-type :allow,
                                                     :failure? true}
@@ -226,10 +192,6 @@
                                                    {:message "port should be 80",
                                                     :name "differently-named-allow-rule",
                                                     :rule-type :allow,
-                                                    :failure? true}
-                                                   {:message "port should be 80",
-                                                    :name "deny-malli-rule",
-                                                    :rule-type :deny,
                                                     :failure? true}
                                                    {:message :conjtest/rule-validation-failed,
                                                     :name "deny-my-absolute-bare-rule",
@@ -249,10 +211,6 @@
                                                     :failure? true}
                                                    {:message "port should be 80",
                                                     :name "differently-named-warn-rule",
-                                                    :rule-type :warn,
-                                                    :failure? true}
-                                                   {:message "port should be 80",
-                                                    :name "warn-malli-rule",
                                                     :rule-type :warn,
                                                     :failure? true}
                                                    {:message :conjtest/rule-validation-failed,
@@ -278,12 +236,8 @@
                                 (the-ns 'conjtest.example-warn-rules))
                  (select-keys [:result :summary])))))
     (testing "not triggered"
-      (is (= {:summary {:total 15, :passed 15, :warnings 0, :failures 0}
+      (is (= {:summary {:total 12, :passed 12, :warnings 0, :failures 0}
               :result {"test-resources/test.yaml" [{:message nil,
-                                                    :name "allow-malli-rule",
-                                                    :rule-type :allow,
-                                                    :failure? false}
-                                                   {:message nil,
                                                     :name "allow-my-absolute-bare-rule",
                                                     :rule-type :allow,
                                                     :failure? false}
@@ -298,10 +252,6 @@
                                                    {:message nil,
                                                     :name "differently-named-allow-rule",
                                                     :rule-type :allow,
-                                                    :failure? false}
-                                                   {:message nil,
-                                                    :name "deny-malli-rule",
-                                                    :rule-type :deny,
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "deny-my-absolute-bare-rule",
@@ -321,10 +271,6 @@
                                                     :failure? false}
                                                    {:message nil,
                                                     :name "differently-named-warn-rule",
-                                                    :rule-type :warn,
-                                                    :failure? false}
-                                                   {:message nil,
-                                                    :name "warn-malli-rule",
                                                     :rule-type :warn,
                                                     :failure? false}
                                                    {:message nil,
@@ -588,8 +534,7 @@
                   [#'conjtest.example-deny-rules/deny-my-rule
                    #'conjtest.example-deny-rules/differently-named-deny-rule
                    #'conjtest.example-deny-rules/deny-my-bare-rule
-                   #'conjtest.example-deny-rules/deny-my-absolute-bare-rule
-                   #'conjtest.example-deny-rules/deny-malli-rule]
+                   #'conjtest.example-deny-rules/deny-my-absolute-bare-rule]
                   {:trace true})))))
       (testing "when rule is not triggered"
         (is (string?
@@ -599,8 +544,7 @@
                   [#'conjtest.example-deny-rules/deny-my-rule
                    #'conjtest.example-deny-rules/differently-named-deny-rule
                    #'conjtest.example-deny-rules/deny-my-bare-rule
-                   #'conjtest.example-deny-rules/deny-my-absolute-bare-rule
-                   #'conjtest.example-deny-rules/deny-malli-rule]
+                   #'conjtest.example-deny-rules/deny-my-absolute-bare-rule]
                   {:trace true}))))))
     (testing "vector inputs"
       (testing "when rule is trigerred"

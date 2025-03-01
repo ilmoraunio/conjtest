@@ -46,7 +46,7 @@
 (deftest api-test
   (testing "smoke test"
     (testing "triggered"
-      (is (thrown-with-msg? Exception #"16 tests, 0 passed, 5 warnings, 11 failures"
+      (is (thrown-with-msg? Exception #"13 tests, 0 passed, 4 warnings, 9 failures"
                             (api/test! ["test-resources/invalid.yaml"]
                                        {:policy ["test-resources/conjtest/example_allow_rules.clj"
                                                  "test-resources/conjtest/example_warn_rules.clj"
@@ -62,11 +62,11 @@
                     :config "test.conjtest.edn"})
         (is false)
         (catch Exception e
-          (is (= {:total 16, :passed 0, :warnings 5, :failures 11}
+          (is (= {:total 13, :passed 0, :warnings 4, :failures 9}
                  (ex-data e))))))
     (testing "not triggered"
-      (is (= {:summary {:total 16, :passed 16, :warnings 0, :failures 0},
-              :summary-report "16 tests, 16 passed, 0 warnings, 0 failures\n"}
+      (is (= {:summary {:total 13, :passed 13, :warnings 0, :failures 0},
+              :summary-report "13 tests, 13 passed, 0 warnings, 0 failures\n"}
              (select-keys
               (api/test! ["test-resources/valid.yaml"]
                          {:policy ["test-resources/conjtest/example_allow_rules.clj"
@@ -82,7 +82,7 @@
                   :config "test.conjtest.edn"})
       (is false)
       (catch Exception e
-        (is (= {:total 20, :passed 1, :warnings 5, :failures 14}
+        (is (= {:total 16, :passed 1, :warnings 4, :failures 11}
                (ex-data e)))))))
 
 (deftest cli-test
@@ -90,78 +90,73 @@
     (testing "allow rule"
       (testing "fails when rule returns false"
         (is (= {:exit 1,
-                :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-malli-rule", :message "port should be 80"}
-                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-my-absolute-bare-rule", :message ":conjtest/rule-validation-failed"}
+                :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-my-absolute-bare-rule", :message ":conjtest/rule-validation-failed"}
                        {:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-my-bare-rule", :message "port should be 80"}
                        {:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-my-rule", :message "port should be 80"}
                        {:type "FAIL", :file "test-resources/invalid.yaml", :rule "differently-named-allow-rule", :message "port should be 80"}]
-                      {:tests 5, :passed 0, :warnings 0, :failures 5}]}
+                      {:tests 4, :passed 0, :warnings 0, :failures 4}]}
                (conjtest-test ["test-resources/invalid.yaml"]
                               ["test-resources/conjtest/example_allow_rules.clj"]))))
       (testing "passes when rule returns true"
-        (is (= {:exit 0 :out [[] {:tests 5 :passed 5 :warnings 0 :failures 0}]}
+        (is (= {:exit 0 :out [[] {:tests 4 :passed 4 :warnings 0 :failures 0}]}
                (conjtest-test ["test-resources/valid.yaml"]
                               ["test-resources/conjtest/example_allow_rules.clj"])))))
     (testing "deny rule"
       (testing "fails when rule returns true"
-        (is (= {:exit 0 :out [[] {:tests 5 :passed 5 :warnings 0 :failures 0}]}
+        (is (= {:exit 0 :out [[] {:tests 4 :passed 4 :warnings 0 :failures 0}]}
                (conjtest-test ["test-resources/valid.yaml"]
                               ["test-resources/conjtest/example_deny_rules.clj"]))))
       (testing "passes when rule returns false"
         (is (= {:exit 1,
-                :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-malli-rule", :message "port should be 80"}
-                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-absolute-bare-rule", :message ":conjtest/rule-validation-failed"}
+                :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-absolute-bare-rule", :message ":conjtest/rule-validation-failed"}
                        {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-bare-rule", :message "port should be 80"}
                        {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-rule", :message "port should be 80"}
                        {:type "FAIL", :file "test-resources/invalid.yaml", :rule "differently-named-deny-rule", :message "port should be 80"}]
-                      {:tests 5, :passed 0, :warnings 0, :failures 5}]}
+                      {:tests 4, :passed 0, :warnings 0, :failures 4}]}
                (conjtest-test ["test-resources/invalid.yaml"]
                               ["test-resources/conjtest/example_deny_rules.clj"])))))
     (testing "warn rule"
       (testing "fails when rule returns true and --fail-on-warn flag is provided"
         (is (= {:exit 1,
                 :out [[{:type "WARN", :file "test-resources/invalid.yaml", :rule "differently-named-warn-rule", :message "port should be 80"}
-                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-malli-rule", :message "port should be 80"}
                        {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-absolute-bare-rule", :message ":conjtest/rule-validation-failed"}
                        {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-bare-rule", :message "port should be 80"}
                        {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-rule", :message "port should be 80"}]
-                      {:tests 5, :passed 0, :warnings 5, :failures 0}]}
+                      {:tests 4, :passed 0, :warnings 4, :failures 0}]}
                (conjtest-test ["test-resources/invalid.yaml"]
                               ["test-resources/conjtest/example_warn_rules.clj"]
                               "--fail-on-warn"))))
       (testing "warns when rule returns true and --fail-on-warn flag is not provided"
-        (is (= {:exit 0 :out [[] {:tests 5 :passed 0 :warnings 5 :failures 0}]}
+        (is (= {:exit 0 :out [[] {:tests 4 :passed 0 :warnings 4 :failures 0}]}
                (conjtest-test ["test-resources/invalid.yaml"]
                               ["test-resources/conjtest/example_warn_rules.clj"]))))
       (testing "passes when rule returns false"
-        (is (= {:exit 0 :out [[] {:tests 5 :passed 5 :warnings 0 :failures 0}]}
+        (is (= {:exit 0 :out [[] {:tests 4 :passed 4 :warnings 0 :failures 0}]}
                (conjtest-test ["test-resources/valid.yaml"]
                               ["test-resources/conjtest/example_warn_rules.clj"])))))
     (testing "combined policies"
       (testing "smoke test"
-        (is (= {:exit 0, :out [[] {:tests 15, :passed 15, :warnings 0, :failures 0}]}
+        (is (= {:exit 0, :out [[] {:tests 12, :passed 12, :warnings 0, :failures 0}]}
                (conjtest-test ["test-resources/valid.yaml"]
                               ["test-resources/conjtest/example_allow_rules.clj"
                                "test-resources/conjtest/example_warn_rules.clj"
                                "test-resources/conjtest/example_deny_rules.clj"]))))
       (testing "duplicates are deduped"
-        (is (= {:exit 0, :out [[] {:tests 5, :passed 5, :warnings 0, :failures 0}]}
+        (is (= {:exit 0, :out [[] {:tests 4, :passed 4, :warnings 0, :failures 0}]}
                (conjtest-test ["test-resources/valid.yaml"]
                               ["test-resources/conjtest/example_deny_rules.clj"
                                "test-resources/conjtest/example_deny_rules.clj"]))))
       (testing "exit code 2 when deny rule returns true and --fail-on-warn flag is provided"
         (is (= {:exit 2,
-                :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-malli-rule", :message "port should be 80"}
-                       {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-absolute-bare-rule", :message ":conjtest/rule-validation-failed"}
+                :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-absolute-bare-rule", :message ":conjtest/rule-validation-failed"}
                        {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-bare-rule", :message "port should be 80"}
                        {:type "FAIL", :file "test-resources/invalid.yaml", :rule "deny-my-rule", :message "port should be 80"}
                        {:type "FAIL", :file "test-resources/invalid.yaml", :rule "differently-named-deny-rule", :message "port should be 80"}
                        {:type "WARN", :file "test-resources/invalid.yaml", :rule "differently-named-warn-rule", :message "port should be 80"}
-                       {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-malli-rule", :message "port should be 80"}
                        {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-absolute-bare-rule", :message ":conjtest/rule-validation-failed"}
                        {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-bare-rule", :message "port should be 80"}
                        {:type "WARN", :file "test-resources/invalid.yaml", :rule "warn-my-rule", :message "port should be 80"}]
-                      {:tests 10, :passed 0, :warnings 5, :failures 5}]}
+                      {:tests 8, :passed 0, :warnings 4, :failures 4}]}
                (conjtest-test ["test-resources/invalid.yaml"]
                               ["test-resources/conjtest/example_warn_rules.clj"
                                "test-resources/conjtest/example_deny_rules.clj"]
@@ -182,8 +177,7 @@
                                 "--config" "test.conjtest.edn"))))))
     (testing "--trace"
       (testing "triggered"
-        (is (= ["deny-malli-rule"
-                "deny-my-absolute-bare-rule"
+        (is (= ["deny-my-absolute-bare-rule"
                 "deny-my-bare-rule"
                 "deny-my-rule"
                 "differently-named-deny-rule"]
@@ -194,8 +188,7 @@
                                                      ["test-resources/conjtest/example_deny_rules.clj"]
                                                      "--trace")))))))
       (testing "not triggered"
-        (is (= ["deny-malli-rule"
-                "deny-my-absolute-bare-rule"
+        (is (= ["deny-my-absolute-bare-rule"
                 "deny-my-bare-rule"
                 "deny-my-rule"
                 "differently-named-deny-rule"]
@@ -271,27 +264,18 @@
       (is (= {:exit 1,
               :out [[{:type "FAIL",
                       :file "test-resources/valid.yaml",
-                      :rule "deny-broken-malli-rule",
-                      :message "clojure.lang.ExceptionInfo: :malli.core/invalid-schema {:type :malli.core/invalid-schema, :message :malli.core/invalid-schema, :data {:schema :mapxxx, :form [:mapxxx [\"apiVersion\" [:= \"v1\"]] [\"kind\" [:= \"Service\"]] [\"spec\" [:map [\"ports\" [:+ [:map [\"port\" [:not= 80.0]]]]]]]]}}"}
-                     {:type "FAIL",
-                      :file "test-resources/valid.yaml",
                       :rule "deny-will-trigger-cleanly",
                       :message ":conjtest/rule-validation-failed"}
                      {:type "FAIL",
                       :file "test-resources/valid.yaml",
                       :rule "deny-will-trigger-with-exception",
                       :message "java.lang.NullPointerException"}]
-                    {:tests 4, :passed 1, :warnings 0, :failures 3}]}
+                    {:tests 3, :passed 1, :warnings 0, :failures 2}]}
              (conjtest-test ["test-resources/valid.yaml"]
                             ["test-resources/conjtest/example_broken_rules.clj"]))))
     (testing "when --trace is provided, stack trace is shown"
       (is (= {:exit 1,
               :out [[{:type "FAIL",
-                      :file "test-resources/valid.yaml",
-                      :rule "deny-broken-malli-rule",
-                      ;; the full stack trace continues beyond what we assert here
-                      :message "clojure.lang.ExceptionInfo: :malli.core/invalid-schema"}
-                     {:type "FAIL",
                       :file "test-resources/valid.yaml",
                       :rule "deny-will-trigger-cleanly",
                       :message ":conjtest/rule-validation-failed"}
@@ -300,7 +284,7 @@
                       :rule "deny-will-trigger-with-exception",
                       ;; ditto; the full stack trace continues beyond what we assert here
                       :message "java.lang.NullPointerException: null"}]
-                    {:tests 4, :passed 1, :warnings 0, :failures 3}]}
+                    {:tests 3, :passed 1, :warnings 0, :failures 2}]}
              (conjtest-test ["test-resources/valid.yaml"]
                             ["test-resources/conjtest/example_broken_rules.clj"]
                             "--trace"))))))

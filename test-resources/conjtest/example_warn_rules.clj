@@ -29,12 +29,3 @@
   (and (= "v1" (:apiVersion input))
        (= "Service" (:kind input))
        (not= 80 (-> input :spec :ports first :port))))
-
-(def warn-malli-rule
-  {:type :warn
-   :name "warn-malli-rule"
-   :message "port should be 80"
-   :rule [:map
-          [:apiVersion [:= "v1"]]
-          [:kind [:= "Service"]]
-          [:spec [:map [:ports [:+ [:map [:port [:not= 80]]]]]]]]})

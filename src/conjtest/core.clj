@@ -1,8 +1,7 @@
 (ns conjtest.core
   (:refer-clojure :exclude [test])
   (:require [clojure.string :as string]
-            [clojure.string]
-            [malli.core :as m]))
+            [clojure.string]))
 
 (defn string-or-nil
   [x]
@@ -46,12 +45,9 @@
 
 (defn rule-function
   [rule]
-  (let [f-or-schema (or (:rule rule)
-                        (and (var? rule) (:rule (var-get rule)))
-                        rule)]
-    (if (vector? f-or-schema)
-      (partial m/validate f-or-schema)
-      f-or-schema)))
+  (or (:rule rule)
+      (and (var? rule) (:rule (var-get rule)))
+      rule))
 
 (defn -test
   [inputs rule {:keys [trace] :as _opts}]
