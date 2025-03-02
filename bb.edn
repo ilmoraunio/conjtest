@@ -3,5 +3,9 @@
  :pods {pod-ilmoraunio-conftest {:path "pod-ilmoraunio-conftest/pod-ilmoraunio-conftest"
                                  :cache false}}
  :tasks
- {:requires ([conjtest.bb.main :as main])
-  test (main/test *command-line-args*)}}
+ {test
+  {:requires ([conjtest.bb.main :as main])
+   :task (main/test *command-line-args*)}
+  parse
+  {:requires ([conjtest.bb.main :as main])
+   :task (main/parse *command-line-args*)}}}

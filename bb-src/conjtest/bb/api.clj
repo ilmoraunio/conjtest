@@ -1,7 +1,6 @@
 (ns conjtest.bb.api
   (:require [babashka.fs :as fs]
             [clojure.edn :as edn]
-            [clojure.string :as string]
             [clojure.string :as str]
             [conjtest.core :as conjtest]
             [pod-ilmoraunio-conjtest.api :as api]
@@ -87,21 +86,24 @@
     args))
 
 (defn ls-files
-  [& dir-or-filename]
+  [& dirs-or-filenames]
   (mapcat #(if (fs/directory? %)
              (fs/list-dirs [%] (fn [p] (and (fs/regular-file? p) (not (fs/executable? p)))))
              (let [[relative-path filename] (split-with
                                               (partial = "..")
-                                              (clojure.string/split
+                                              (str/split
                                                 (str (fs/relativize
                                                        (fs/cwd)
                                                        (fs/canonicalize %)))
                                                 #"/"))]
-               (filter fs/regular-file?
-                       (fs/glob (clojure.string/join "/" relative-path)
-                                (clojure.string/join "/" filename)
-                                {:hidden true}))))
-          dir-or-filename))
+               (let [filepath (str/join "/" filename)]
+                 (if (re-find #"\*" filepath)
+                   (filter fs/regular-file?
+                           (fs/glob (str/join "/" relative-path)
+                                    filepath
+                                    {:hidden true}))
+                   [(fs/file filepath)]))))
+          dirs-or-filenames))
 
 (defn test!
   [inputs {:keys [policy trace] :as opts}]
