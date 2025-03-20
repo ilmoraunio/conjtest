@@ -156,7 +156,10 @@
       (println (show-help parse-cli-spec))
       (try (let [parsed (conjtest.bb.api/parse args opts)]
              (if-bb-cli
-               (pprint/pprint parsed)
+               (pprint/pprint
+                 (if (= (count parsed) 1)
+                   (first (vals parsed))
+                   parsed))
                parsed))
            (catch Exception e
              (if-bb-cli

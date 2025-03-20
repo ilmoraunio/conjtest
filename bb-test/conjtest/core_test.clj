@@ -201,34 +201,34 @@
   (testing "conjtest parse"
     (testing "clojure parser"
       (is (= {:exit 0,
-              :out {"test-resources/deps.edn" {:paths ["src" "resources"],
-                                               :deps {'org.clojure/clojure {:mvn/version "1.12.0"}, 'metosin/malli {:mvn/version "0.16.4"}},
-                                               :aliases {:build {:deps {'io.github.clojure/tools.build {:mvn/version "0.10.5"},
-                                                                        'slipset/deps-deploy {:mvn/version "0.2.2"}},
-                                                                 :ns-default 'build},
-                                                         :test {:extra-paths ["test" "test-resources" "examples"],
-                                                                :extra-deps {'lambdaisland/kaocha {:mvn/version "1.82.1306"},
-                                                                             'lambdaisland/kaocha-cljs {:mvn/version "1.4.130"},
-                                                                             'lambdaisland/kaocha-junit-xml {:mvn/version "1.17.101"}}}}}}}
+              :out {:paths ["src" "resources"],
+                    :deps {'org.clojure/clojure {:mvn/version "1.12.0"}, 'metosin/malli {:mvn/version "0.16.4"}},
+                    :aliases {:build {:deps {'io.github.clojure/tools.build {:mvn/version "0.10.5"},
+                                             'slipset/deps-deploy {:mvn/version "0.2.2"}},
+                                      :ns-default 'build},
+                              :test {:extra-paths ["test" "test-resources" "examples"],
+                                     :extra-deps {'lambdaisland/kaocha {:mvn/version "1.82.1306"},
+                                                  'lambdaisland/kaocha-cljs {:mvn/version "1.4.130"},
+                                                  'lambdaisland/kaocha-junit-xml {:mvn/version "1.17.101"}}}}}}
              (conjtest-parse ["test-resources/deps.edn"])
              (conjtest-parse ["test-resources/deps.edn"] "--parser" "edn"))))
     (testing "go parser"
       (is (= {:exit 0,
-              :out {"test-resources/deps.edn" {":deps" {"org.clojure/clojure" {":mvn/version" "1.12.0"}, "metosin/malli" {":mvn/version" "0.16.4"}},
-                                               ":aliases" {":build" {":deps" {"io.github.clojure/tools.build" {":mvn/version" "0.10.5"},
-                                                                              "slipset/deps-deploy" {":mvn/version" "0.2.2"}},
-                                                                     ":ns-default" "build"},
-                                                           ":test" {":extra-paths" ["test" "test-resources" "examples"],
-                                                                    ":extra-deps" {"lambdaisland/kaocha-cljs" {":mvn/version" "1.4.130"},
-                                                                                   "lambdaisland/kaocha-junit-xml" {":mvn/version" "1.17.101"},
-                                                                                   "lambdaisland/kaocha" {":mvn/version" "1.82.1306"}}}},
-                                               ":paths" ["src" "resources"]}}}
+              :out {":deps" {"org.clojure/clojure" {":mvn/version" "1.12.0"}, "metosin/malli" {":mvn/version" "0.16.4"}},
+                    ":aliases" {":build" {":deps" {"io.github.clojure/tools.build" {":mvn/version" "0.10.5"},
+                                                   "slipset/deps-deploy" {":mvn/version" "0.2.2"}},
+                                          ":ns-default" "build"},
+                                ":test" {":extra-paths" ["test" "test-resources" "examples"],
+                                         ":extra-deps" {"lambdaisland/kaocha-cljs" {":mvn/version" "1.4.130"},
+                                                        "lambdaisland/kaocha-junit-xml" {":mvn/version" "1.17.101"},
+                                                        "lambdaisland/kaocha" {":mvn/version" "1.82.1306"}}}},
+                    ":paths" ["src" "resources"]}}
              (conjtest-parse ["test-resources/deps.edn"] "--go-parsers-only"))))
     (testing "--parser"
-      (is (= {:exit 0, :out {"test-resources/test.json" {:hello [1 2 4], "@foo" "bar"}}}
+      (is (= {:exit 0, :out {:hello [1 2 4], "@foo" "bar"}}
              (conjtest-parse ["test-resources/test.json"])
              (conjtest-parse ["test-resources/test.json"] "--parser" "json")))
-      (is (= {:exit 0, :out {"test-resources/test.json" #ordered/map([:hello [1 2 4]] ["@foo" "bar"])}}
+      (is (= {:exit 0, :out {:hello [1 2 4] "@foo" "bar"}}
              (conjtest-parse ["test-resources/test.json"] "--parser" "yaml"))))
     (testing "multiple arguments"
       (is (= {:exit 0,
