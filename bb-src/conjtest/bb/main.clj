@@ -2,6 +2,7 @@
   (:require [babashka.cli :as cli]
             [babashka.tasks :as tasks]
             [clojure.string :as str]
+            [clojure.pprint :as pprint]
             [conjtest.bb.api]
             [conjtest.bb.repl :as repl]))
 
@@ -155,7 +156,7 @@
       (println (show-help parse-cli-spec))
       (try (let [parsed (conjtest.bb.api/parse args opts)]
              (if-bb-cli
-               (println (pr-str parsed))
+               (pprint/pprint parsed)
                parsed))
            (catch Exception e
              (if-bb-cli
