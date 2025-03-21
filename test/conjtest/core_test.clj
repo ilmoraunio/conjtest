@@ -563,11 +563,11 @@
     (is (nil?
           (:trace-report
             (conjtest/test [(first (vals valid-yaml))]
-                           [#'conjtest.example-deny-rules/deny-my-rule]))))
+                           #'conjtest.example-deny-rules/deny-my-rule))))
     (is (nil?
           (:trace-report
             (conjtest/test invalid-yaml
-                           [#'conjtest.example-deny-rules/deny-my-rule])))))
+                           #'conjtest.example-deny-rules/deny-my-rule)))))
   (testing "exceptions bubble up to reporting and all rules are evaluated"
     (testing "by default, don't expose the stack trace"
       (let [report (conjtest/test valid-yaml
