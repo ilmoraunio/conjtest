@@ -1,6 +1,7 @@
 (ns conjtest.core
   (:refer-clojure :exclude [test])
-  (:require [clojure.string :as string]
+  (:require [clojure.stacktrace]
+            [clojure.string :as string]
             [clojure.string]))
 
 (defn string-or-nil
