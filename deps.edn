@@ -1,11 +1,17 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}}
  :aliases
- {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}
-                 slipset/deps-deploy {:mvn/version "0.2.2"}}
-          :ns-default build}
-  :test {:extra-paths ["test" "test-resources" "examples"]
+ {:test {:extra-paths ["test" "test-resources" "examples"]
          :extra-deps {lambdaisland/kaocha {:mvn/version "1.82.1306"}
                       lambdaisland/kaocha-cljs {:mvn/version "1.4.130"}
                       lambdaisland/kaocha-junit-xml {:mvn/version "1.17.101"}
-                      org.flatland/ordered {:mvn/version "1.15.12"}}}}}
+                      org.flatland/ordered {:mvn/version "1.15.12"}}}
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}
+                 slipset/deps-deploy {:mvn/version "0.2.2"}}
+          :ns-default build}
+  :deploy {:extra-deps {slipset/deps-deploy {:mvn/version "RELEASE"}}
+           :exec-fn deps-deploy.deps-deploy/deploy
+           :exec-args {:installer :remote
+                       :pom-file "target/classes/META-INF/maven/com.github.ilmoraunio/conjtest/pom.xml"
+                       :sign-releases? false
+                       :artifact "target/conjtest.jar"}}}}
