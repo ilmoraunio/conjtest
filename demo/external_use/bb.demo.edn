@@ -1,7 +1,6 @@
 {:paths ["."]
  :deps {ilmoraunio/conjtest {:local/root "../.."}} ; TODO: publish
- :pods {pod-ilmoraunio-conjtest {:path "pod-ilmoraunio-conjtest/pod-ilmoraunio-conjtest" ; TODO: publish
-                                 :cache false}}
+ :pods {ilmoraunio/conftest {:version "0.0.2"}}
  :tasks
  {:requires ([main])
   test (apply main/test *command-line-args*)}}
