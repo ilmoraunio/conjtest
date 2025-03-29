@@ -9,7 +9,7 @@ on:
       - 'lib-v*'
 
 jobs:
-  build-and-release:
+  build-and-deploy-lib:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4

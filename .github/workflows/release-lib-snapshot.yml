@@ -6,7 +6,7 @@ on:
       - 'main'
 
 jobs:
-  build-and-release:
+  build-and-deploy-lib-snapshot:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
