@@ -1,5 +1,5 @@
 {:paths ["src" "pod-ilmoraunio-conjtest/src"]
- :deps {com.github.ilmoraunio/conjtest {:mvn/version "0.1.0"}}
+ :deps {org.conjtest/conjtest-clj {:mvn/version "0.2.0"}}
  :pods {ilmoraunio/conftest {:version "0.0.2"}}
  #_#_:pods {ilmoraunio/conftest {:path "pod-ilmoraunio-conftest/pod-ilmoraunio-conftest"
                                  :cache false}}
