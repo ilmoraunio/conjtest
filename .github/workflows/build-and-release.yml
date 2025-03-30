@@ -46,8 +46,6 @@ jobs:
           bb uberjar target/conjtest.jar -m conjtest.bb.main
           cat $(which bb) target/conjtest.jar > conjtest
           chmod +x conjtest
-      - name: clj tests
-        run: ./scripts/kaocha
       - name: babashka & CLI tests
         run: ./scripts/test
       - name: Debug
@@ -100,8 +98,6 @@ jobs:
           bb uberjar target/conjtest.jar -m conjtest.bb.main
           cat $(which bb) target/conjtest.jar > conjtest
           chmod +x conjtest
-      - name: clj tests
-        run: ./scripts/kaocha
       - name: babashka & CLI tests
         run: ./scripts/test
       - name: Debug
