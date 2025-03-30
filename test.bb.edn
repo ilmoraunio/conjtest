@@ -1,9 +1,8 @@
-{:paths ["bb-src"]
- :deps {ilmoraunio/conjtest {:local/root "."}}
- :pods {pod-ilmoraunio-conjtest {:path "pod-ilmoraunio-conjtest/pod-ilmoraunio-conjtest"
-                                 :cache false}}
+{:paths ["src" "pod-ilmoraunio-conjtest/src"]
+ :deps {com.github.ilmoraunio/conjtest {:mvn/version "0.1.0"}}
+ :pods {ilmoraunio/conftest {:version "0.0.2"}}
  :tasks
- {test:bb {:extra-paths ["bb-test" "test-resources"]
+ {test:bb {:extra-paths ["test" "test-resources"]
            :extra-deps {io.github.cognitect-labs/test-runner
                         {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
            :task (exec 'cognitect.test-runner.api/test)
