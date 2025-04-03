@@ -290,7 +290,6 @@
                             "--trace"))))))
 
 (deftest examples-test
-  (testing "Configfile")
   (testing "CUE"
     (is (= {:exit 1,
          :out [[{:type "FAIL",
@@ -493,7 +492,6 @@
                   {:tests 1, :passed 0, :warnings 0, :failures 1}]}
            (conjtest-test ["examples/spdx/sbom.spdx"]
                           ["examples/spdx/policy.clj"]))))
-  (testing "Textproto")
   (testing "TOML"
     (testing "Traefik"
       (is (= {:exit 1,
@@ -504,7 +502,6 @@
                     {:tests 1, :passed 0, :warnings 0, :failures 1}]}
              (conjtest-test ["examples/toml/traefik/traefik.toml"]
                             ["examples/toml/traefik/policy.clj"])))))
-  (testing "Typescript")
   (testing "VCL"
     (is (= {:exit 1,
             :out [[{:type "FAIL",
