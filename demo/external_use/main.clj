@@ -7,9 +7,10 @@
   [& args]
   (let [inputs (apply parser/parse args)]
     (let [{:keys [summary-report failure-report]}
-          (conjtest/test inputs
-                         #'policy/deny-incorrect-log-level-development
-                         #'policy/deny-incorrect-log-level-production)]
+          (conjtest/test inputs 'policy)]
       (cond
         failure-report (do (println failure-report) (System/exit 1))
         summary-report (do (println summary-report) (System/exit 0))))))
+
+(comment
+  "bb test sample_config.edn")
