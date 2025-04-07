@@ -48,14 +48,32 @@ Check [CHANGELOG.md](CHANGELOG.md) for any breaking changes.
   and separate conjtest (pure Clojure) library.
 - Linux and macOS
 
-## Quickstart
+## Installation
 
-Download the binary from the latest
-[release](https://github.com/ilmoraunio/conjtest/releases).
+Download the binaries for the MacOS (arm64) and Linux (amd64) platforms from
+the repository's [latest
+release](https://github.com/ilmoraunio/conjtest/releases) and install the
+binary to `usr/local/bin`.
 
-How to get started:
+MacOS (arm64):
+
+```bash
+curl -sLO https://github.com/ilmoraunio/conjtest/releases/download/v0.0.1/conjtest-0.0.1-macos-arm64.zip -o conjtest.zip
+unzip conjtest.zip conjtest
+sudo mv conjtest /usr/local/bin
+```
+
+Linux (amd64):
 
 ```
+curl -sLO https://github.com/ilmoraunio/conjtest/releases/download/v0.0.1/conjtest-0.0.1-linux-x86_64.tar.gz -o conjtest.tar.gz
+tar -xvzf conjtest.zip conjtest
+sudo mv conjtest /usr/local/bin
+```
+
+## Quickstart
+
+```clojure
 cat <<EOF > my-ingress.yaml
 ---
 apiVersion: networking.k8s.io/v1
