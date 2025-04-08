@@ -5,7 +5,7 @@
 Run Policy-as-Code using Clojure!
 
 Conjtest is a command-line utility heavily inspired by and partially based on
-[conftest](https://www.conftest.dev/). It allows you to write policies against
+[Conftest](https://www.conftest.dev/). It allows you to write policies against
 structured configuration data using a robust and practical language. You can,
 for example, write policies against your EDN files, Kubernetes configurations,
 Terraform code, or against other common configuration formats.
