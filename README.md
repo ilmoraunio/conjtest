@@ -85,8 +85,8 @@ metadata:
   namespace: foobar
 EOF
 
-cat <<EOF > my-rules.clj
-(ns my-rules)
+cat <<EOF > policy.clj
+(ns policy)
 
 (defn deny-*-cors
   [input]
@@ -99,13 +99,13 @@ EOF
 ```
 
 ```
-conjtest test my-ingress.yaml -p my-rules.clj
+conjtest test my-ingress.yaml -p policy.clj
 ```
 
 Output:
 
 ```
-$ conjtest test my-ingress.yaml -p my-rules.clj
+$ conjtest test my-ingress.yaml -p policy.clj
 FAIL - my-ingress.yaml - deny-*-cors - CORS is too permissive
 
 1 tests, 0 passed, 0 warnings, 1 failures
