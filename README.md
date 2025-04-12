@@ -10,6 +10,17 @@ structured configuration data using a robust and practical language. You can,
 for example, write policies against your EDN files, Kubernetes configurations,
 Terraform code, or against other common configuration formats.
 
+Conjtest enables you to:
+
+- Define & run policies against your infrastructure as part of your CI pipeline
+  or Git Hooks using a standardized tool.
+- Catch problems or security issues before they become incidents & enforce
+  compliance.
+- Use Clojure to define your infrastructure policies, which may either support
+  a full-stack Clojure approach or enable gradual introduction of Clojure to a
+  codebase.
+- Provide Go/Conftest parsers for compatibility.
+
 ## Project status
 
 [![Slack](https://img.shields.io/badge/slack-conjtest-orange.svg?logo=slack)](https://clojurians.slack.com/app_redirect?channel=conjtest)
@@ -45,7 +56,8 @@ Check [CHANGELOG.md](CHANGELOG.md) for any breaking changes.
   - YAML
 - Support customizability via
   [pod-ilmoraunio-conjtest](https://github.com/ilmoraunio/pod-ilmoraunio-conjtest)
-  and separate conjtest (pure Clojure) library.
+  and separate [conjtest-clj](https://github.com/ilmoraunio/conjtest-clj) (pure
+  Clojure) library.
 - Linux and macOS
 
 ## Installation
