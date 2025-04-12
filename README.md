@@ -75,7 +75,7 @@ unzip conjtest.zip conjtest
 sudo mv conjtest /usr/local/bin
 ```
 
-Linux (x86_64):
+Linux (amd64):
 
 ```
 curl -sLO https://github.com/ilmoraunio/conjtest/releases/download/v0.0.1/conjtest-0.0.1-linux-x86_64.tar.gz -o conjtest.tar.gz
