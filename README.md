@@ -1,5 +1,7 @@
 # conjtest
 
+![Introducing Conjtest](https://ilmo.me/img/conjtest-hello-world.gif)
+
 ## Introduction
 
 Run Policy-as-Code using Clojure!
