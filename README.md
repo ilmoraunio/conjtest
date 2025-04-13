@@ -125,7 +125,7 @@ FAIL - my-ingress.yaml - deny-*-cors - CORS is too permissive
 
 ## Documentation
 
-- [User Guide](https://conjtest.github.io)
+- [User Guide](https://user-guide.conjtest.org)
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [DEVELOPMENT.md](DEVELOPMENT.md)
 - [CHANGELOG.md](CHANGELOG.md)
