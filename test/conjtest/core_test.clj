@@ -43,6 +43,13 @@
       (select-keys [:exit :out])
       (update :out (partial clojure.edn/read-string {:readers {'ordered/map #'flatland.ordered.map/ordered-map}}))))
 
+(defn conjtest-version
+  []
+  (-> (apply shell [{:out :string, :err :string, :continue true}
+                    "./conjtest"
+                    "version"])
+      (select-keys [:exit :out])))
+
 (deftest api-test
   (testing "smoke test"
     (testing "triggered"
@@ -259,6 +266,9 @@
                                                                            [:selector #ordered/map([:app "hello-kubernetes"])])])}}
              (conjtest-parse ["test-resources/test.json" "test-resources/deps.edn" "test-resources/valid.yaml" "test-resources/invalid.yaml"])
              (conjtest-parse ["test-resources/*.{json,edn,yaml}"])))))
+  (testing "conjtest version"
+    (let [expected-version (slurp "resources/CONJTEST_VERSION")]
+      (is (= expected-version (:out (conjtest-version))))))
   (testing "exception reporting"
     (testing "stack trace is not shown by default"
       (is (= {:exit 1,

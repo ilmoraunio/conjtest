@@ -33,7 +33,8 @@
    (let [command-rows (cli/pad-cells [["help" " " "Show available commands"]
                                       ["test" " " "Tests configuration files against Clojure policies"]
                                       ["parse" " " "Parses configuration files and prints them out as Clojure data structures"]
-                                      ["repl" " " "Opens up a nREPL session inside conjtest allowing"]])
+                                      ["repl" " " "Opens up a nREPL session inside conjtest allowing"]
+                                      ["version" " " "Print CLI version"]])
          rows (-> [["Test your configuration files using Clojure!"]
                    []
                    ["Usage:"]
@@ -168,6 +169,15 @@
                  (System/exit 1))
                (throw e)))))))
 
+(defn version
+  []
+  (let [version (-> (slurp "resources/CONJTEST_VERSION")
+                    (str/trim))]
+    (println version)
+    (if-bb-cli
+      (System/exit 0)
+      (do))))
+
 (defn -main
   [& args]
   (let [command (keyword (first args))
@@ -177,4 +187,5 @@
       :test (test args)
       :parse (parse args)
       :repl (repl/-main)
+      :version (version)
       (println (show-help)))))
