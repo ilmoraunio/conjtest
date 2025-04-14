@@ -24,4 +24,4 @@ CONJTEST_DEV=1 rlwrap bb
 
 ## Test
 
-Run `./scripts/kaocha && ./scripts/test`
+Run `./scripts/test`
