@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+latest_release_version="0.0.1"
+default_install_dir="/usr/local/bin"
+default_download_dir="/tmp"
+
+version="${VERSION:-${latest_release_version}}"
+install_dir="${INSTALL_DIR:-$default_install_dir}"
+download_dir="${DOWNLOAD_DIR:-$default_download_dir}"
+
+print_help() {
+    echo "Usage:"
+    echo
+    echo "install [--install-dir <dir>] [--download-dir <download-dir>] [--version <version>]"
+    echo
+    echo "You can also provide arguments using environment variables:"
+    echo
+    echo "* VERSION corresponds to --version"
+    echo "* INSTALL_DIR corresponds to --install-dir"
+    echo "* DOWNLOAD_DIR corresponds to --download-dir"
+    echo
+    echo "Defaults:"
+    echo " * Latest conjtest release on GitHub: ${latest_release_version#v}"
+    echo " * Installation directory: ${default_install_dir}"
+    echo " * Download directory: ${default_download_dir}"
+    echo " * Version: ${latest_release_version}"
+    exit 1
+}
+
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+    case "$key" in
+        --install-dir)
+            install_dir="${2%/}"
+            shift
+            shift
+            ;;
+        --download-dir)
+            download_dir="${2%/}"
+            shift
+            shift
+            ;;
+        --version)
+            version="${2#v}"
+            shift
+            shift
+            ;;
+        --help)
+            print_help
+            shift
+            ;;
+        *)    # unknown option
+            print_help
+            shift
+            ;;
+    esac
+done
+
+case "$(uname -s)" in
+    Linux*)  OS=linux;;
+    Darwin*) OS=macos;;
+    *) echo "Unsupported operating system: $(uname- s)"
+       exit 1
+       ;;
+esac
+
+case "$(uname -m)" in
+    aarch64) platform=arm64
+             ;;
+    arm64) platform=arm64
+           ;;
+    amd64) platform=x86_64
+	   ;;
+    x86_64) platform=x86_64
+	    ;;
+    *) echo "Unsupported architecture: $(uname -m)"
+       exit 1
+       ;;
+esac
+
+case "$OS-$platform" in
+    linux-x86_64) filename="conjtest-${version}-linux-x86_64.tar.gz"
+	          ;;
+    macos-arm64) filename="conjtest-${version}-macos-arm64.zip"
+	         ;;
+    *) echo "Unsupported architecture. Operating system: \"$(uname -s)\" Platform: \"$(uname -m)\""
+       exit 1
+       ;;
+esac
+
+download_url="https://github.com/ilmoraunio/conjtest/releases/download/v${version}/$filename"
+unarchive_dir="$(mktemp -d)/${filename}"
+
+echo "Downloading file from $download_url"
+curl -o "${download_dir%/}/${filename}" -sLO "$download_url"
+
+unarchive_destination="$(mktemp -d)"
+echo "Unarchiving file to ${unarchive_destination}"
+if [[ $OS == "linux" ]]
+then
+  tar -xzvf "${download_dir%/}/${filename}" -C "${unarchive_destination}"
+elif [[ $OS == "macos" ]]
+then
+  unzip "${download_dir%/}/${filename}" -d "${unarchive_destination}"
+fi
+
+echo "Moving file to '$install_dir'"
+mv "${unarchive_destination}/conjtest" "${install_dir}/conjtest"
