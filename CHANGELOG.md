@@ -15,6 +15,8 @@ This project uses [Break Versioning][breakver]. The version numbers follow a
 
 ## 0.0.2-SNAPSHOT
 
+- Add install script [7c901cd](https://github.com/ilmoraunio/conjtest/commit/7c901cd89f58acc265dc1b55c3667e77efe83cdc)
+
 ## 0.0.1
 
 This is the first release! 🎉
