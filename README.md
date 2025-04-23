@@ -64,6 +64,39 @@ Check [CHANGELOG.md](CHANGELOG.md) for any breaking changes.
 
 ## Installation
 
+You can install `conjtest` either using an installer script or by pulling the
+binary from [GitHub releases](https://github.com/ilmoraunio/conjtest/releases).
+
+### Installer script
+
+Download & run the installer script using `bash`.
+
+```bash
+bash < <(curl -s https://raw.githubusercontent.com/ilmoraunio/conjtest/master/install)
+```
+
+By default the script will install the binary to `/usr/local/bin` (you may need
+to use `sudo`).
+
+You can install the binary to another location using `--install-dir`.
+
+```bash
+curl -sO https://raw.githubusercontent.com/ilmoraunio/conjtest/master/install
+chmod u+x install
+./install --install-dir .
+```
+
+To install a specific version, you may provide `--version`.
+
+```bash
+./install --version 0.0.1
+```
+
+The full list of versions can be found from
+[here](https://github.com/ilmoraunio/conjtest/tags).
+
+### GitHub releases
+
 Download the binaries for the MacOS (arm64) and Linux (amd64) platforms from
 the repository's [latest
 release](https://github.com/ilmoraunio/conjtest/releases) and install the
