@@ -51,7 +51,7 @@ jobs:
   linux-amd64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
