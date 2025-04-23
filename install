@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-latest_release_version="0.0.1"
+latest_release_version="$(curl -s https://api.github.com/repos/ilmoraunio/conjtest/releases/latest | jq -r .tag_name | sed 's|^v||')"
 default_install_dir="/usr/local/bin"
 default_download_dir="/tmp"
 
@@ -22,10 +22,9 @@ print_help() {
     echo "* DOWNLOAD_DIR corresponds to --download-dir"
     echo
     echo "Defaults:"
-    echo " * Latest conjtest release on GitHub: ${latest_release_version#v}"
+    echo " * Version (latest release): ${latest_release_version#v}"
     echo " * Installation directory: ${default_install_dir}"
     echo " * Download directory: ${default_download_dir}"
-    echo " * Version: ${latest_release_version}"
     exit 1
 }
 
