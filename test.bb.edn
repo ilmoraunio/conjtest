@@ -1,6 +1,6 @@
 {:paths ["src" "pod-ilmoraunio-conjtest/src"]
  :deps {org.conjtest/conjtest-clj {:mvn/version "0.3.1"}}
- :pods {ilmoraunio/conftest {:version "0.0.2"}}
+ :pods {ilmoraunio/conftest {:version "0.0.3"}}
  :tasks
  {test:bb {:extra-paths ["test" "test-resources"]
            :extra-deps {io.github.cognitect-labs/test-runner
