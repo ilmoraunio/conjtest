@@ -10,7 +10,7 @@ on:
     - main
 
 jobs:
-  macos-build:
+  macos-arm64:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -48,10 +48,48 @@ jobs:
         run: bb --config bb.ci.edn release-artifact --file conjtest-$VERSION-macos-$ARCH.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  linux-build:
+  linux-amd64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - name: Read version to environment
+        run: echo "VERSION=$(cat resources/CONJTEST_VERSION)" >> $GITHUB_ENV
+      - name: Read architecture to environment
+        run: echo "ARCH=$(uname -m)" >> $GITHUB_ENV
+      - name: Install babashka
+        uses: DeLaGuardo/setup-clojure@13.0
+        with:
+          cli: 1.11.3.1463
+          bb: 1.3.190
+      - name: Build conjtest
+        run: |
+          bb uberjar target/conjtest.jar -m conjtest.bb.main
+          cat $(which bb) target/conjtest.jar > conjtest
+          chmod +x conjtest
+      - name: babashka & CLI tests
+        run: ./scripts/test
+      - name: Debug
+        run: ls -lart
+      - name: Produce artifact
+        run: tar -czvf conjtest-$VERSION-linux-$ARCH.tar.gz conjtest
+      - name: Release artifact
+        if: github.event_name == 'push'
+        run: bb --config bb.ci.edn release-artifact --file conjtest-$VERSION-linux-$ARCH.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  linux-arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
         with:
           submodules: true
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
