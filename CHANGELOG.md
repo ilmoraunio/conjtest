@@ -15,11 +15,13 @@ This project uses [Break Versioning][breakver]. The version numbers follow a
 
 ## 0.0.2-SNAPSHOT
 
-- Add `conjtest version` [aacdc3e](https://github.com/ilmoraunio/conjtest/commit/aacdc3e45d2cd54a658156accb885ca0ebcd90c1)
-- Update docs: missed a spot after moving code [253b979](https://github.com/ilmoraunio/conjtest/commit/253b9795be7ece8729e52019f5d752b2464452a0)
-- Add install script [7c901cd](https://github.com/ilmoraunio/conjtest/commit/7c901cd89f58acc265dc1b55c3667e77efe83cdc)
-- Check latest version from github for installer [0e191b1](https://github.com/ilmoraunio/conjtest/commit/0e191b1eafa6800de5c4874786df169bdc0fe06e)
-- Add installer script documentation [d0393a7](https://github.com/ilmoraunio/conjtest/commit/d0393a741e4ec24a4e9d4dd4f4960f787ec8503e)
+- Add Linux arm64 binary #2 [89d3a69](https://github.com/ilmoraunio/cljconf/commit/89d3a69f9d8f2d5a9acb2f47595250405631cb5d)
+- ci: Don't release artifact upon pull request [be56adc](https://github.com/ilmoraunio/cljconf/commit/be56adcf585d320c2225deaf4fa578b3d826a98c)
+- Add installer script documentation [d0393a7](https://github.com/ilmoraunio/cljconf/commit/d0393a741e4ec24a4e9d4dd4f4960f787ec8503e)
+- Check latest version from github for installer [0e191b1](https://github.com/ilmoraunio/cljconf/commit/0e191b1eafa6800de5c4874786df169bdc0fe06e)
+- Add install script [7c901cd](https://github.com/ilmoraunio/cljconf/commit/7c901cd89f58acc265dc1b55c3667e77efe83cdc)
+- Update docs: missed a spot after moving code [253b979](https://github.com/ilmoraunio/cljconf/commit/253b9795be7ece8729e52019f5d752b2464452a0)
+- Add `conjtest version` [aacdc3e](https://github.com/ilmoraunio/cljconf/commit/aacdc3e45d2cd54a658156accb885ca0ebcd90c1)
 
 ## 0.0.1
 
