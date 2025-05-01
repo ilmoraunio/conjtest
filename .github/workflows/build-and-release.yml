@@ -44,7 +44,7 @@ jobs:
       - name: Produce artifact
         run: zip conjtest-$VERSION-macos-$ARCH.zip conjtest
       - name: Release artifact
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: bb --config bb.ci.edn release-artifact --file conjtest-$VERSION-macos-$ARCH.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
       - name: Produce artifact
         run: tar -czvf conjtest-$VERSION-linux-$ARCH.tar.gz conjtest
       - name: Release artifact
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: bb --config bb.ci.edn release-artifact --file conjtest-$VERSION-linux-$ARCH.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -120,7 +120,7 @@ jobs:
       - name: Produce artifact
         run: tar -czvf conjtest-$VERSION-linux-$ARCH.tar.gz conjtest
       - name: Release artifact
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: bb --config bb.ci.edn release-artifact --file conjtest-$VERSION-linux-$ARCH.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
