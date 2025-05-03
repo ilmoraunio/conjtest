@@ -118,7 +118,7 @@ jobs:
       - name: Debug
         run: ls -lart
       - name: Produce artifact
-        run: tar -czvf conjtest-$VERSION-linux-$ARCH.tar.gz conjtest
+        run: tar -czvf conjtest-$VERSION-linux-arm64.tar.gz conjtest
       - name: Release artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: bb --config bb.ci.edn release-artifact --file conjtest-$VERSION-linux-$ARCH.tar.gz
