@@ -1,4 +1,4 @@
-{:paths ["src" "pod-ilmoraunio-conjtest/src"]
+{:paths ["src" "pod-ilmoraunio-conjtest/src" "resources/"]
  :deps {org.conjtest/conjtest-clj {:mvn/version "0.3.1"}}
  :pods {ilmoraunio/conftest {:version "0.0.3"}}
  #_#_:pods {ilmoraunio/conftest {:path "pod-ilmoraunio-conftest/pod-ilmoraunio-conftest"

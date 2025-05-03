@@ -171,7 +171,7 @@
 
 (defn version
   []
-  (let [version (-> (slurp "resources/CONJTEST_VERSION")
+  (let [version (-> (slurp (clojure.java.io/resource "CONJTEST_VERSION"))
                     (str/trim))]
     (println version)
     (if-bb-cli
