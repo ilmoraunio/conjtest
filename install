@@ -81,6 +81,8 @@ case "$(uname -m)" in
 esac
 
 case "$OS-$platform" in
+    linux-arm64) filename="conjtest-${version}-linux-arm64.tar.gz"
+	         ;;
     linux-x86_64) filename="conjtest-${version}-linux-x86_64.tar.gz"
 	          ;;
     macos-arm64) filename="conjtest-${version}-macos-arm64.zip"
