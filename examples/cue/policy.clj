@@ -3,7 +3,7 @@
 (defn deny-apps-not-using-v1
   [input]
   (let [api-version (:apiVersion input)
-        name (-> input :metadata :name)]
+        name (get-in input [:metadata :name])]
     (when-not (= api-version "apps/v1")
       (format "apiVersion must be apps/v1 in '%s'" name))))
 
@@ -24,6 +24,6 @@
 
 (defn deny-no-images-tagged
   [input]
-  (let [containers (-> input :spec :template :spec :containers)]
+  (let [containers (get-in input [:spec :template :spec :containers])]
     (when-not (seq (filter #(clojure.string/ends-with? (:image %) ":latest") containers))
       "No images tagged latest")))
