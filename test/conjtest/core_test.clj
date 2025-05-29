@@ -173,15 +173,13 @@
         (testing "pass"
           (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
                  (conjtest-test ["test-resources/valid.yaml"]
-                                ["test-resources/conjtest/example_local_require.clj"]
-                                "--config" "test.conjtest.edn"))))
+                                ["test-resources/conjtest/example_local_require.clj"]))))
         (testing "failure"
           (is (= {:exit 1,
                   :out [[{:type "FAIL", :file "test-resources/invalid.yaml", :rule "allow-allowlisted-selector-only", :message ":conjtest/rule-validation-failed"}]
                         {:tests 1, :passed 0, :warnings 0, :failures 1}]}
                  (conjtest-test ["test-resources/invalid.yaml"]
-                                ["test-resources/conjtest/example_local_require.clj"]
-                                "--config" "test.conjtest.edn"))))))
+                                ["test-resources/conjtest/example_local_require.clj"]))))))
     (testing "--trace"
       (testing "triggered"
         (is (= ["deny-my-absolute-bare-rule"
