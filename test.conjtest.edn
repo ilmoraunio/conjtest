@@ -1,1 +1,2 @@
-{:paths ["test-resources/"]}
+{:paths ["test-resources/"]
+ :keywordize? true}

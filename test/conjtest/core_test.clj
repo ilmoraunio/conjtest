@@ -30,7 +30,7 @@
 
 (defn conjtest-test
   [inputs policies & extra-args]
-  (select-keys (apply conjtest-test* inputs policies extra-args) [:exit :out]))
+  (select-keys (apply conjtest-test* inputs policies (into ["--config" "test.conjtest.edn"] extra-args)) [:exit :out]))
 
 (defn conjtest-parse
   [inputs & extra-args]
