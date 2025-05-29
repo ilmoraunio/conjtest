@@ -460,7 +460,7 @@
                 :out [[{:type "FAIL",
                         :file "examples/json/package.json",
                         :rule "deny-caret-ranges",
-                        :message "caret ranges not allowed, offending library: [\"express\" \"^4.17.3\"]"}]
+                        :message "caret ranges not allowed, offending library: [:express \"^4.17.3\"]"}]
                       {:tests 1, :passed 0, :warnings 0, :failures 1}]}
                (conjtest-test ["examples/json/package.json"]
                               ["examples/json/policy_go.clj"]
