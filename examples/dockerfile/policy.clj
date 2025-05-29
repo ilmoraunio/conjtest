@@ -6,11 +6,11 @@
 (defn deny-unallowed-commands
   [input]
   (distinct (for [dockerfile input
-                  command dockerfile
-                  value (get command "Value")
+                  {:keys [Cmd] :as command} dockerfile
+                  value (:Value command)
                   re cmd-denylist
                   :let [eval-result (re-find re value)]
-                  :when (and (= "run" (get command "Cmd"))
+                  :when (and (= "run" Cmd)
                              (not (nil? eval-result)))]
               (format "unallowed command found '%s'" value))))
 
@@ -20,10 +20,10 @@
 (defn deny-unallowed-images
   [input]
   (for [dockerfile input
-        command dockerfile
-        value (get command "Value")
+        {:keys [Cmd] :as command} dockerfile
+        value (:Value command)
         re image-denylist
         :let [eval-result (re-find re value)]
-        :when (and (= "from" (get command "Cmd"))
+        :when (and (= "from" Cmd)
                    (not (nil? eval-result)))]
     (format "unallowed image found '%s'" value)))
