@@ -75,15 +75,31 @@
       (mapcat (comp vals :ns-publics) ns-publics-all))))
 
 (defn parse
-  [args {:keys [go-parsers-only parser] :as _opts}]
-  (apply
-    (cond
-      (and (some? parser)
-           (some? go-parsers-only)) (partial api/parse-go-as parser)
-      (some? go-parsers-only) api/parse-go
-      (some? parser) (partial api/parse-as parser)
-      :else api/parse)
-    args))
+  [args {:keys [go-parsers-only parser config] :as _opts}]
+  (let [keywordize? (some-> config slurp edn/read-string :keywordize?)]
+    (apply
+      (cond
+        (and (some? parser)
+             (some? go-parsers-only))
+        (if (some? keywordize?)
+          (partial api/parse-go-as* {:keywordize? keywordize?} parser)
+          (partial api/parse-go-as parser))
+
+        (some? go-parsers-only)
+        (if (some? keywordize?)
+          (partial api/parse-go* {:keywordize? keywordize?})
+          api/parse-go)
+
+        (some? parser)
+        (if (some? keywordize?)
+          (partial api/parse-as* {:keywordize? keywordize?} parser)
+          (partial api/parse-as parser))
+
+        :else
+        (if (some? keywordize?)
+          (partial api/parse* {:keywordize? keywordize?})
+          api/parse))
+      args)))
 
 (defn test!
   [inputs {:keys [policy trace] :as opts}]
