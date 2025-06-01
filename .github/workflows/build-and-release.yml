@@ -31,7 +31,7 @@ jobs:
         uses: DeLaGuardo/setup-clojure@13.0
         with:
           cli: 1.11.3.1463
-          bb: 1.3.190
+          bb: 1.12.200
       - name: Build conjtest
         run: |
           bb uberjar target/conjtest.jar -m conjtest.bb.main
@@ -69,7 +69,7 @@ jobs:
         uses: DeLaGuardo/setup-clojure@13.0
         with:
           cli: 1.11.3.1463
-          bb: 1.3.190
+          bb: 1.12.200
       - name: Build conjtest
         run: |
           bb uberjar target/conjtest.jar -m conjtest.bb.main
@@ -107,7 +107,7 @@ jobs:
         uses: DeLaGuardo/setup-clojure@13.0
         with:
           cli: 1.11.3.1463
-          bb: 1.3.190
+          bb: 1.12.200
       - name: Build conjtest
         run: |
           bb uberjar target/conjtest.jar -m conjtest.bb.main
