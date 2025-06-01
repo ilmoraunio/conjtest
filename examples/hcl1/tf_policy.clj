@@ -2,5 +2,5 @@
 
 (defn deny-no-resources
   [input]
-  (when (empty? (get input "resource"))
+  (when (empty? (:resource input))
     (format "could not find any resources in: %s" input)))

@@ -15,31 +15,31 @@
 (defn deny-python2.7
   [input]
   (when (get-in input
-                ["Resources"
-                 "LambdaFunction"
-                 "Properties"
-                 "Runtime"])
+                [:Resources
+                 :LambdaFunction
+                 :Properties
+                 :Runtime])
     "python2.7 runtime not allowed"))
 
 (defn deny-denylisted-runtimes
   [input]
   (let [runtime (get-in input
-                        ["Resources"
-                         "LambdaFunction"
-                         "Properties"
-                         "Runtime"])]
+                        [:Resources
+                         :LambdaFunction
+                         :Properties
+                         :Runtime])]
     (when (contains? runtime-denylist runtime)
       (format "'%s' runtime not allowed" runtime))))
 
 (defn deny-excessive-action-permissions
   [input]
-  (let [policies (get-in input ["Resources"
-                                "LambdaFunction"
-                                "Properties"
-                                "Policies"])]
-    (when (not-empty (filter (fn [{statements "Statement"}]
-                               (some (fn [{actions "Action"
-                                           effect "Effect"}]
+  (let [policies (get-in input [:Resources
+                                :LambdaFunction
+                                :Properties
+                                :Policies])]
+    (when (not-empty (filter (fn [{statements :Statement}]
+                               (some (fn [{actions :Action
+                                           effect :Effect}]
                                        (and (= effect "Allow")
                                             (ends-with? denylist actions)))
                                      statements)) policies))
@@ -47,13 +47,13 @@
 
 (defn deny-excessive-resource-permissions
   [input]
-  (let [policies (get-in input ["Resources"
-                                "LambdaFunction"
-                                "Properties"
-                                "Policies"])]
-    (when (not-empty (filter (fn [{statements "Statement"}]
-                               (some (fn [{resources "Resource"
-                                           effect "Effect"}]
+  (let [policies (get-in input [:Resources
+                                :LambdaFunction
+                                :Properties
+                                :Policies])]
+    (when (not-empty (filter (fn [{statements :Statement}]
+                               (some (fn [{resources :Resource
+                                           effect :Effect}]
                                        (and (= effect "Allow")
                                             (ends-with? denylist resources)))
                                      statements)) policies))
@@ -61,10 +61,10 @@
 
 (defn deny-sensitive-environment-variables
   [input]
-  (let [variables (get-in input ["Resources"
-                                "LambdaFunction"
-                                "Properties"
-                                "Environment"
-                                "Variables"])]
+  (let [variables (get-in input [:Resources
+                                 :LambdaFunction
+                                 :Properties
+                                 :Environment
+                                 :Variables])]
     (when (seq (filter (fn [x] (some (fn [y] (re-find y x)) sensitive-denylist)) variables))
       "Sensitive data not allowed in environment variables")))

@@ -79,7 +79,10 @@
           ["conjtest test deployment.yaml --policy policy.clj --config conjtest.edn"]
           []
           ["Config file can be provided to support local file requires via `:paths`. Eg:"]
-          ["{:paths [\"util/\"]}"]]
+          ["{:paths [\"util/\"]}"]
+          []
+          ["For keyworded keys, include `:keywordize?` in config file. Eg:"]
+          ["{:keywordize? true}"]]
    :spec {:config {:coerce :string
                    :alias :c
                    :desc "Filepath to configuration file"
@@ -120,8 +123,19 @@
           ["Examples:"]
           ["conjtest parse deployment.yaml"]
           ["conftest parse hocon.conf --parser hocon"]
-          ["conjtest parse deps.edn --parser edn --go-parsers-only"]]
-   :spec {:go-parsers-only {:coerce :boolean
+          ["conjtest parse deps.edn --parser edn --go-parsers-only"]
+          ["conjtest parse Dockerfile --config conjtest.edn"]
+          []
+          ["For keyworded keys, include `:keywordize?` in config file. Eg:"]
+          ["{:keywordize? true}"]]
+   :spec {:config {:coerce :string
+                   :alias :c
+                   :desc "Filepath to configuration file"
+                   :default nil
+                   :default-desc ""
+                   :validate {:pred (complement empty?)
+                              :ex-msg "--config must be non-empty string"}}
+          :go-parsers-only {:coerce :boolean
                             :alias :go
                             :desc "Use Go-based parsers only"}
           :help {:coerce :boolean
@@ -130,7 +144,7 @@
                    :desc "Use specific parser to parse files. Supported parsers: cue, dockerfile, edn, hcl1, hcl2, hocon, ignore, ini, json, jsonnet, properties, spdx, toml, vcl, xml, yaml, dotenv"
                    :validate {:pred (complement empty?)
                               :ex-msg (constantly "--parser must be non-empty string")}}}
-   :restrict [:go-parsers-only :help :parser]})
+   :restrict [:config :go-parsers-only :help :parser]})
 
 (defn test
   [args]
