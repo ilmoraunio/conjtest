@@ -13,7 +13,36 @@ This project uses [Break Versioning][breakver]. The version numbers follow a
 
 [breakver]: https://github.com/ptaoussanis/encore/blob/master/BREAK-VERSIONING.md
 
-## 0.0.3-SNAPSHOT
+## 0.0.3
+
+- Support keyworded keys via `keywordize?` [#4](https://github.com/ilmoraunio/conjtest/pull/4)
+  - Enables keyworded keys for parsed data results. This allows for more
+    idiomatic access to Clojure data structures inside policies.
+
+```clojure
+$ cat conjtest.edn
+{:keywordize? true}
+
+$ conjtest parse examples/hcl2/terraform.tf --config conjtest.edn
+{:resource
+ {:aws_alb_listener
+  {:my-alb-listener [{:port "80", :protocol "HTTP"}]},
+  :aws_db_security_group {:my-group [{}]},
+  :aws_s3_bucket
+  {:valid
+   [{:acl "private",
+     :bucket "validBucket",
+     :tags {:environment "prod", :owner "devops"}}]},
+  :aws_security_group_rule
+  {:my-rule [{:cidr_blocks ["0.0.0.0/0"], :type "ingress"}]},
+  :azurerm_managed_disk
+  {:source [{:encryption_settings [{:enabled false}]}]}}}
+```
+
+- BREAKING: Upgrade ilmoraunio/conftest to 0.1.0 [#5](https://github.com/ilmoraunio/conjtest/pull/5)
+  - The output of HCL2 changes slightly. See [open-policy-agent/conftest#1074](https://github.com/open-policy-agent/conftest/pull/1074) and [open-policy-agent/conftest#1006](https://github.com/open-policy-agent/conftest/issues/1006) for more info.
+- Bump babashka dependency to 1.12.200 [d55dbc7](https://github.com/ilmoraunio/conjtest/commit/d55dbc7d60dadc3a2cf1a5d8c58ae649eea58c24)
+- ci: bump DeLaGuardo/setup-clojure to 13.2 [0ae518a](https://github.com/ilmoraunio/conjtest/commit/0ae518a7948a0aca76b83a88157f2754aa34cf8c)
 
 ## 0.0.2
 
