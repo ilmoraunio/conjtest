@@ -2,13 +2,15 @@
 
 (defn deny-http
   [input]
-  (for [[alb-listener-name alb-listener] (get-in input [:resource :aws_alb_listener])
+  (for [[alb-listener-name alb-listeners] (get-in input [:resource :aws_alb_listener])
+        alb-listener alb-listeners
         :when (= "HTTP" (:protocol alb-listener))]
     (format "ALB listener '%s' is using HTTP rather than HTTPS" alb-listener-name)))
 
 (defn deny-fully-open-ingress
   [input]
-  (for [[rule-name security-group-rule] (get-in input [:resource :aws_security_group_rule])
+  (for [[rule-name security-group-rules] (get-in input [:resource :aws_security_group_rule])
+        security-group-rule security-group-rules
         cidr-block (:cidr_blocks security-group-rule)
         :when (and (= "ingress" (:type security-group-rule))
                    (= "0.0.0.0/0" cidr-block))]
@@ -16,8 +18,9 @@
 
 (defn deny-unencrypted-azure-disk
   [input]
-  (for [[disk-name disk] (get-in input [:resource :azurerm_managed_disk])
-        :let [encryption-settings (:encryption_settings disk)]
+  (for [[disk-name disks] (get-in input [:resource :azurerm_managed_disk])
+        disk disks
+        encryption-settings (:encryption_settings disk)
         :when (not (true? (:enabled encryption-settings)))]
     (format "Azure disk '%s' is not encrypted" disk-name)))
 
@@ -26,7 +29,8 @@
 (defn deny-missing-tags
   [input]
   (sort (for [[resource-type resources] (:resource input)
-              [resource-name resource-definition] resources
+              [resource-name resource-definitions] resources
+              resource-definition resource-definitions
               :let [tags (into #{} (keys (:tags resource-definition)))
                     missing-tags (clojure.set/difference
                                    (clojure.set/union tags required-tags)
