@@ -13,7 +13,7 @@ This project uses [Break Versioning][breakver]. The version numbers follow a
 
 [breakver]: https://github.com/ptaoussanis/encore/blob/master/BREAK-VERSIONING.md
 
-## 0.0.3
+## 0.1.0
 
 - Support keyworded keys via `keywordize?` [#4](https://github.com/ilmoraunio/conjtest/pull/4)
   - Enables keyworded keys for parsed data results. This allows for more
