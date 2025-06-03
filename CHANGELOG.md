@@ -37,6 +37,18 @@ $ conjtest parse examples/hcl2/terraform.tf --config conjtest.edn
   {:my-rule [{:cidr_blocks ["0.0.0.0/0"], :type "ingress"}]},
   :azurerm_managed_disk
   {:source [{:encryption_settings [{:enabled false}]}]}}}
+
+$ conjtest test examples/hcl2/terraform.tf -p examples/hcl2/policy.clj --config conjtest.edn
+FAIL - examples/hcl2/terraform.tf - deny-fully-open-ingress - ASG rule ':my-rule' defines a fully open ingress
+FAIL - examples/hcl2/terraform.tf - deny-http - ALB listener ':my-alb-listener' is using HTTP rather than HTTPS
+FAIL - examples/hcl2/terraform.tf - deny-missing-tags - AWS resource: :aws_alb_listener named ':my-alb-listener' is missing required tags: #{:environment :owner}
+FAIL - examples/hcl2/terraform.tf - deny-missing-tags - AWS resource: :aws_db_security_group named ':my-group' is missing required tags: #{:environment :owner}
+FAIL - examples/hcl2/terraform.tf - deny-missing-tags - AWS resource: :aws_security_group_rule named ':my-rule' is missing required tags: #{:environment :owner}
+FAIL - examples/hcl2/terraform.tf - deny-unencrypted-azure-disk - Azure disk ':source' is not encrypted
+
+4 tests, 0 passed, 0 warnings, 4 failures
+
+# See policy definitions at: https://github.com/ilmoraunio/conjtest/blob/main/examples/hcl2/policy.clj
 ```
 
 - BREAKING: Upgrade ilmoraunio/conftest to 0.1.0 [#5](https://github.com/ilmoraunio/conjtest/pull/5)
