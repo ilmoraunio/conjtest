@@ -29,9 +29,14 @@
       (str/replace #"_" "-")
       symbol))
 
+(defn slurp-if-exists
+  [filename]
+  (when (fs/exists? filename)
+    (slurp filename)))
+
 (defn namespace->source
   [config-filename]
-  (let [deps-paths (some-> config-filename slurp edn/read-string :paths)
+  (let [deps-paths (some-> config-filename slurp-if-exists edn/read-string :paths)
         source-m (->> deps-paths
                       (mapcat #(fs/glob % "**{.clj,.cljc,.bb}"))
                       (map str)
@@ -76,7 +81,7 @@
 
 (defn parse
   [args {:keys [go-parsers-only parser config] :as _opts}]
-  (let [keywordize? (some-> config slurp edn/read-string :keywordize?)]
+  (let [keywordize? (some-> config slurp-if-exists edn/read-string :keywordize?)]
     (apply
       (cond
         (and (some? parser)

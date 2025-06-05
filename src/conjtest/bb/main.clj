@@ -86,7 +86,7 @@
    :spec {:config {:coerce :string
                    :alias :c
                    :desc "Filepath to configuration file"
-                   :default nil
+                   :default "conjtest.edn"
                    :default-desc ""
                    :validate {:pred (complement empty?)
                               :ex-msg "--config must be non-empty string"}}
@@ -131,7 +131,7 @@
    :spec {:config {:coerce :string
                    :alias :c
                    :desc "Filepath to configuration file"
-                   :default nil
+                   :default "conjtest.edn"
                    :default-desc ""
                    :validate {:pred (complement empty?)
                               :ex-msg "--config must be non-empty string"}}
