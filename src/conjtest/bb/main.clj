@@ -85,8 +85,8 @@
           ["{:keywordize? true}"]]
    :spec {:config {:coerce :string
                    :alias :c
-                   :desc "Filepath to configuration file"
-                   :default "conjtest.edn"
+                   :desc "Filepath to configuration file. Defaults to conjtest.edn in current dir."
+                   :default "./conjtest.edn"
                    :default-desc ""
                    :validate {:pred (complement empty?)
                               :ex-msg "--config must be non-empty string"}}
@@ -130,8 +130,8 @@
           ["{:keywordize? true}"]]
    :spec {:config {:coerce :string
                    :alias :c
-                   :desc "Filepath to configuration file"
-                   :default "conjtest.edn"
+                   :desc "Filepath to configuration file. Defaults to conjtest.edn in current dir."
+                   :default "./conjtest.edn"
                    :default-desc ""
                    :validate {:pred (complement empty?)
                               :ex-msg "--config must be non-empty string"}}
