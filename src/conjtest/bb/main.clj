@@ -67,6 +67,18 @@
               (filter (partial = ""))
               (some identity)))))
 
+(def init-cli-spec
+  {:desc [["Creates a default conjtest.edn configuration file"]
+          []
+          ["Usage:"]
+          ["conjtest init"]
+          []
+          ["Config file defaults:"]
+          [":keywordize? true (enables keyworded keys for all parse outputs)"]]
+   :spec {:help {:coerce :boolean
+                 :alias :h}}
+   :restrict [:help]})
+
 (def test-cli-spec
   {:desc [["Tests configuration files against Clojure policies"]
           []
@@ -149,29 +161,32 @@
    :restrict [:config :go-parsers-only :help :parser]})
 
 (defn init
-  []
-  (let [filename "conjtest.edn"
-        default-conjtest "{:keywordize? true}"]
-    (if-not (fs/exists? filename)
-      (do
-        (println "Creating conjtest.edn...")
-        (try
-          (spit filename default-conjtest)
-          (catch Exception e
+  [args]
+  (let [{:keys [args opts] :as m} (cli/parse-args args init-cli-spec)]
+    (if (or (:help opts) (:h opts))
+      (println (show-help init-cli-spec))
+      (let [filename "conjtest.edn"
+            default-conjtest "{:keywordize? true}"]
+        (if-not (fs/exists? filename)
+          (do
+            (println "Creating conjtest.edn...")
+            (try
+              (spit filename default-conjtest)
+              (catch Exception e
+                (if-bb-cli
+                  (do
+                    (println "Something went wrong")
+                    (System/exit 1))
+                  (throw e))))
+            (println "Done!")
             (if-bb-cli
-              (do
-                (println "Something went wrong")
-                (System/exit 1))
-              (throw e))))
-        (println "Done!")
-        (if-bb-cli
-          (System/exit 0)
-          nil))
-      (do
-        (println (format "File '%s' already exists" filename))
-        (if-bb-cli
-          (System/exit 1)
-          (throw (ex-info "existing file" {:filename filename})))))))
+              (System/exit 0)
+              nil))
+          (do
+            (println (format "File '%s' already exists" filename))
+            (if-bb-cli
+              (System/exit 1)
+              (throw (ex-info "existing file" {:filename filename})))))))))
 
 (defn test
   [args]
@@ -225,7 +240,7 @@
         args (rest args)]
     (case command
       :help (println (show-help))
-      :init (init)
+      :init (init args)
       :test (test args)
       :parse (parse args)
       :repl (repl/-main)
