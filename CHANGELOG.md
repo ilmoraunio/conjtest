@@ -13,7 +13,46 @@ This project uses [Break Versioning][breakver]. The version numbers follow a
 
 [breakver]: https://github.com/ptaoussanis/encore/blob/master/BREAK-VERSIONING.md
 
-## 0.1.1-SNAPSHOT
+## 0.2.0-SNAPSHOT
+
+- Add default `--config` value [#8](https://github.com/ilmoraunio/conjtest/pull/8)
+- Add `conjtest init` command [#9](https://github.com/ilmoraunio/conjtest/pull/9)
+
+### Highlights
+
+This version offers a way to handle all parse outputs as fully keywordized by
+default using `conjtest init` (which will initialize a new config file
+`conjtest.edn` to current directory) & default `--config` value `conjtest.edn`
+(which allows conjtest to implicitly transform keys as keywords).
+
+```
+$ conjtest init # creates conjtest.edn with default config, eg. `{:keywordize? true}`
+Creating conjtest.edn...
+Done!
+$ conjtest parse examples/hcl2/terraform.tf # using keyworded keys implicitly
+{:resource
+ {:aws_db_security_group {:my-group [{}]},
+  :aws_s3_bucket
+  {:valid
+   [{:acl "private",
+     :bucket "validBucket",
+     :tags {:environment "prod", :owner "devops"}}]},
+  :aws_security_group_rule
+  {:my-rule [{:cidr_blocks ["0.0.0.0/0"], :type "ingress"}]},
+  :azurerm_managed_disk
+  {:source [{:encryption_settings [{:enabled false}]}]},
+  :aws_alb_listener
+  {:my-alb-listener [{:port "80", :protocol "HTTP"}]}}}
+$ conjtest test examples/hcl2/terraform.tf -p examples/hcl2/policy.clj # using keyworded keys implicitly
+FAIL - examples/hcl2/terraform.tf - deny-fully-open-ingress - ASG rule ':my-rule' defines a fully open ingress
+FAIL - examples/hcl2/terraform.tf - deny-http - ALB listener ':my-alb-listener' is using HTTP rather than HTTPS
+FAIL - examples/hcl2/terraform.tf - deny-missing-tags - AWS resource: :aws_alb_listener named ':my-alb-listener' is missing required tags: #{:environment :owner}
+FAIL - examples/hcl2/terraform.tf - deny-missing-tags - AWS resource: :aws_db_security_group named ':my-group' is missing required tags: #{:environment :owner}
+FAIL - examples/hcl2/terraform.tf - deny-missing-tags - AWS resource: :aws_security_group_rule named ':my-rule' is missing required tags: #{:environment :owner}
+FAIL - examples/hcl2/terraform.tf - deny-unencrypted-azure-disk - Azure disk ':source' is not encrypted
+
+4 tests, 0 passed, 0 warnings, 4 failures
+```
 
 ## 0.1.0
 
