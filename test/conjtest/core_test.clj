@@ -1,5 +1,6 @@
 (ns conjtest.core-test
-  (:require [babashka.process :refer [shell process exec]]
+  (:require [babashka.fs :as fs]
+            [babashka.process :refer [shell process exec]]
             [conjtest.bb.api :as api]
             [clojure.test :refer [deftest is testing]]))
 
@@ -8,6 +9,19 @@
 (defn copy
   [m k new-k f & args]
   (merge m {new-k (apply f (get m k) args)}))
+
+(defn conjtest-init
+  []
+  (-> (apply shell (-> [{:out :string, :err :string, :continue true}
+                        "./conjtest"
+                        "init"]))
+      (copy :out :out-original identity)
+      (select-keys [:exit :out])))
+
+(defn remove-conjtest-edn
+  []
+  (try (fs/delete "conjtest.edn")
+       (catch Exception _)))
 
 (defn conjtest-test*
   [inputs policies & extra-args]
@@ -93,6 +107,15 @@
                (ex-data e)))))))
 
 (deftest cli-test
+  (testing "conjtest init"
+    (testing "when file does not exist, it gets created"
+      (is (= {:exit 0, :out "Creating conjtest.edn...\nDone!\n"} (conjtest-init)))
+      (remove-conjtest-edn))
+    (testing "when conjtest.edn exists, it doesn't get overwritten"
+      (spit "conjtest.edn" "")
+      (is (= {:exit 1, :out "File 'conjtest.edn' already exists\n"} (conjtest-init)))
+      (is (zero? (count (slurp "conjtest.edn"))))
+      (remove-conjtest-edn)))
   (testing "conjtest test"
     (testing "allow rule"
       (testing "fails when rule returns false"
