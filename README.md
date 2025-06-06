@@ -153,6 +153,7 @@ EOF
 ```
 
 ```
+conjtest init
 conjtest test my-ingress.yaml -p policy.clj
 ```
 
