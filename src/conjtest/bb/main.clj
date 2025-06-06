@@ -1,5 +1,6 @@
 (ns conjtest.bb.main
   (:require [babashka.cli :as cli]
+            [babashka.fs :as fs]
             [babashka.tasks :as tasks]
             [clojure.string :as str]
             [clojure.pprint :as pprint]
@@ -31,6 +32,7 @@
   ([]
    ;; root-level help
    (let [command-rows (cli/pad-cells [["help" " " "Show available commands"]
+                                      ["init" " " "Creates a default conjtest.edn configuration file"]
                                       ["test" " " "Tests configuration files against Clojure policies"]
                                       ["parse" " " "Parses configuration files and prints them out as Clojure data structures"]
                                       ["repl" " " "Opens up a nREPL session inside conjtest allowing"]
@@ -64,6 +66,18 @@
               (map str/trim)
               (filter (partial = ""))
               (some identity)))))
+
+(def init-cli-spec
+  {:desc [["Creates a default conjtest.edn configuration file"]
+          []
+          ["Usage:"]
+          ["conjtest init"]
+          []
+          ["Config file defaults:"]
+          [":keywordize? true (enables keyworded keys for all parse outputs)"]]
+   :spec {:help {:coerce :boolean
+                 :alias :h}}
+   :restrict [:help]})
 
 (def test-cli-spec
   {:desc [["Tests configuration files against Clojure policies"]
@@ -146,6 +160,34 @@
                               :ex-msg (constantly "--parser must be non-empty string")}}}
    :restrict [:config :go-parsers-only :help :parser]})
 
+(defn init
+  [args]
+  (let [{:keys [args opts] :as m} (cli/parse-args args init-cli-spec)]
+    (if (or (:help opts) (:h opts))
+      (println (show-help init-cli-spec))
+      (let [filename "conjtest.edn"
+            default-conjtest "{:keywordize? true}"]
+        (if-not (fs/exists? filename)
+          (do
+            (println "Creating conjtest.edn...")
+            (try
+              (spit filename default-conjtest)
+              (catch Exception e
+                (if-bb-cli
+                  (do
+                    (println "Something went wrong")
+                    (System/exit 1))
+                  (throw e))))
+            (println "Done!")
+            (if-bb-cli
+              (System/exit 0)
+              nil))
+          (do
+            (println (format "File '%s' already exists" filename))
+            (if-bb-cli
+              (System/exit 1)
+              (throw (ex-info "existing file" {:filename filename})))))))))
+
 (defn test
   [args]
   (let [{:keys [args opts] :as m} (cli/parse-args args test-cli-spec)]
@@ -198,6 +240,7 @@
         args (rest args)]
     (case command
       :help (println (show-help))
+      :init (init args)
       :test (test args)
       :parse (parse args)
       :repl (repl/-main)
