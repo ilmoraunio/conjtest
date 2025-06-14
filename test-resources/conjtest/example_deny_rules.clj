@@ -29,3 +29,9 @@
   (and (= "v1" (:apiVersion input))
        (= "Service" (:kind input))
        (not= 80 (-> input :spec :ports first :port))))
+
+(def deny-malli-rule
+  [:map
+   [:apiVersion [:= "v1"]]
+   [:kind [:= "Service"]]
+   [:spec [:map [:ports [:+ [:map [:port [:not= 80]]]]]]]])
