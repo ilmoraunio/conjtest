@@ -374,11 +374,15 @@
                           ["examples/dotenv/policy.clj"]))))
   (testing "EDN"
     (testing "clojure parser"
-      (is (= {:exit 1, :out [[{:type "FAIL"
+      (is (= {:exit 1, :out [[{:type "FAIL",
+                               :file "examples/edn/sample_config.edn",
+                               :rule "allow-declarative-example",
+                               :message "[\"Applications in the production environment should have error only logging\"]"}
+                              {:type "FAIL"
                                :file "examples/edn/sample_config.edn",
                                :rule "deny-incorrect-log-level-production",
                                :message "Applications in the production environment should have error only logging"}]
-                             {:tests 2, :passed 1, :warnings 0, :failures 1}]}
+                             {:tests 3, :passed 1, :warnings 0, :failures 2}]}
              (conjtest-test ["examples/edn/sample_config.edn"]
                             ["examples/edn/policy.clj"])
              (conjtest-test ["examples/edn/sample_config.edn"]
