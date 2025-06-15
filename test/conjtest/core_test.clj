@@ -332,13 +332,17 @@
     (is (= {:exit 1,
          :out [[{:type "FAIL",
                  :file "examples/cue/deployment.cue",
+                 :rule "allow-declarative-example",
+                 :message "{:spec {:template {:spec {:containers [{:ports [{:containerPort [\"should be 8080.0\"]}]}]}}}}"}
+                {:type "FAIL",
+                 :file "examples/cue/deployment.cue",
                  :rule "deny-no-images-tagged",
                  :message "No images tagged latest"}
                 {:type "FAIL",
                  :file "examples/cue/deployment.cue",
                  :rule "deny-ports-outside-of-8080",
                  :message "The image port should be 8080 in deployment.cue. you have: [8081.0]"}]
-               {:tests 4, :passed 2, :warnings 0, :failures 2}]}
+               {:tests 5, :passed 2, :warnings 0, :failures 3}]}
         (conjtest-test ["examples/cue/deployment.cue"]
                        ["examples/cue/policy.clj"]))))
   (testing "Dockerfile"
