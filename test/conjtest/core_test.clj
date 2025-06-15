@@ -359,7 +359,17 @@
            (conjtest-test ["examples/dockerfile/Dockerfile"]
                           ["examples/dockerfile/policy.clj"]))))
   (testing "Dotenv"
-    (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
+    (is (= {:exit 1,
+            :out [[{:type "FAIL",
+                    :file "examples/dotenv/sample.env",
+                    :rule "allow-declarative-example",
+                    :message "{:APP_NAME [\"APP_NAME must be set\"], :MYSQL_USER [\"MYSQL_USER should not be root\"]}"}
+                   {:type "FAIL", :file "examples/dotenv/sample.env", :rule "deny-empty-app-name", :message "APP_NAME must be set"}
+                   {:type "FAIL",
+                    :file "examples/dotenv/sample.env",
+                    :rule "deny-root-user",
+                    :message "MYSQL_USER should not be root"}]
+                  {:tests 3, :passed 0, :warnings 0, :failures 3}]}
            (conjtest-test ["examples/dotenv/sample.env"]
                           ["examples/dotenv/policy.clj"]))))
   (testing "EDN"
