@@ -403,7 +403,7 @@
                             "--go-parsers-only"
                             "--parser" "edn")))))
   (testing "HCL"
-    (is (= {:exit 0, :out [[] {:tests 1, :passed 1, :warnings 0, :failures 0}]}
+    (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
            (conjtest-test ["examples/hcl1/gke.tf"]
                           ["examples/hcl1/tf_policy.clj"])))
     (is (= {:exit 1,
