@@ -22,6 +22,21 @@
     (when-not (every? (partial = 8080.0) ports)
       (format "The image port should be 8080 in deployment.cue. you have: %s" ports))))
 
+(def allow-port-8080-for-deployments
+  [:map
+   [:apiVersion [:= "apps/v1"]]
+   [:kind [:= "Deployment"]]
+   [:spec
+    [:map
+     [:template
+      [:map
+       [:spec
+        [:map
+         [:containers
+          [:vector
+           [:map
+            [:ports [:vector [:map [:containerPort [:= 8080.0]]]]]]]]]]]]]]])
+
 (defn deny-no-images-tagged
   [input]
   (let [containers (get-in input [:spec :template :spec :containers])]
