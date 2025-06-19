@@ -496,9 +496,30 @@
     (is (= {:exit 1,
             :out [[{:type "FAIL",
                     :file "examples/ini/grafana.ini",
+                    :rule "allow-declarative-example",
+                    :message "{:alerting {:enabled [\"Alerting should turned on\"]}, :auth.basic {:enabled [\"Basic auth should be enabled\"]}, :server {:http_port [\"Port should be 3000\"], :protocol [\"Should use https\"]}, :users {:allow_sign_up [\"Users cannot sign up themselves\"]}}"}
+                   {:type "FAIL",
+                    :file "examples/ini/grafana.ini",
+                    :rule "deny-alerting-disabled",
+                    :message "Alerting should turned on"}
+                   {:type "FAIL",
+                    :file "examples/ini/grafana.ini",
+                    :rule "deny-allow-sign-up",
+                    :message "Users cannot sign up themselves"}
+                   {:type "FAIL",
+                    :file "examples/ini/grafana.ini",
+                    :rule "deny-basic-auth-disabled",
+                    :message "Basic auth should be enabled"}
+                   {:type "FAIL",
+                    :file "examples/ini/grafana.ini",
+                    :rule "deny-incorrect-port",
+                    :message "Grafana port should be 3000"}
+                   {:type "FAIL", :file "examples/ini/grafana.ini", :rule "deny-server-protocol", :message "Should use https"}
+                   {:type "FAIL",
+                    :file "examples/ini/grafana.ini",
                     :rule "deny-verify-email-disabled",
                     :message "Users should verify their e-mail address"}]
-                  {:tests 6, :passed 5, :warnings 0, :failures 1}]}
+                  {:tests 7, :passed 0, :warnings 0, :failures 7}]}
            (conjtest-test ["examples/ini/grafana.ini"]
                           ["examples/ini/policy.clj"]))))
   (testing "JSON"
