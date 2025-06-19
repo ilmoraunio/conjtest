@@ -422,6 +422,10 @@
     (is (= {:exit 1,
             :out [[{:type "FAIL",
                     :file "examples/hcl2/terraform.tf",
+                    :rule "allow-declarative-example",
+                    :message "{:resource {:aws_alb_listener {:my-alb-listener [{:protocol [\"AWS ALB listener should use 'HTTPS' protocol\"]}]}, :aws_security_group_rule {:my-rule [{:cidr_blocks [\"CIDR block cannot be fully open\"]}]}, :azurerm_managed_disk {:source [{:encryption_settings [{:enabled [\"Disk must be encrypted\"]}]}]}}}"}
+                   {:type "FAIL",
+                    :file "examples/hcl2/terraform.tf",
                     :rule "deny-fully-open-ingress",
                     :message "ASG rule ':my-rule' defines a fully open ingress"}
                    {:type "FAIL",
@@ -444,7 +448,7 @@
                     :file "examples/hcl2/terraform.tf",
                     :rule "deny-unencrypted-azure-disk",
                     :message "Azure disk ':source' is not encrypted"}]
-                  {:tests 4, :passed 0, :warnings 0, :failures 4}]}
+                  {:tests 5, :passed 0, :warnings 0, :failures 5}]}
            (conjtest-test ["examples/hcl2/terraform.tf"]
                           ["examples/hcl2/policy.clj"]))))
   (testing "HOCON"
