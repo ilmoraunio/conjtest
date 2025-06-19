@@ -567,9 +567,13 @@
     (is (= {:exit 1,
             :out [[{:type "FAIL",
                     :file "examples/jsonnet/arith.jsonnet",
+                    :rule "allow-declarative-example",
+                    :message "{:concat_array [\"should have at most 3 elements\"]}"}
+                   {:type "FAIL",
+                    :file "examples/jsonnet/arith.jsonnet",
                     :rule "deny-concat-array",
                     :message "Concat array should be less than 3"}]
-                  {:tests 2, :passed 1, :warnings 0, :failures 1}]}
+                  {:tests 3, :passed 1, :warnings 0, :failures 2}]}
            (conjtest-test ["examples/jsonnet/arith.jsonnet"]
                           ["examples/jsonnet/policy.clj"]))))
   (testing "Properties"
