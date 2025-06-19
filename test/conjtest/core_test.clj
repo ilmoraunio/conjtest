@@ -577,7 +577,15 @@
            (conjtest-test ["examples/jsonnet/arith.jsonnet"]
                           ["examples/jsonnet/policy.clj"]))))
   (testing "Properties"
-    (is (= {:exit 0, :out [[] {:tests 2, :passed 2, :warnings 0, :failures 0}]}
+    (is (= {:exit 1, :out [[{:type "FAIL",
+                             :file "examples/properties/sample.properties",
+                             :rule "allow-declarative-example",
+                             :message "{:other.value.url [\"Must start with 'https://'\"]}"}
+                            {:type "FAIL",
+                             :file "examples/properties/sample.properties",
+                             :rule "deny-invalid-uri",
+                             :message "Invalid value: 'http://example.com/'. Must start with 'https://...'"}]
+                           {:tests 3, :passed 1, :warnings 0, :failures 2}]}
            (conjtest-test ["examples/properties/sample.properties"]
                           ["examples/properties/policy.clj"]))))
   (testing "Spdx"
