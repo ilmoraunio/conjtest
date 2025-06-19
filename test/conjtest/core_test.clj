@@ -451,9 +451,17 @@
     (is (= {:exit 1,
             :out [[{:type "FAIL",
                     :file "examples/hocon/hocon.conf",
+                    :rule "allow-declarative-example",
+                    :message "{:play {:server {:http {:port [\"Play http server port should be 9000\"], :address [\"Play http server bind address should be 0.0.0.0\"]}}}}"}
+                   {:type "FAIL",
+                    :file "examples/hocon/hocon.conf",
+                    :rule "deny-http-bind-address",
+                    :message "Play http server bind address should be 0.0.0.0"}
+                   {:type "FAIL",
+                    :file "examples/hocon/hocon.conf",
                     :rule "deny-wrong-port",
                     :message "Play http server port should be 9000"}]
-                  {:tests 2, :passed 1, :warnings 0, :failures 1}]}
+                  {:tests 3, :passed 0, :warnings 0, :failures 3}]}
            (conjtest-test ["examples/hocon/hocon.conf"]
                           ["examples/hocon/policy.clj"]
                           "--parser" "hocon")
