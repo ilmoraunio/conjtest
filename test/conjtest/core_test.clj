@@ -592,9 +592,13 @@
     (is (= {:exit 1,
             :out [[{:type "FAIL",
                     :file "examples/spdx/sbom.spdx",
+                    :rule "allow-declarative-example",
+                    :message "{:dataLicense [\"Data license should be 'correct-license', but found 'conftest-demo'\"]}"}
+                   {:type "FAIL",
+                    :file "examples/spdx/sbom.spdx",
                     :rule "deny-incorrect-license",
-                    :message "DataLicense should be 'correct-license', but found 'conftest-demo'"}]
-                  {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+                    :message "Data license should be 'correct-license', but found 'conftest-demo'"}]
+                  {:tests 2, :passed 0, :warnings 0, :failures 2}]}
            (conjtest-test ["examples/spdx/sbom.spdx"]
                           ["examples/spdx/policy.clj"]))))
   (testing "TOML"
