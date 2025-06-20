@@ -619,9 +619,17 @@
     (is (= {:exit 1,
             :out [[{:type "FAIL",
                     :file "examples/vcl/varnish.vcl",
+                    :rule "allow-declarative-example",
+                    :message "{:acl {:purge [\"should be either \\\"127.0.0.1\\\" or \\\"localhost\\\"\"]}, :backend {:app {:port [\"should be \\\"8080\\\"\"]}}}"}
+                   {:type "FAIL",
+                    :file "examples/vcl/varnish.vcl",
                     :rule "deny-incorrect-port",
-                    :message "default backend port should be 8080"}]
-                  {:tests 2, :passed 1, :warnings 0, :failures 1}]}
+                    :message "default backend port should be 8080"}
+                   {:type "FAIL",
+                    :file "examples/vcl/varnish.vcl",
+                    :rule "deny-purge-list",
+                    :message "acl purge should be one of [\"127.0.0.1\" \"localhost\"], was 192.168.0.1 instead"}]
+                  {:tests 3, :passed 0, :warnings 0, :failures 3}]}
            (conjtest-test ["examples/vcl/varnish.vcl"]
                           ["examples/vcl/policy.clj"]))))
   (testing "XML"

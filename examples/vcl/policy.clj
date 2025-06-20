@@ -12,3 +12,14 @@
   [input]
   (when (not= "8080" (get-in input [:backend :app :port]))
     "default backend port should be 8080"))
+
+(def allow-declarative-example
+  [:map
+   [:acl
+    [:map
+     [:purge [:enum "127.0.0.1" "localhost"]]]]
+   [:backend
+    [:map
+     [:app
+      [:map
+       [:port [:= "8080"]]]]]]])
