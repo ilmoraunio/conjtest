@@ -544,9 +544,13 @@
         (is (= {:exit 1,
                 :out [[{:type "FAIL",
                         :file "examples/json/package.json",
+                        :rule "allow-declarative-example",
+                        :message "{:dependencies {:express [\"caret ranges not allowed, offending library: ^4.17.3\"]}}"}
+                       {:type "FAIL",
+                        :file "examples/json/package.json",
                         :rule "deny-caret-ranges",
                         :message "caret ranges not allowed, offending library: [:express \"^4.17.3\"]"}]
-                      {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+                      {:tests 2, :passed 0, :warnings 0, :failures 2}]}
                (conjtest-test ["examples/json/package.json"]
                               ["examples/json/policy_go.clj"]
                               "--go-parsers-only")
