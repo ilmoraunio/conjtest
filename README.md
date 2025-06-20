@@ -168,6 +168,50 @@ FAIL - my-ingress.yaml - deny-*-cors - CORS is too permissive
 1 tests, 0 passed, 0 warnings, 1 failures
 ```
 
+### Declarative policies
+
+You can also get started using declarative policies which are just
+[malli](https://github.com/metosin/malli) schemas.
+
+```clojure
+cat <<EOF > my-ingress.yaml
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+  name: service-a
+  namespace: foobar
+EOF
+
+cat <<EOF > policy.clj
+(ns policy)
+
+(def allow-non-*-cors
+  [:map
+   [:metadata
+    [:map
+     [:annotations
+      [:map
+       [:nginx.ingress.kubernetes.io/cors-allow-origin [:not= {:error/message "CORS is too permissive"} "*"]]]]]]])
+EOF
+```
+
+```
+conjtest init
+conjtest test my-ingress.yaml -p policy.clj
+```
+
+Output:
+
+```
+$ conjtest test my-ingress.yaml -p policy.clj
+FAIL - my-ingress.yaml - allow-non-*-cors - {:metadata {:annotations {:nginx.ingress.kubernetes.io/cors-allow-origin ["CORS is too permissive"]}}}
+
+1 tests, 0 passed, 0 warnings, 1 failures
+```
+
 ## Documentation
 
 - [User Guide](https://user-guide.conjtest.org)

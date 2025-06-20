@@ -13,7 +13,61 @@ This project uses [Break Versioning][breakver]. The version numbers follow a
 
 [breakver]: https://github.com/ptaoussanis/encore/blob/master/BREAK-VERSIONING.md
 
-## 0.2.1-SNAPSHOT
+## 0.3.0-SNAPSHOT
+
+- Support declarative policies via malli schemas [#10](https://github.com/ilmoraunio/conjtest/pull/10)
+
+### Highlights
+
+It's now possible to define **declarative** policies using
+[malli](https://github.com/metosin/malli) schemas. Malli schemas are evaluated
+using
+[`malli.core/validate`](https://github.com/metosin/malli?tab=readme-ov-file#validation),
+after which they are processed for any errors using
+[`malli.core/explain`](https://github.com/metosin/malli?tab=readme-ov-file#error-messages)
+and
+[`malli.error/humanize`](https://github.com/metosin/malli?tab=readme-ov-file#humanized-error-messages).
+
+Example:
+
+```clojure
+cat <<EOF > my-ingress.yaml
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+  name: service-a
+  namespace: foobar
+EOF
+
+cat <<EOF > policy.clj
+(ns policy)
+
+(def allow-non-*-cors
+  [:map
+   [:metadata
+    [:map
+     [:annotations
+      [:map
+       [:nginx.ingress.kubernetes.io/cors-allow-origin [:not= {:error/message "CORS is too permissive"} "*"]]]]]]])
+EOF
+```
+
+```
+conjtest init
+conjtest test my-ingress.yaml -p policy.clj
+```
+
+Output:
+
+```
+$ conjtest test my-ingress.yaml -p policy.clj
+FAIL - my-ingress.yaml - allow-non-*-cors - {:metadata {:annotations {:nginx.ingress.kubernetes.io/cors-allow-origin ["CORS is too permissive"]}}}
+
+1 tests, 0 passed, 0 warnings, 1 failures
+```
 
 ## 0.2.0
 
