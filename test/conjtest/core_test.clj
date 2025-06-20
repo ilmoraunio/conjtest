@@ -668,26 +668,34 @@
         (is (= {:exit 1,
                 :out [[{:type "FAIL",
                         :file "examples/yaml/kubernetes/deployment.yaml",
+                        :rule "allow-declarative-example",
+                        :message "{:spec {:selector {:matchLabels {:release [\"missing required key\"]}}, :template {:spec {:securityContext {:runAsNonRoot [\"Containers must not run as root\"]}}}}}"}
+                       {:type "FAIL",
+                        :file "examples/yaml/kubernetes/deployment.yaml",
                         :rule "deny-missing-required-deployment-selectors",
                         :message "Deployment \"hello-kubernetes\" must provide app/release labels for pod selectors"}
                        {:type "FAIL",
                         :file "examples/yaml/kubernetes/deployment.yaml",
                         :rule "deny-should-not-run-as-root",
                         :message "Containers must not run as root in Deployment \"hello-kubernetes\""}]
-                      {:tests 2, :passed 0, :warnings 0, :failures 2}]}
+                      {:tests 3, :passed 0, :warnings 0, :failures 3}]}
                (conjtest-test ["examples/yaml/kubernetes/deployment.yaml"]
                               ["examples/yaml/kubernetes/policy.clj"]))))
       (testing "go parser"
         (is (= {:exit 1,
                 :out [[{:type "FAIL",
                         :file "examples/yaml/kubernetes/deployment.yaml",
+                        :rule "allow-declarative-example",
+                        :message "{:spec {:selector {:matchLabels {:release [\"missing required key\"]}}, :template {:spec {:securityContext {:runAsNonRoot [\"Containers must not run as root\"]}}}}}"}
+                       {:type "FAIL",
+                        :file "examples/yaml/kubernetes/deployment.yaml",
                         :rule "deny-missing-required-deployment-selectors",
                         :message "Deployment \"hello-kubernetes\" must provide app/release labels for pod selectors"}
                        {:type "FAIL",
                         :file "examples/yaml/kubernetes/deployment.yaml",
                         :rule "deny-should-not-run-as-root",
                         :message "Containers must not run as root in Deployment \"hello-kubernetes\""}]
-                      {:tests 2, :passed 0, :warnings 0, :failures 2}]}
+                      {:tests 3, :passed 0, :warnings 0, :failures 3}]}
                (conjtest-test ["examples/yaml/kubernetes/deployment.yaml"]
                               ["examples/yaml/kubernetes/policy_go.clj"]
                               "--go-parsers-only")))))
