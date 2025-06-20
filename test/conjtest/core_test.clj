@@ -602,9 +602,13 @@
       (is (= {:exit 1,
               :out [[{:type "FAIL",
                       :file "examples/toml/traefik/traefik.toml",
+                      :rule "allow-declarative-example",
+                      :message "{:entryPoints {:http {:tls {:cipherSuites [\"should be \\\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\\\"\"]}}}}"}
+                     {:type "FAIL",
+                      :file "examples/toml/traefik/traefik.toml",
                       :rule "deny-disallowed-ciphers",
                       :message "Following ciphers are not allowed: [\"TLS_RSA_WITH_AES_256_GCM_SHA384\"]"}]
-                    {:tests 1, :passed 0, :warnings 0, :failures 1}]}
+                    {:tests 2, :passed 0, :warnings 0, :failures 2}]}
              (conjtest-test ["examples/toml/traefik/traefik.toml"]
                             ["examples/toml/traefik/policy.clj"])))))
   (testing "VCL"
