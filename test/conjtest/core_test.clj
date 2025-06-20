@@ -636,9 +636,21 @@
     (is (= {:exit 1,
             :out [[{:type "FAIL",
                     :file "examples/xml/pom.xml",
+                    :rule "allow-declarative-example",
+                    :message "{:project {:build {:plugins {:plugin [{:version [\"incorrect maven-compiler-plugin version '3.0', should be '2.5.1'\"]} {:executions {:execution {:goals {:goal [\"activejdbc-instrumentation plugin must have 'instrument' goal\"]}}}} nil {:version [\"incorrect maven-surefire-plugin version '3.0.0', should be '2.18.1'\"]}]}}}}"}
+                   {:type "FAIL",
+                    :file "examples/xml/pom.xml",
                     :rule "deny-incorrect-compiler-plugin-version",
-                    :message "maven-compiler-plugin must have the following version: 3.6.1"}]
-                  {:tests 3, :passed 2, :warnings 0, :failures 1}]}
+                    :message "maven-compiler-plugin must have the following version: 2.5.1"}
+                   {:type "FAIL",
+                    :file "examples/xml/pom.xml",
+                    :rule "deny-incorrect-surefire-plugin-version",
+                    :message "maven-surefire-plugin must have the following version: 2.18.1"}
+                   {:type "FAIL",
+                    :file "examples/xml/pom.xml",
+                    :rule "deny-missing-instrument-goal",
+                    :message "activejdbc-instrumentation plugin must have 'instrument' goal"}]
+                  {:tests 4, :passed 0, :warnings 0, :failures 4}]}
            (conjtest-test ["examples/xml/pom.xml"]
                           ["examples/xml/policy.clj"])))
     (testing "CycloneDX"
