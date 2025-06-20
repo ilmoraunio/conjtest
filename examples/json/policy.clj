@@ -10,5 +10,5 @@
   [:map
    [:dependencies [:map-of :keyword [:re
                                      {:error/fn (fn [{:keys [value]} _]
-                                                  (format "caret ranges not allowed, offending library: %s" value))}
-                                     "^[0-9~(>=)(latest)(beta)]"]]]])
+                                                  (format "caret ranges not allowed, version found: %s" value))}
+                                     "^[0-9~]|latest|beta|>="]]]])

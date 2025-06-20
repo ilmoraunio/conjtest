@@ -529,7 +529,7 @@
                 :out [[{:type "FAIL",
                         :file "examples/json/package.json",
                         :rule "allow-declarative-example",
-                        :message "{:dependencies {:express [\"caret ranges not allowed, offending library: ^4.17.3\"]}}"}
+                        :message "{:dependencies {:express [\"caret ranges not allowed, version found: ^4.17.3\"]}}"}
                        {:type "FAIL",
                         :file "examples/json/package.json",
                         :rule "deny-caret-ranges",
@@ -545,7 +545,7 @@
                 :out [[{:type "FAIL",
                         :file "examples/json/package.json",
                         :rule "allow-declarative-example",
-                        :message "{:dependencies {:express [\"caret ranges not allowed, offending library: ^4.17.3\"]}}"}
+                        :message "{:dependencies {:express [\"caret ranges not allowed, version found: ^4.17.3\"]}}"}
                        {:type "FAIL",
                         :file "examples/json/package.json",
                         :rule "deny-caret-ranges",
