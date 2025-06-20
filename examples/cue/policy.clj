@@ -27,3 +27,18 @@
   (let [containers (get-in input [:spec :template :spec :containers])]
     (when-not (seq (filter #(clojure.string/ends-with? (:image %) ":latest") containers))
       "No images tagged latest")))
+
+(def allow-declarative-example
+  [:map
+   [:apiVersion [:= "apps/v1"]]
+   [:kind [:= "Deployment"]]
+   [:spec
+    [:map
+     [:template
+      [:map
+       [:spec
+        [:map
+         [:containers
+          [:vector
+           [:map
+            [:ports [:vector [:map [:containerPort [:= 8080.0]]]]]]]]]]]]]]])

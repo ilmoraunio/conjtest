@@ -9,3 +9,8 @@
   [input]
   (when (not (true? (:obj_member input)))
     "Object member should be true"))
+
+(def allow-declarative-example
+  [:map
+   [:obj_member [:= true]]
+   [:concat_array [:vector {:max 3} :double]]])

@@ -29,3 +29,9 @@
   (and (= "v1" (:apiVersion input))
        (= "Service" (:kind input))
        (= 80 (-> input :spec :ports first :port))))
+
+(def allow-malli-rule
+  [:map
+   [:apiVersion [:= "v1"]]
+   [:kind [:= "Service"]]
+   [:spec [:map [:ports [:+ [:map [:port [:= 80]]]]]]]])

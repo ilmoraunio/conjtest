@@ -1,2 +1,3 @@
 {:deps {org.clojure/clojure {:mvn/version "1.12.0"}
-        ilmoraunio/conjtest-clj {:local/root "../conjtest-clj"}}}
+        ilmoraunio/conjtest-clj {:mvn/version "0.4.0"
+                                 #_#_:local/root "../conjtest-clj"}}}

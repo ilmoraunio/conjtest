@@ -17,8 +17,8 @@
 
 (defn deny-server-protocol
   [input]
-  (when (not= "http" (get-in input [:server :protocol]))
-    "Grafana should use default http"))
+  (when (not= "https" (get-in input [:server :protocol]))
+    "Should use https"))
 
 (defn deny-allow-sign-up
   [input]
@@ -29,3 +29,14 @@
   [input]
   (when (not (true? (get-in input [:users :verify_email_enabled])))
     "Users should verify their e-mail address"))
+
+(def allow-declarative-example
+  [:map
+   [:alerting [:map [:enabled [:= {:error/message "Alerting should turned on"} true]]]]
+   [:auth.basic [:map [:enabled [:= {:error/message "Basic auth should be enabled"} true]]]]
+   [:server [:map
+             [:http_port [:= {:error/message "Port should be 3000"} 3000.0]]
+             [:protocol [:= {:error/message "Should use https"} "https"]]]]
+   [:users [:map
+            [:allow_sign_up [:= {:error/message "Users cannot sign up themselves"} false]]
+            [:verify_email_enabled [:= {:error/message "Users should verify their e-mail address"} false]]]]])

@@ -41,3 +41,15 @@
                   resource-type
                   resource-name
                   missing-tags))))
+
+(def allow-declarative-example
+  [:map
+   [:resource
+    [:map
+     [:aws_alb_listener [:map-of :keyword
+                         [:vector [:map [:protocol [:= {:error/message "AWS ALB listener should use 'HTTPS' protocol"} "HTTPS"]]]]]]
+     [:aws_security_group_rule [:map-of :keyword
+                                [:vector [:map [:cidr_blocks [:not= {:error/message "CIDR block cannot be fully open"} ["0.0.0.0/0"]]]]]]]
+     [:azurerm_managed_disk [:map-of :keyword
+                             [:vector [:map
+                                       [:encryption_settings [:vector [:map [:enabled [:= {:error/message "Disk must be encrypted"} true]]]]]]]]]]]])
