@@ -1,6 +1,6 @@
 {:paths ["src" "pod-ilmoraunio-conjtest/src"]
- :deps {org.conjtest/conjtest-clj {#_#_:mvn/version "0.3.1"
-                                   :local/root "../conjtest-clj"}}
+ :deps {org.conjtest/conjtest-clj {:mvn/version "0.4.0"
+                                   #_#_:local/root "../conjtest-clj"}}
  :pods {ilmoraunio/conftest {:version "0.1.0"}}
  :tasks
  {test:bb {:extra-paths ["test" "test-resources"]
