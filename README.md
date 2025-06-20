@@ -37,6 +37,8 @@ Check [CHANGELOG.md](CHANGELOG.md) for any breaking changes.
 - Write and evaluate policies using [Clojure](https://clojure.org/),
   [babashka](https://github.com/babashka/babashka), and
   [SCI](https://github.com/babashka/sci).
+  - Support writing policies using pure functions or declaratively using
+    [malli](https://github.com/metosin/malli) schemas.
 - Provide self-contained binary for ease of use.
 - Support many common configuration file formats. Supported file formats:
   - CUE
