@@ -16,6 +16,7 @@ This project uses [Break Versioning][breakver]. The version numbers follow a
 ## 0.3.0-SNAPSHOT
 
 - Support declarative policies via malli schemas [#10](https://github.com/ilmoraunio/conjtest/pull/10)
+- upgrade babashka to 1.12.203 + minor sci fix [2beb82a](https://github.com/ilmoraunio/conjtest/commit/2beb82a0f1170d70431f2f03883ad6799f8cff71)
 
 ### Highlights
 
