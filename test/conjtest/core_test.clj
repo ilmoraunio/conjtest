@@ -23,6 +23,13 @@
   (try (fs/delete "conjtest.edn")
        (catch Exception _)))
 
+(defn conjtest*
+  [& args]
+  (-> (apply shell (-> [{:out :string, :err :string, :continue true}
+                        "./conjtest"]
+                       (into args)))
+      (select-keys [:exit :out])))
+
 (defn conjtest-test*
   [inputs policies & extra-args]
   (assert (and (coll? inputs) (not-empty inputs)))
@@ -107,15 +114,30 @@
                (ex-data e)))))))
 
 (deftest cli-test
-  (testing "conjtest init"
-    (testing "when file does not exist, it gets created"
-      (is (= {:exit 0, :out "Creating conjtest.edn...\nDone!\n"} (conjtest-init)))
-      (remove-conjtest-edn))
-    (testing "when conjtest.edn exists, it doesn't get overwritten"
-      (spit "conjtest.edn" "")
-      (is (= {:exit 1, :out "File 'conjtest.edn' already exists\n"} (conjtest-init)))
-      (is (zero? (count (slurp "conjtest.edn"))))
-      (remove-conjtest-edn)))
+  (testing "help"
+    (testing "conjtest help"
+      (is (re-find #"Test your configuration files using Clojure!"
+                   (:out (conjtest* "help")))))
+    (testing "conjtest parse --help"
+      (is (re-find #"Parses configuration files and prints them out as Clojure data structures"
+                   (:out (conjtest* "parse" "--help")))))
+    (testing "conjtest test --help"
+      (is (re-find #"Tests configuration files against Clojure policies"
+                   (:out (conjtest* "test" "--help")))))
+    (testing "unsupported options"
+      (is (re-find #"Parses configuration files and prints them out as Clojure data structures"
+                   (:out (conjtest* "parse" "--foo"))))
+      (is (re-find #"Tests configuration files against Clojure policies"
+                   (:out (conjtest* "test" "--foo")))))
+    (testing "conjtest init"
+      (testing "when file does not exist, it gets created"
+        (is (= {:exit 0, :out "Creating conjtest.edn...\nDone!\n"} (conjtest-init)))
+        (remove-conjtest-edn))
+      (testing "when conjtest.edn exists, it doesn't get overwritten"
+        (spit "conjtest.edn" "")
+        (is (= {:exit 1, :out "File 'conjtest.edn' already exists\n"} (conjtest-init)))
+        (is (zero? (count (slurp "conjtest.edn"))))
+        (remove-conjtest-edn))))
   (testing "conjtest test"
     (testing "allow rule"
       (testing "fails when rule returns false"

@@ -162,7 +162,10 @@
 
 (defn init
   [args]
-  (let [{:keys [args opts] :as m} (cli/parse-args args init-cli-spec)]
+  (let [{:keys [args opts] :as m} (try (cli/parse-args args init-cli-spec)
+                                       (catch Exception e
+                                         (println (ex-message e))
+                                         {:opts {:help true}}))]
     (if (or (:help opts) (:h opts))
       (println (show-help init-cli-spec))
       (let [filename "conjtest.edn"
@@ -190,7 +193,10 @@
 
 (defn test
   [args]
-  (let [{:keys [args opts] :as m} (cli/parse-args args test-cli-spec)]
+  (let [{:keys [args opts] :as m} (try (cli/parse-args args test-cli-spec)
+                                       (catch Exception e
+                                         (println (ex-message e))
+                                         {:opts {:help true}}))]
     (if (or (:help opts) (:h opts) (empty? args))
       (println (show-help test-cli-spec))
       (try (println (:summary-report (conjtest.bb.api/test! args opts)))
@@ -208,7 +214,10 @@
 
 (defn parse
   [args]
-  (let [{:keys [args opts] :as _args} (cli/parse-args args parse-cli-spec)]
+  (let [{:keys [args opts] :as _args} (try (cli/parse-args args parse-cli-spec)
+                                           (catch Exception e
+                                             (println (ex-message e))
+                                             {:opts {:help true}}))]
     (if (or (:help opts) (:h opts) (empty? args))
       (println (show-help parse-cli-spec))
       (try (let [parsed (conjtest.bb.api/parse args opts)]
