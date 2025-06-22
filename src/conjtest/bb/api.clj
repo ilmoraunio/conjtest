@@ -74,7 +74,7 @@
       (sci-eval ctx policy))
     (let [user-defined-namespaces (remove (comp default-namespaces str)
                                           (sci/eval-string* ctx "(all-ns)"))
-          command (format "(map #(-> {:ns %% :ns-publics (ns-publics %%)}) [%s])"
+          command (format "(mapv #(-> {:ns %% :ns-publics (ns-publics %%)}) [%s])"
                           (str/join " " (mapv #(str "'" %) user-defined-namespaces)))
           ns-publics-all (sci/eval-string* ctx command)]
       (mapcat (comp vals :ns-publics) ns-publics-all))))
