@@ -25,7 +25,9 @@ Conjtest enables you to:
 
 ## Project status
 
+![GitHub CI](https://github.com/ilmoraunio/conjtest/actions/workflows/build-and-release.yml/badge.svg)
 [![Slack](https://img.shields.io/badge/slack-conjtest-orange.svg?logo=slack)](https://clojurians.slack.com/app_redirect?channel=conjtest)
+[![docs](https://img.shields.io/badge/conjtest-docs-blue)](https://user-guide.conjtest.org/)
 
 Project is **active** and in
 [alpha](https://kotlinlang.org/docs/components-stability.html#stability-levels-explained).
