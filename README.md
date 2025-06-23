@@ -91,7 +91,7 @@ chmod u+x install
 To install a specific version, you may provide `--version`.
 
 ```bash
-./install --version 0.2.0
+./install --version 0.3.0
 ```
 
 The full list of versions can be found from
@@ -107,7 +107,7 @@ binary to `usr/local/bin`.
 MacOS (arm64):
 
 ```bash
-curl -sL https://github.com/ilmoraunio/conjtest/releases/download/v0.2.0/conjtest-0.2.0-macos-arm64.zip -o conjtest.zip
+curl -sL https://github.com/ilmoraunio/conjtest/releases/download/v0.3.0/conjtest-0.3.0-macos-arm64.zip -o conjtest.zip
 unzip conjtest.zip conjtest
 sudo mv conjtest /usr/local/bin
 ```
@@ -115,7 +115,7 @@ sudo mv conjtest /usr/local/bin
 Linux (amd64):
 
 ```
-curl -sL https://github.com/ilmoraunio/conjtest/releases/download/v0.2.0/conjtest-0.2.0-linux-x86_64.tar.gz -o conjtest.tar.gz
+curl -sL https://github.com/ilmoraunio/conjtest/releases/download/v0.3.0/conjtest-0.3.0-linux-x86_64.tar.gz -o conjtest.tar.gz
 tar -xvzf conjtest.tar.gz conjtest
 sudo mv conjtest /usr/local/bin
 ```
@@ -123,7 +123,7 @@ sudo mv conjtest /usr/local/bin
 Linux (arm64):
 
 ```
-curl -sL https://github.com/ilmoraunio/conjtest/releases/download/v0.2.0/conjtest-0.2.0-linux-arm64.tar.gz -o conjtest.tar.gz
+curl -sL https://github.com/ilmoraunio/conjtest/releases/download/v0.3.0/conjtest-0.3.0-linux-arm64.tar.gz -o conjtest.tar.gz
 tar -xvzf conjtest.tar.gz conjtest
 sudo mv conjtest /usr/local/bin
 ```

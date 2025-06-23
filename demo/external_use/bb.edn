@@ -1,6 +1,6 @@
 {:paths ["."]
  :deps {org.conjtest/conjtest-clj {:mvn/version "0.4.0"}}
- :pods {ilmoraunio/conjtest {:version "0.1.0"}}
+ :pods {ilmoraunio/conjtest {:version "0.1.1"}}
  :tasks
  {:requires ([main])
   test (apply main/test *command-line-args*)}}
