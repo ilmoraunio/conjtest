@@ -60,11 +60,11 @@ Check [CHANGELOG.md](CHANGELOG.md) for any breaking changes.
   - VCL
   - XML
   - YAML
-- Support custom Policy-as-Code tooling using Babashka by publishing
+- Support custom Policy-as-Code scripting/tooling via
   [pod-ilmoraunio-conjtest](https://github.com/ilmoraunio/pod-ilmoraunio-conjtest)
   (which enables you to parse various configuration file formats) and
   [conjtest-clj](https://github.com/ilmoraunio/conjtest-clj) library (allows
-  you to evaluate functions or malli schemas against parsed structures).
+  you to evaluate functions or malli schemas against parsed data structures).
 - Linux and macOS
 
 ## Installation
