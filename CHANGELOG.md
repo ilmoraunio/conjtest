@@ -15,6 +15,8 @@ This project uses [Break Versioning][breakver]. The version numbers follow a
 
 ## 0.3.1-SNAPSHOT
 
+- docs: add mise installation instructions [9322a6e](https://github.com/ilmoraunio/conjtest/commit/9322a6efd5a7609b0ccd9959068acf4f71c0fa10)
+
 ## 0.3.0
 
 - Support declarative policies via malli schemas [#10](https://github.com/ilmoraunio/conjtest/pull/10)
