@@ -72,6 +72,17 @@ Check [CHANGELOG.md](CHANGELOG.md) for any breaking changes.
 You can install `conjtest` either using an installer script or by pulling the
 binary from [GitHub releases](https://github.com/ilmoraunio/conjtest/releases).
 
+### mise
+
+[mise](https://mise.jdx.dev/) is a development environment setup tool for linux
+and macOS.
+
+Install:
+
+```
+mise use ubi:ilmoraunio/conjtest@latest
+```
+
 ### Installer script
 
 Download & run the installer script using `bash`.
