@@ -35,7 +35,7 @@
                                       ["init" " " "Creates a default conjtest.edn configuration file"]
                                       ["test" " " "Tests configuration files against Clojure policies"]
                                       ["parse" " " "Parses configuration files and prints them out as Clojure data structures"]
-                                      ["repl" " " "Opens up a nREPL session inside conjtest allowing"]
+                                      ["repl" " " "Opens up a nREPL session"]
                                       ["version" " " "Print CLI version"]])
          rows (-> [["Test your configuration files using Clojure!"]
                    []
