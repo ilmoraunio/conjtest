@@ -2,6 +2,12 @@
 
 ## Build
 
+You'll need to download the sub-repositories before building.
+
+```
+git submodule update --init --recursive
+```
+
 ### macOS (AArch64)
 
 ```
