@@ -1,0 +1,10 @@
+{
+  "name": "conjtest-talk-2026",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "watch": "npx @marp-team/marp-cli -w presentation.md -o index.html",
+    "html": "npx @marp-team/marp-cli presentation.md -o index.html",
+    "pdf": "npx @marp-team/marp-cli presentation.md -o presentation.pdf"
+  }
+}
