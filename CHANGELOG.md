@@ -13,9 +13,12 @@ This project uses [Break Versioning][breakver]. The version numbers follow a
 
 [breakver]: https://github.com/ptaoussanis/encore/blob/master/BREAK-VERSIONING.md
 
-## 0.3.1-SNAPSHOT
+## 0.3.1
 
-- docs: add mise installation instructions [9322a6e](https://github.com/ilmoraunio/conjtest/commit/9322a6efd5a7609b0ccd9959068acf4f71c0fa10)
+- Upgrade ilmoraunio/conjtest & ilmoraunio/conftest to 0.1.2
+  [001b938](https://github.com/ilmoraunio/conjtest/commit/001b938d6a31b00a2a109a9ddb092798207b3f0b)
+- docs: add mise installation instructions
+  [9322a6e](https://github.com/ilmoraunio/conjtest/commit/9322a6efd5a7609b0ccd9959068acf4f71c0fa10)
 
 ## 0.3.0
 
