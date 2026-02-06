@@ -13,6 +13,8 @@ This project uses [Break Versioning][breakver]. The version numbers follow a
 
 [breakver]: https://github.com/ptaoussanis/encore/blob/master/BREAK-VERSIONING.md
 
+## 0.3.2-SNAPSHOT
+
 ## 0.3.1
 
 - Upgrade ilmoraunio/conjtest & ilmoraunio/conftest to 0.1.2
