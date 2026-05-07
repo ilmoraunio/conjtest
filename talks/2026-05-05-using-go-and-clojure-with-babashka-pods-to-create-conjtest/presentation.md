@@ -132,7 +132,7 @@ It also has a fast startup thanks to GraalVM compilation.
 
 ## What's Babashka?
 
-![](man-i-love-babashka.png)
+![](img/man-i-love-babashka.png)
 
 - Native Clojure interpreter for scripting with fast startup (uses GraalVM under the hood)
 - Allows you to use Clojure in places where you would be using bash otherwise
