@@ -320,7 +320,7 @@ We have a Babashka pod called pod-ilmoraunio-conjtest which uses some Clojure pa
 Finally, the pods and the rule engine is published separately as a set of libraries which allows for custom scripting through Babashka.
 -->
 
-![](dependencies.png)
+![](img/dependencies.png)
 
 - conjtest (x86 & arm64 binaries)
 - conjtest-clj, pod-ilmoraunio-conjtest, pod-ilmoraunio-conftest are published separately as libraries/pods
